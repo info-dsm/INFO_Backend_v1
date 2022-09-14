@@ -1,6 +1,6 @@
 package com.info.info_v1_backend.global.image.entity
 
-import com.info.info_v1_backend.global.base.entity.BaseTimeEntity
+import com.info.info_v1_backend.global.base.entity.BaseAuthorEntity
 import com.info.info_v1_backend.global.image.entity.type.FileType
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -12,9 +12,9 @@ import javax.persistence.Id
 class File(
     fileKey: String,
     fileType: FileType,
-    extention: String
+    extension: String
 
-): BaseTimeEntity() {
+): BaseAuthorEntity() {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null
@@ -27,8 +27,8 @@ class File(
     var fileType: FileType = fileType
         protected set
 
-    @Column(name = "extention", nullable = false)
-    var extention: String = extention
+    @Column(name = "extension", nullable = false)
+    var extention: String = extension
         protected set
 
 
