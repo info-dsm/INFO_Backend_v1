@@ -1,0 +1,16 @@
+package com.info.info_v1_backend.domain.company.data.entity.company
+
+import javax.persistence.Column
+import javax.persistence.Embeddable
+
+@Embeddable
+class Contactor(
+    @Column(name = "contactor_name", nullable = false)
+    var name: String,
+    @Column(name = "contactor_position", nullable = false)
+    var position: String,
+    @Column(name = "contactor_phone", nullable = false)
+    var phone: String
+) {
+
+}
