@@ -26,6 +26,8 @@ server:
   port: 8080
 
 datasource:
+  mongo:
+    url: mongodb+srv://${mongoUsername}:${mongoPassword}@cluster0.w2gs3nq.mongodb.net/?retryWrites=true&w=majority
 
 
 

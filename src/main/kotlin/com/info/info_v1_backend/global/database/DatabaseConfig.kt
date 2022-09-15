@@ -18,31 +18,21 @@ class DatabaseConfig(
     private val env: Environment
 ) {
     companion object {
-        const val READ_DATASOURCE = "readDatasource"
-        const val WRITE_DATASOURCE = "writeDatasource"
-        const val WRITE_JDBC_TEMPLATE = "writeJdbcTemplate"
+        const val MONGO_DB = "mongoDb"
+        const val MONGO_JDBC_TEMPLATE = "mongoJdbcTemplate"
     }
 
 
-    @Bean(name = [READ_DATASOURCE])
-    fun readDatasource(): DataSource {
-        return getDatasource(prop.read.driverClassName, prop.read.url, prop.read.userName, prop.read.password)
+    @Bean(name = [MONGO_DB])
+    fun getMongoDBSource(): DataSource {
+        return DataSourceBuilder.create()
+            .url(prop.mongo.url)
+            .build()
     }
 
     @PreDestroy
-    fun destroyReadDatasource() {
-        destroyDatasource(readDatasource())
-    }
-
-    @Bean(name = [WRITE_DATASOURCE])
-    fun writeDatasource(): DataSource {
-        return getDatasource(prop.write.driverClassName, prop.write.url, prop.write.userName, prop.write.password)
-    }
-
-
-    @PreDestroy
-    fun destroyWriteDatasource() {
-        destroyDatasource(writeDatasource())
+    fun destroyMongoDbSource() {
+        destroyDatasource(getMongoDBSource())
     }
 
     @Bean
@@ -60,20 +50,10 @@ class DatabaseConfig(
         destroyDatasource(defaultDatasource())
     }
 
-
-    private fun getDatasource(driverClassName: String, url: String, username: String, password: String): DataSource {
-        return DataSourceBuilder.create()
-            .driverClassName(driverClassName)
-            .url(url)
-            .username(username)
-            .password(password)
-            .build()
-    }
-
-    @Bean(name = [WRITE_JDBC_TEMPLATE])
+    @Bean(name = [MONGO_JDBC_TEMPLATE])
     @Primary
     fun jdbcTemplate(): JdbcTemplate {
-        val template = JdbcTemplate(writeDatasource())
+        val template = JdbcTemplate(getMongoDBSource())
         return template
     }
 
