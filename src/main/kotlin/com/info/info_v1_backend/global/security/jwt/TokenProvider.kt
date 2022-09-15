@@ -1,6 +1,5 @@
 package com.info.info_v1_backend.global.security.jwt
 
-import com.info.info_v1_backend.global.security.jwt.auth.CustomAuthDetails
 import com.info.info_v1_backend.global.security.jwt.auth.CustomAuthDetailsService
 import com.info.info_v1_backend.global.security.jwt.data.TokenResponse
 import com.info.info_v1_backend.global.security.jwt.env.JwtProperty
@@ -14,7 +13,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Component
-import java.time.LocalDateTime
 import java.util.*
 
 

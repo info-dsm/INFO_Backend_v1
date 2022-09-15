@@ -17,7 +17,6 @@ class MailUtil (
     private val mailProperty: MailProperty
 ) {
 
-
     fun sendHtmlMail(to: String, title: String, templatePath: String, models: Map<String, Any>) {
         val message: MimeMessage = jms.createMimeMessage()
         var context = Context()

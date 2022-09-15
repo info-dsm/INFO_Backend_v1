@@ -1,11 +1,9 @@
 package com.info.info_v1_backend.global.security.jwt
 
-import com.info.info_v1_backend.global.security.jwt.auth.CustomAuthDetails
 import com.info.info_v1_backend.global.security.jwt.auth.CustomAuthDetailsService
 import com.info.info_v1_backend.global.security.jwt.exception.InvalidTokenException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.filter.OncePerRequestFilter
 import javax.servlet.FilterChain
 import javax.servlet.http.HttpServletRequest
