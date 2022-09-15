@@ -6,7 +6,11 @@ plugins {
     kotlin("jvm") version "1.6.21"
     kotlin("plugin.spring") version "1.6.21"
     kotlin("plugin.jpa") version "1.6.21"
+    kotlin("kapt") version "1.6.21"
 }
+
+apply(plugin = "kotlin-kapt")
+
 
 group = "com.info"
 version = "0.0.1-SNAPSHOT"
@@ -68,7 +72,14 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-ui:1.6.11")
     //mongo
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
+    //queryDsl
+    implementation("com.querydsl:querydsl-jpa:5.0.0")
+    kapt("com.querydsl:querydsl-apt:5.0.0:jpa")
+    kapt("org.springframework.boot:spring-boot-configuration-processor")
+}
 
+sourceSets["main"].withConvention(org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet::class) {
+    kotlin.srcDir("$buildDir/generated/source/kapt/main")
 }
 
 tasks.withType<KotlinCompile> {

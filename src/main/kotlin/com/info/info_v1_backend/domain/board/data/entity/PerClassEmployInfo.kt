@@ -1,6 +1,6 @@
 package com.info.info_v1_backend.domain.board.data.entity
 
-import com.info.info_v1_backend.domain.board.data.type.ClassNum
+import com.info.info_v1_backend.domain.board.data.entity.type.ClassNum
 import javax.persistence.Column
 import javax.persistence.ElementCollection
 import javax.persistence.Embeddable
