@@ -67,7 +67,7 @@ dependencies {
     //spring-doc
     implementation("org.springdoc:springdoc-openapi-ui:1.6.11")
     //mongo
-    implementation ("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
+    implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
 
 }
 
