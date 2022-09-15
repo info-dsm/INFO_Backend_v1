@@ -1,6 +1,7 @@
 package com.info.info_v1_backend.domain.company.data.entity.notice
 
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
+import com.info.info_v1_backend.domain.company.data.entity.notice.embeddable.*
 import com.info.info_v1_backend.domain.company.data.entity.type.WorkTime
 import java.time.LocalDate
 import javax.persistence.CascadeType

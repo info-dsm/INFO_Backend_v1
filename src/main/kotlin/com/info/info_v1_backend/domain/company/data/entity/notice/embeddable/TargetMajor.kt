@@ -1,4 +1,4 @@
-package com.info.info_v1_backend.domain.company.data.entity.notice
+package com.info.info_v1_backend.domain.company.data.entity.notice.embeddable
 
 import com.info.info_v1_backend.domain.company.data.entity.type.MajorType
 import javax.persistence.Embeddable

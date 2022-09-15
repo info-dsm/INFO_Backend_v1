@@ -1,4 +1,4 @@
-package com.info.info_v1_backend.domain.company.data.entity.notice
+package com.info.info_v1_backend.domain.company.data.entity.notice.embeddable
 
 import javax.persistence.Column
 import javax.persistence.Embeddable
