@@ -66,6 +66,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     //spring-doc
     implementation("org.springdoc:springdoc-openapi-ui:1.6.11")
+    //mongo
+    implementation ("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
+
 }
 
 tasks.withType<KotlinCompile> {

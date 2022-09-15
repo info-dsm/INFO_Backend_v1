@@ -2,25 +2,17 @@ package com.info.info_v1_backend.global.batch.config
 
 import com.info.info_v1_backend.global.batch.data.entity.BatchPost
 import com.info.info_v1_backend.global.batch.data.entity.BatchWritePost
-import com.info.info_v1_backend.global.batch.data.mapper.IsTrueRowMapper
-import com.info.info_v1_backend.global.batch.data.mapper.PostRowMapper
 import com.info.info_v1_backend.global.batch.service.BatchProcessService
-import com.info.info_v1_backend.global.database.DatabaseConfiguration
+import com.info.info_v1_backend.global.database.DatabaseConfig
 import org.slf4j.LoggerFactory
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
-import org.springframework.batch.core.launch.JobLauncher
 import org.springframework.batch.core.launch.support.RunIdIncrementer
-import org.springframework.batch.core.launch.support.SimpleJobLauncher
-import org.springframework.batch.core.repository.JobRepository
-import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean
 import org.springframework.batch.item.ItemProcessor
 import org.springframework.batch.item.ItemWriter
-import org.springframework.batch.item.database.JdbcBatchItemWriter
 import org.springframework.batch.item.database.JdbcCursorItemReader
-import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder
 import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
@@ -32,7 +24,7 @@ import org.springframework.jdbc.core.JdbcTemplate
 class JobConfiguration(
     private val jobBuilderFactory: JobBuilderFactory,
     private val stepBuilderFactory: StepBuilderFactory,
-    private val dbSource: DatabaseConfiguration,
+    private val dbSource: DatabaseConfig,
     @Qualifier("writeJdbcTemplate")
     private val writeJdbcTemplate: JdbcTemplate,
     private val batchProcessService: BatchProcessService

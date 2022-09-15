@@ -24,8 +24,8 @@ sealed class Project(
     creationList: MutableList<Creation>,
     developTeam: Team,
     codeLinkList: MutableList<String>,
-    tagList: MutableList<String>
-
+    tagList: MutableList<String>,
+    projectStatus: ProjectStatus
 ): BaseAuthorEntity() {
 
     @Id
@@ -59,7 +59,7 @@ sealed class Project(
         protected set
 
     @Column(name = "project_status")
-    var status: ProjectStatus = ProjectStatus.WAITING
+    var status: ProjectStatus = projectStatus
         protected set
 
 }

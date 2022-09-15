@@ -1,6 +1,7 @@
 package com.info.info_v1_backend.domain.project.data.entity.project
 
 import com.info.info_v1_backend.domain.project.data.entity.Creation
+import com.info.info_v1_backend.domain.project.data.entity.type.ProjectStatus
 import com.info.info_v1_backend.domain.team.data.Team
 import javax.persistence.Column
 import javax.persistence.DiscriminatorValue
@@ -32,7 +33,8 @@ class RegisteredProject(
     creationList,
     developTeam,
     codeLinkList,
-    tagList
+    tagList,
+    ProjectStatus.WAITING
 ) {
 
     var purpose: String = purpose
