@@ -1,4 +1,4 @@
-package com.info.info_v1_backend.domain.employment.data.type
+package com.info.info_v1_backend.domain.board.data.type
 
 enum class ClassNum(
     number: Int
