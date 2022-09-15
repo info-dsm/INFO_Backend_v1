@@ -13,13 +13,15 @@ import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
+import javax.persistence.MapsId
+import javax.persistence.OneToMany
 
 @Entity
 @DiscriminatorColumn(name = "project_type")
 sealed class Project(
     name: String,
     shortContent: String,
-    developerList: MutableList<Student>,
+    creationList: MutableList<Creation>,
     developTeam: Team,
     codeLinkList: MutableList<String>,
     tagList: MutableList<String>
@@ -37,8 +39,8 @@ sealed class Project(
     @Column(name = "project_short_content", nullable = false)
     var shortContent: String = shortContent
 
-//    @
-//    var developerList: MutableList<Student> = developerList
+    @OneToMany(mappedBy = "project")
+    var creationList: MutableList<Creation> = creationList
 
     @ManyToOne(cascade = [CascadeType.REMOVE])
     @JoinColumn(name = "team_id")
