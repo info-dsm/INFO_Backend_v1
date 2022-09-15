@@ -3,6 +3,9 @@ package com.info.info_v1_backend.domain.auth.data.entity.user
 import com.info.info_v1_backend.domain.auth.data.entity.type.Role
 import com.info.info_v1_backend.domain.team.data.Affiliation
 import com.info.info_v1_backend.global.base.entity.BaseTimeEntity
+import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.core.userdetails.UserDetails
 import javax.persistence.*
 
 
@@ -13,7 +16,7 @@ abstract class User(
     email: String,
     password: String,
     role: Role
-): BaseTimeEntity() {
+): BaseTimeEntity(), UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,14 +28,50 @@ abstract class User(
     var email: String = email
         protected set
 
-    var password: String = password
+    private var password: String = password
+
+    override fun getPassword(): String {
+        return this.password
+    }
+
+    @ElementCollection
+    var roleList: MutableList<Role> = ArrayList()
         protected set
 
-    var role: Role = role
+    var isDeleted: Boolean = false
         protected set
 
-    @OneToMany(cascade = [CascadeType.REMOVE])
-    var affiliation: MutableList<Affiliation> = ArrayList()
+    init {
+        this.roleList.add(role)
+    }
+
+    override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
+        var authorityList: MutableList<GrantedAuthority> = ArrayList()
+        this.roleList.map{
+            authorityList.add(SimpleGrantedAuthority(it.toString()))
+        }
+        return authorityList
+    }
+
+    override fun getUsername(): String {
+        return this.id.toString()
+    }
+    override fun isAccountNonLocked(): Boolean {
+        return this.roleList.contains(Role.BLOCK)
+    }
+
+    override fun isAccountNonExpired(): Boolean {
+        return !this.isDeleted
+    }
+
+    override fun isCredentialsNonExpired(): Boolean {
+        return false
+    }
+
+    override fun isEnabled(): Boolean {
+        return !this.isDeleted
+    }
+
 
 
 
