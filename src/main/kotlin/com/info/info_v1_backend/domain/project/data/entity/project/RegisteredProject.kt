@@ -1,4 +1,4 @@
-package com.info.info_v1_backend.domain.project.data.entity
+package com.info.info_v1_backend.domain.project.data.entity.project
 
 import com.info.info_v1_backend.domain.auth.data.entity.user.Student
 import com.info.info_v1_backend.domain.team.data.Team

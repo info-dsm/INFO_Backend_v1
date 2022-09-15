@@ -1,6 +1,6 @@
-package com.info.info_v1_backend.domain.project.data.entity
+package com.info.info_v1_backend.domain.project.data.entity.project
 
-import com.info.info_v1_backend.domain.auth.data.entity.user.Student
+import com.info.info_v1_backend.domain.project.data.entity.Creation
 import com.info.info_v1_backend.domain.team.data.Team
 import com.info.info_v1_backend.global.base.entity.BaseAuthorEntity
 import javax.persistence.CascadeType
@@ -13,7 +13,6 @@ import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
-import javax.persistence.MapsId
 import javax.persistence.OneToMany
 
 @Entity

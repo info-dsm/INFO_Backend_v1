@@ -1,4 +1,4 @@
-package com.info.info_v1_backend.domain.project.data.entity
+package com.info.info_v1_backend.domain.project.data.entity.project
 
 import javax.persistence.DiscriminatorValue
 import javax.persistence.Entity

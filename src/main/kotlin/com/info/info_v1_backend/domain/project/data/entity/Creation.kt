@@ -1,13 +1,13 @@
 package com.info.info_v1_backend.domain.project.data.entity
 
 import com.info.info_v1_backend.domain.auth.data.entity.user.Student
+import com.info.info_v1_backend.domain.project.data.entity.project.Project
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
-import javax.persistence.OneToMany
 
 @Entity
 class Creation(
