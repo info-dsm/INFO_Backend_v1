@@ -3,7 +3,6 @@ package com.info.info_v1_backend.global.batch.service
 import com.info.info_v1_backend.global.batch.config.JobConfiguration
 import com.info.info_v1_backend.global.batch.data.entity.BatchPost
 import com.info.info_v1_backend.global.batch.data.entity.BatchWritePost
-import com.info.info_v1_backend.global.database.DatabaseConfiguration
 import com.info.info_v1_backend.global.komoran.service.KomoranService
 import com.info.info_v1_backend.infra.alarm.AlarmService
 import com.info.info_v1_backend.infra.ncloud.clova.ClovaService

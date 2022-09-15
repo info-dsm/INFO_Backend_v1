@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration
 
 @OpenAPIDefinition(
     info = Info(
-        title = "DSQL-Backend-API-DOCS",
+        title = "Info-Backend-API-DOCS",
 
     )
 )

@@ -13,7 +13,7 @@ import javax.sql.DataSource
 
 
 @Configuration
-class DatabaseConfiguration(
+class DatabaseConfig(
     private val prop: DataSourceListProperty,
     private val env: Environment
 ) {

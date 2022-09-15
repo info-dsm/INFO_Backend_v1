@@ -1,1 +1,73 @@
+spring:
+  jpa:
+    database: mysql
+    hibernate:
+      ddl-auto: update
+    generate-ddl: true
+    show-sql: false
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+
+
+
+  datasource:
+    url: ${dbDefaultUrl}
+    username: ${dbDefaultUsername}
+    password: ${dbDefaultPw}
+    driver-class-name: ${dbDefaultDriver}
+  batch:
+    job:
+      enabled: false
+
+  redis:
+    host: ${redisHost}
+    port: 6379
+
+server:
+  port: 8080
+
+datasource:
+
+
+
+ncloud:
+  clientKey: ${ncloudClientKey}
+  secretKey: ${ncloudSecretKey}
+
+jwt:
+  secretKey: dafdsvdavads
+  accessExpiredAt: 86400
+  refreshExpiredAt: 604800
+cloud:
+  aws:
+    credentials:
+      access-key: ${S3_IAM_ACCESS_KEY}
+      secret-key: ${S3_IAM_SECRET_KEY}
+    region:
+      static: ${S3_REGION}
+    stack:
+      auto: false
+    s3:
+      bucketName: ${S3_BUCKET_NAME}
+
+
+springdoc:
+  swagger-ui:
+    path: /info-api-docs
+    operations-sorter: method
+    tags-sorter: method
+
+
+mail:
+  host: smtp.naver.com
+  port: 587
+  username: ${EMAIL_NAME}
+  password: ${EMAIL_PASSWORD}
+  protocol: smtp
+  properties:
+    mail:
+      smtp:
+        auth: true
+        starttls:
+          enable: true
+
 
