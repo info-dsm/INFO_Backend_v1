@@ -16,6 +16,7 @@ import javax.validation.constraints.Pattern
 
 @RestController
 @RequestMapping("/v1/auth")
+@Validated
 class AuthController(
     private val authService: AuthService,
     private val emailService: EmailService

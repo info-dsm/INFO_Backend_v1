@@ -31,8 +31,6 @@ class AuthServiceImpl(
         if((checkEmailCodeRepository.findById(req.email).orElse(null)?:
         throw CheckEmailCodeException(req.email)).code == req.emailCheckCode){
             val encPw = passwordEncoder.encode(req.password)
-
-
             val user = Student(
                 req.studentKey,
                 req.name,
