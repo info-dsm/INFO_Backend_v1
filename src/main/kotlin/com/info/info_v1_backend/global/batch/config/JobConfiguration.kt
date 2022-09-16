@@ -25,8 +25,8 @@ class JobConfiguration(
     private val jobBuilderFactory: JobBuilderFactory,
     private val stepBuilderFactory: StepBuilderFactory,
     private val dbSource: DatabaseConfig,
-    @Qualifier("writeJdbcTemplate")
-    private val writeJdbcTemplate: JdbcTemplate,
+    @Qualifier(DatabaseConfig.MONGO_JDBC_TEMPLATE)
+    private val mongoJdbcTemplate: JdbcTemplate,
     private val batchProcessService: BatchProcessService
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
