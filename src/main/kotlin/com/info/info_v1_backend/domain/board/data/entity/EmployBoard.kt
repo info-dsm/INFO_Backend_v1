@@ -1,4 +1,4 @@
-package com.info.info_v1_backend.domain.employment.data.entity
+package com.info.info_v1_backend.domain.board.data.entity
 
 import javax.persistence.Column
 import javax.persistence.ElementCollection
