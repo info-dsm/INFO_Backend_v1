@@ -12,7 +12,8 @@ import javax.persistence.Embeddable
 class PerClassEmployInfo(
     classNum: ClassNum,
     indicationList: MutableList<Indication>,
-    majorType: MajorType
+    majorType: MajorType,
+    employRate: Int
 ) {
 
     @Column(name = "class_num", nullable = false)
@@ -23,6 +24,9 @@ class PerClassEmployInfo(
 
     @ElementCollection
     var indicationList: MutableList<Indication> = indicationList
+
+    @Column(name = "employ_rate", nullable = false)
+    var employRate: Int = employRate
 
     fun toPerClassEmployInfoDto(): PerClassEmployInfoDto {
         return PerClassEmployInfoDto(
