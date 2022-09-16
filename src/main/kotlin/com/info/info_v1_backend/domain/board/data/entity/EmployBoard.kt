@@ -15,6 +15,7 @@ import javax.persistence.Id
 class EmployBoard(
     totalRate: Int,
     bestMajor: MajorType,
+    bestEmployRate: Int,
     perClassEmployInfoList: MutableList<PerClassEmployInfo>
 ): BaseTimeEntity() {
     @Id
@@ -27,6 +28,9 @@ class EmployBoard(
     @Column(name = "best_major")
     val bestMajor: MajorType = bestMajor
 
+    @Column(name = "best_employ_rate")
+    val bestEmployRate: Int = bestEmployRate
+
     @ElementCollection
     val perClassEmployInfoList: MutableList<PerClassEmployInfo> = perClassEmployInfoList
 
@@ -34,6 +38,7 @@ class EmployBoard(
         return EmployBoardDto(
             this.totalRate,
             this.bestMajor,
+            this.bestEmployRate,
             this.perClassEmployInfoList.map {
                 it.toPerClassEmployInfoDto()
             } as MutableList<PerClassEmployInfoDto>
