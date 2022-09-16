@@ -1,6 +1,8 @@
 package com.info.info_v1_backend.domain.board.data.entity
 
+import com.info.info_v1_backend.domain.board.business.dto.IndicationDto
 import com.info.info_v1_backend.global.image.entity.File
+import com.info.info_v1_backend.infra.amazon.s3.dto.ImageDto
 import javax.persistence.Column
 import javax.persistence.ElementCollection
 import javax.persistence.Embeddable
@@ -12,7 +14,6 @@ class Indication(
     companyId: Long,
     companyShortName: String,
     image: File,
-    perClassEmployInfoList: MutableList<PerClassEmployInfo>
 ) {
     @Column(name = "company_id", nullable = false)
     val companyId: Long = companyId
@@ -24,8 +25,19 @@ class Indication(
     @JoinColumn(name = "indication_image", nullable = false)
     val image: File = image
 
-    @ElementCollection
-    val perClassEmployInfo: MutableList<PerClassEmployInfo> = perClassEmployInfoList
+    fun toIndicationDto(): IndicationDto {
+        return IndicationDto(
+            this.companyId,
+            this.companyShortName,
+            ImageDto(
+                this.image.fileKey,
+                this.image.id!!
+            )
+        )
+    }
 
+    override fun toString(): String {
+        return "companyId: ${this.companyId}/ companyShortName:${this.companyShortName}"
+    }
 
 }
