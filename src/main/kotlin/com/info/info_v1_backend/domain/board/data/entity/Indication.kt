@@ -36,4 +36,8 @@ class Indication(
         )
     }
 
+    override fun toString(): String {
+        return "companyId: ${this.companyId}/ companyShortName:${this.companyShortName}"
+    }
+
 }
