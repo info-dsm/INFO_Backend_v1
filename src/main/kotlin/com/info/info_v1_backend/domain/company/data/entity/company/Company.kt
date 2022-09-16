@@ -1,6 +1,7 @@
 package com.info.info_v1_backend.domain.company.data.entity.company
 
 import com.info.info_v1_backend.domain.auth.data.entity.type.Role
+import com.info.info_v1_backend.domain.auth.data.entity.user.Student
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
 import com.info.info_v1_backend.global.image.entity.File
 import javax.persistence.*
@@ -35,7 +36,9 @@ class Company(
     @Embedded
     var contactor: Contactor = contactor
 
-
+    @OneToMany
+    var studentList: MutableList<Student> = ArrayList()
+        protected set
 
 
 }
