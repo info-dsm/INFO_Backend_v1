@@ -2,10 +2,14 @@ package com.info.info_v1_backend.domain.auth.presentation.controller
 
 import com.info.info_v1_backend.domain.auth.business.service.AuthService
 import com.info.info_v1_backend.domain.auth.business.service.EmailService
+import com.info.info_v1_backend.domain.auth.presentation.dto.request.StudentSignUpRequest
+import com.info.info_v1_backend.domain.auth.presentation.dto.request.TeacherSingUpRequest
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import javax.validation.Valid
 import javax.validation.constraints.Pattern
 
 @RestController
@@ -22,9 +26,20 @@ class AuthController(
         emailService.sendCodeToEmail(email)
     }
 
-    @PostMapping("/studentSignup")
-    fun studentSignup(){
+    @PostMapping("/studentSignUp")
+    fun studentSignUp(
+        @RequestBody @Valid
+        request: StudentSignUpRequest
+    ){
+        authService.studentSignUp(request)
+    }
 
+    @PostMapping("/teacherSingUp")
+    fun teacherSignUp(
+        @RequestBody @Valid
+        request: TeacherSingUpRequest
+    ){
+        authService.teacherSignUp(request)
     }
 
 }
