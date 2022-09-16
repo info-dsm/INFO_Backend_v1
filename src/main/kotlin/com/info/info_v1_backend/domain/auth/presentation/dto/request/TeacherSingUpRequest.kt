@@ -5,12 +5,9 @@ import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
 
-data class StudentSignUpRequest(
+data class TeacherSingUpRequest(
 
-    @field:Pattern(regexp = "^[123][1-5][012]\\d\$")
-    val studentKey: String,
-
-    @field:Pattern(regexp = "[a-zA-Z0-9+\\_.]+@dsm\\.hs\\.kr\$")
+    @field:Pattern(regexp = "[a-zA-Z\\d+_.]+@dsm\\.hs\\.kr\$")
     val email: String,
 
     @field:Size(min = 4, max = 4)
@@ -20,10 +17,10 @@ data class StudentSignUpRequest(
     val password: String,
 
     @field:NotNull
+    val teacherCheckCode: String,
+
+    @field:NotNull
     @field:Size(min = 2, max = 4, message="2 ~ 4글자")
     val name: String,
     val userType: Role,
-
-    @field:NotNull
-    val githubLink: String
 )

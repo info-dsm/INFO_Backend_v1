@@ -1,6 +1,7 @@
 package com.info.info_v1_backend.domain.auth.data.entity.user
 
 import com.info.info_v1_backend.domain.auth.data.entity.type.Role
+import com.info.info_v1_backend.domain.company.data.entity.company.Company
 import com.info.info_v1_backend.domain.project.data.entity.Creation
 import com.info.info_v1_backend.domain.team.data.Affiliation
 import javax.persistence.*
@@ -15,7 +16,7 @@ class Student(
     email: String,
     password: String,
     githubLink: String,
-    creationList: MutableList<Creation>?
+    creationList: MutableList<Creation>?,
 ): User(
     name,
     email,
@@ -33,6 +34,7 @@ class Student(
     @OneToMany(cascade = [CascadeType.REMOVE])
     var affiliation: MutableList<Affiliation> = ArrayList()
 
-
+    @ManyToOne
+    var company: Company? = null
 
 }
