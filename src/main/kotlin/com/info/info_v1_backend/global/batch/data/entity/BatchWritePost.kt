@@ -1,6 +1,5 @@
 package com.info.info_v1_backend.global.batch.data.entity
 
-
 class BatchWritePost(
     post: BatchPost
 ) {
