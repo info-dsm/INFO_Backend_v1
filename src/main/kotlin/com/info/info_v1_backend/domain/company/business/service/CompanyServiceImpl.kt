@@ -1,7 +1,7 @@
 package com.info.info_v1_backend.domain.company.business.service
 
-import com.info.info_v1_backend.domain.company.business.dto.request.EditCompanyRequest
-import com.info.info_v1_backend.domain.company.business.dto.request.RegisterCompanyRequest
+import com.info.info_v1_backend.domain.company.business.dto.request.company.EditCompanyRequest
+import com.info.info_v1_backend.domain.company.business.dto.request.company.RegisterCompanyRequest
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
 import com.info.info_v1_backend.domain.auth.data.entity.user.Contactor
 import com.info.info_v1_backend.domain.auth.data.entity.user.Student
@@ -9,16 +9,15 @@ import com.info.info_v1_backend.domain.auth.data.entity.user.User
 import com.info.info_v1_backend.domain.auth.data.repository.user.UserRepository
 import com.info.info_v1_backend.domain.auth.exception.StudentCannotOpenException
 import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
-import com.info.info_v1_backend.domain.company.business.dto.response.MaximumCompanyResponse
-import com.info.info_v1_backend.domain.company.business.dto.response.MinimumCompanyResponse
-import com.info.info_v1_backend.domain.company.data.repository.CompanyCheckCodeRepository
-import com.info.info_v1_backend.domain.company.data.repository.CompanyRepository
+import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.company.MinimumCompanyResponse
+import com.info.info_v1_backend.domain.company.data.repository.company.CompanyCheckCodeRepository
+import com.info.info_v1_backend.domain.company.data.repository.company.CompanyRepository
 import com.info.info_v1_backend.domain.company.exception.CompanyNotFoundException
 import com.info.info_v1_backend.domain.company.exception.InvalidCompanyCheckCodeException
 import com.info.info_v1_backend.domain.company.exception.IsNotContactorCompany
 import com.info.info_v1_backend.domain.company.exception.NotContactorException
 import com.info.info_v1_backend.global.util.user.CurrentUtil
-import net.bytebuddy.build.HashCodeAndEqualsPlugin.Sorted
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort

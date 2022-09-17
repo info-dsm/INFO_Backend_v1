@@ -14,20 +14,19 @@ import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
+import javax.persistence.OneToMany
+import javax.persistence.OneToOne
 
 
 @Entity
 class Notice(
     company: Company,
-    targetMajorList: MutableList<TargetMajor>,
     businessInformation: String,
     certificateList: MutableList<String>,
     cutLine: Int?,
-    workRemark: String,
+    personalRemark: String,
     commuteTime: CommuteTime,
     workTime: WorkTime,
-    fieldTraining: Long,
-    employmentPay: EmploymentPay,
     screeningProcedure: ScreeningProcedure,
     alternativeMilitaryPlan: Boolean,
     mealSupport: MealSupport,
@@ -47,10 +46,10 @@ class Notice(
     @JoinColumn(name = "id", nullable = false)
     var company: Company = company
 
-    @ElementCollection
-    var targetMajorList: MutableList<TargetMajor> = targetMajorList
+    @OneToMany(mappedBy = "notice")
+    var targetMajorList: MutableList<TargetMajor> = ArrayList()
 
-    @Column(name = "business_information")
+    @Column(name = "business_information", length = 255)
     var businessInformation: String = businessInformation
 
     @ElementCollection
@@ -60,7 +59,7 @@ class Notice(
     var cutLine: Int? = cutLine
 
     @Column(name = "work_remark", nullable = false)
-    var workRemark: String = workRemark
+    var personalRemark: String = personalRemark
 
     @Embedded
     var commuteTime: CommuteTime = commuteTime
@@ -68,11 +67,8 @@ class Notice(
     @Column(name = "work_time", nullable = false)
     var workTime: WorkTime = workTime
 
-    @Column(name = "field_training", nullable = false)
-    var fieldTraining: Long = fieldTraining
-
-    @Embedded
-    var employmentPay: EmploymentPay = employmentPay
+    @OneToOne
+    var pay: Pay? = null
 
     @Embedded
     var screeningProcedure: ScreeningProcedure = screeningProcedure
