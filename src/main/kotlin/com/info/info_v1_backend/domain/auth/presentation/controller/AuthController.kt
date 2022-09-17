@@ -79,4 +79,12 @@ class AuthController(
        return authService.reissue(request)
     }
 
+    @PostMapping("/login")
+    fun login(
+        @RequestBody
+        request: LoginRequest
+    ): TokenResponse{
+        return authService.login(request)
+    }
+
 }

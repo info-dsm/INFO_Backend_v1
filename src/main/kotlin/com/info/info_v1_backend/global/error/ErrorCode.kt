@@ -24,6 +24,7 @@ enum class ErrorCode(
     USER_ALREADY_EXISTS("User Already Exists", HttpStatus.BAD_REQUEST),
     INVALID_PARAMETER("Null or Invalid Parameter Value Inputted", HttpStatus.BAD_REQUEST),
     CHECK_TEACHER_CODE_ERROR("Error Occurred while Checking Teacher Code", HttpStatus.NOT_FOUND),
+    INVALID_COMPANY_CHECK_CODE("Invalid Company Check Code", HttpStatus.BAD_REQUEST)
 
 
 }
