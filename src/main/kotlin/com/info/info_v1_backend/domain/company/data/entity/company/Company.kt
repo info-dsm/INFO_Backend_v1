@@ -92,7 +92,10 @@ class Company(
     @Column(name = "employed_count", nullable = false)
     var employedCount: Int = 0
 
-    @OneToMany(cascade = [CascadeType.REMOVE])
+    @OneToMany(
+        cascade = [CascadeType.REMOVE],
+        mappedBy = "company"
+    )
     var commentList: MutableList<Comment> = ArrayList()
 
     fun editCompany(request: EditCompanyRequest) {
@@ -129,7 +132,9 @@ class Company(
             },
             this.introduction,
             this.employedCount,
-            this.commentList.map {
+            this.commentList.filter {
+                !it.isDeleted
+            }.map {
                 it.toCommentResponse()
             }
         )
