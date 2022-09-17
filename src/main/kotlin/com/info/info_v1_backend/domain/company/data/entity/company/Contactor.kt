@@ -10,11 +10,9 @@ class Contactor(
     @Column(name = "contactor_position", nullable = false)
     var position: String,
     @Column(name = "contactor_phone", nullable = false)
-    var phone: String,
+    var personalPhone: String,
     @Column(name = "contactor_email", nullable = false)
     var email: String,
-    @Column(name = "contactor_fax_address", nullable = true)
-    var faxAddress: String?,
     @Column(name = "password", nullable = false)
     var password: String
 ) {
