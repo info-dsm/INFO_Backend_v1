@@ -6,7 +6,7 @@ import com.info.info_v1_backend.domain.company.business.dto.request.notice.EditN
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.RegisterNoticeRequest
 import com.info.info_v1_backend.domain.company.data.entity.notice.Notice
 import com.info.info_v1_backend.domain.company.data.entity.notice.Pay
-import com.info.info_v1_backend.domain.company.data.entity.notice.embeddable.TargetMajor
+import com.info.info_v1_backend.domain.company.data.entity.notice.embeddable.*
 import com.info.info_v1_backend.domain.company.data.repository.notice.NoticeRepository
 import com.info.info_v1_backend.domain.company.data.repository.notice.PayRepository
 import com.info.info_v1_backend.domain.company.data.repository.notice.TargetMajorRepository
@@ -35,13 +35,33 @@ class NoticeServiceImpl(
                             r.businessInformation,
                             r.certificateList,
                             r.cutLine,
-                            r.workRemark,
-                            r.commuteTime,
+                            r.personalRemark,
+                            CommuteTime(
+                                r.commuteTime.startTime,
+                                r.commuteTime.endTime
+                            ),
                             r.workTime,
-                            r.screeningProcedure,
+                            ScreeningProcedure(
+                                r.screeningProcedure.document,
+                                r.screeningProcedure.technicalInterview,
+                                r.screeningProcedure.physicalCheck,
+                                r.screeningProcedure.assignment,
+                                r.screeningProcedure.executiveInterview,
+                                r.screeningProcedure.elseProcedure
+                            ),
                             r.alternativeMilitaryPlan,
-                            r.mealSupport,
-                            r.welfare,
+                            MealSupport(
+                                r.mealSupport.mealSupportPay,
+                                r.mealSupport.breakfast,
+                                r.mealSupport.lunch,
+                                r.mealSupport.dinner
+                            ),
+                            Welfare(
+                                r.welfare.dormitorySupport,
+                                r.welfare.selfDevelopmentPay,
+                                r.welfare.equipmentSupport,
+                                r.welfare.elseSupport
+                            ),
                             r.needDocuments,
                             r.deadLine,
                             r.isAlwaysOpen,

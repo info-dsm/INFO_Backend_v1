@@ -24,7 +24,7 @@ class Notice(
     businessInformation: String,
     certificateList: MutableList<String>,
     cutLine: Int?,
-    workRemark: String,
+    personalRemark: String,
     commuteTime: CommuteTime,
     workTime: WorkTime,
     screeningProcedure: ScreeningProcedure,
@@ -49,7 +49,7 @@ class Notice(
     @OneToMany(mappedBy = "notice")
     var targetMajorList: MutableList<TargetMajor> = ArrayList()
 
-    @Column(name = "business_information")
+    @Column(name = "business_information", length = 255)
     var businessInformation: String = businessInformation
 
     @ElementCollection
@@ -59,7 +59,7 @@ class Notice(
     var cutLine: Int? = cutLine
 
     @Column(name = "work_remark", nullable = false)
-    var workRemark: String = workRemark
+    var personalRemark: String = personalRemark
 
     @Embedded
     var commuteTime: CommuteTime = commuteTime

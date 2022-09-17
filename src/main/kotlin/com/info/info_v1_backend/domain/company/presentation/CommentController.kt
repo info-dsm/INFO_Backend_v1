@@ -4,6 +4,7 @@ import com.info.info_v1_backend.domain.company.business.dto.request.comment.Edit
 import com.info.info_v1_backend.domain.company.business.dto.request.comment.WriteCommentRequest
 import com.info.info_v1_backend.domain.company.business.service.CommentService
 import org.springframework.http.HttpStatus
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RequestMapping("/api/info/v1/company/comment")
 @RestController
+@Validated
 class CommentController(
     private val commentService: CommentService
 ) {

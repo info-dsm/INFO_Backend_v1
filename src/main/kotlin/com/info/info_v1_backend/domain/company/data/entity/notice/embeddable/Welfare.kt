@@ -11,7 +11,7 @@ class Welfare(
     var selfDevelopmentPay: Boolean,
     @Column(name = "equipment_support", nullable = false)
     var equipmentSupport: Boolean,
-    @Column(name = "else_support", nullable = true)
+    @Column(name = "else_support", nullable = true, length = 255)
     var elseSupport: String?
 ) {
 }
