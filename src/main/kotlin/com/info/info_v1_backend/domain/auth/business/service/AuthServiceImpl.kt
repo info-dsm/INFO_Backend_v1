@@ -1,6 +1,7 @@
 package com.info.info_v1_backend.domain.auth.business.service
 
 import com.info.info_v1_backend.domain.auth.data.entity.token.RefreshToken
+import com.info.info_v1_backend.domain.auth.data.entity.user.Contactor
 import com.info.info_v1_backend.domain.auth.data.entity.user.Student
 import com.info.info_v1_backend.domain.auth.data.entity.user.Teacher
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
@@ -8,11 +9,7 @@ import com.info.info_v1_backend.domain.auth.data.repository.token.CheckEmailCode
 import com.info.info_v1_backend.domain.auth.data.repository.token.RefreshTokenRepository
 import com.info.info_v1_backend.domain.auth.data.repository.user.UserRepository
 import com.info.info_v1_backend.domain.auth.exception.*
-import com.info.info_v1_backend.domain.auth.presentation.dto.request.EditPasswordRequest
-import com.info.info_v1_backend.domain.auth.presentation.dto.request.LoginRequest
-import com.info.info_v1_backend.domain.auth.presentation.dto.request.ReissueRequest
-import com.info.info_v1_backend.domain.auth.presentation.dto.request.StudentSignUpRequest
-import com.info.info_v1_backend.domain.auth.presentation.dto.request.TeacherSingUpRequest
+import com.info.info_v1_backend.domain.auth.presentation.dto.request.*
 import com.info.info_v1_backend.global.security.jwt.TokenProvider
 import com.info.info_v1_backend.global.security.jwt.data.TokenResponse
 import com.info.info_v1_backend.global.security.jwt.exception.ExpiredTokenException
@@ -30,9 +27,8 @@ class AuthServiceImpl(
     private val current: UserCheckUtil,
 
     ) : AuthService {
-    override fun studentSignUp(req: StudentSignUpRequest): TokenResponse {
-        if((checkEmailCodeRepository.findById(req.email).orElse(null)?:
-            throw CheckEmailCodeException(req.email)).code == req.emailCheckCode){
+    override fun studentSignUp(req: StudentSignUpRequest) {
+        if (checkEmail(req.email, req.emailCheckCode)){
             val encPw = passwordEncoder.encode(req.password)
             val user = Student(
                 req.studentKey,
@@ -43,13 +39,12 @@ class AuthServiceImpl(
                 null
             )
             userRepository.save(user)
-            return tokenProvider.encode(user.id.toString())
+            return
         } else throw CheckEmailCodeException(req.emailCheckCode)
     }
 
-    override fun teacherSignUp(req: TeacherSingUpRequest): TokenResponse {
-        if((checkEmailCodeRepository.findById(req.email).orElse(null)?:
-            throw CheckEmailCodeException(req.email)).code == req.emailCheckCode){
+    override fun teacherSignUp(req: TeacherSingUpRequest) {
+        if (checkEmail(req.email, req.emailCheckCode)){
             if(req.teacherCheckCode == "1111"){
                 val encPw = passwordEncoder.encode(req.password)
 
@@ -59,9 +54,39 @@ class AuthServiceImpl(
                     encPw
                 )
                 userRepository.save(user)
-                return tokenProvider.encode(user.id.toString())
+                return
             } else throw CheckTeacherCodeException(req.teacherCheckCode)
         } else throw CheckEmailCodeException(req.emailCheckCode)
+    }
+
+    override fun contactorSignup(req: ContactorSignupRequest) {
+        if (checkEmail(req.email, req.emailCheckCode)){
+            if(req.contactorCheckCode == "1111") {
+                val encPw = passwordEncoder.encode(req.password)
+
+                userRepository.save(
+                    Contactor(
+                        req.name,
+                        req.position,
+                        req.personalPhone,
+                        req.email,
+                        encPw
+                    )
+                )
+            }
+
+        }
+    }
+
+    private fun checkEmail(email: String, authCode: String): Boolean {
+        userRepository.findByEmail(email).orElse(null)?.let {
+            throw UserAlreadyExists(email)
+        }
+        if ((checkEmailCodeRepository.findById(email).orElse(null)
+            ?: throw CheckEmailCodeException(email)).code == authCode){
+            return true
+        }
+        return false
     }
 
     override fun login(req: LoginRequest): TokenResponse {

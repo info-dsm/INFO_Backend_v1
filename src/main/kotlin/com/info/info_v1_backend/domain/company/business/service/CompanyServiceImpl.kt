@@ -3,7 +3,7 @@ package com.info.info_v1_backend.domain.company.business.service
 import com.info.info_v1_backend.domain.company.business.dto.request.EditCompanyRequest
 import com.info.info_v1_backend.domain.company.business.dto.request.RegisterCompanyRequest
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
-import com.info.info_v1_backend.domain.company.data.entity.company.Contactor
+import com.info.info_v1_backend.domain.auth.data.entity.user.Contactor
 import com.info.info_v1_backend.domain.company.data.repository.CompanyCheckCodeRepository
 import com.info.info_v1_backend.domain.company.data.repository.CompanyRepository
 import com.info.info_v1_backend.domain.company.exception.InvalidCompanyCheckCodeException

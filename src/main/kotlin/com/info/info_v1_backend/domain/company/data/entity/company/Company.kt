@@ -1,18 +1,16 @@
 package com.info.info_v1_backend.domain.company.data.entity.company
 
 import com.info.info_v1_backend.domain.auth.data.entity.type.Role
+import com.info.info_v1_backend.domain.auth.data.entity.user.Contactor
 import com.info.info_v1_backend.domain.auth.data.entity.user.Student
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
 import com.info.info_v1_backend.domain.company.data.entity.notice.Notice
 import com.info.info_v1_backend.global.image.entity.File
 import java.time.Year
-import java.util.Date
 import javax.persistence.*
 
 
 @Entity
-@DiscriminatorValue("company")
-@Inheritance(strategy = InheritanceType.JOINED)
 class Company(
     shortName: String,
     fullName: String,
@@ -26,15 +24,15 @@ class Company(
     industryType: String?,
     mainProduct: String?,
     introduction: String,
-): User(
-    fullName,
-    contactor.name,
-    contactor.password,
-    Role.COMPANY
 ){
+    @Id
+    val id: String = companyNumber
 
     @Column(name = "company_short_name", nullable = false)
     val shortName: String = shortName
+
+    @Column(name = "company_full_name", nullable = false)
+    val fullName: String = fullName
 
     @Column(name = "company_introduction", nullable = false)
     val introduction: String = introduction
@@ -48,15 +46,13 @@ class Company(
     @Column(name = "company_fax_address", nullable = true)
     var faxAddress: String? = faxAddress
 
-    @Embedded
+    @OneToOne
     var contactor: Contactor = contactor
 
     @OneToMany
     var studentList: MutableList<Student> = ArrayList()
         protected set
 
-    @Column(name = "company_number", nullable = false)
-    var companyNumber: String = companyNumber
 
     @Column(name = "company_established_at", nullable = false)
     var establishedAt: Year = establishedAt
