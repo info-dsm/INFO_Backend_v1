@@ -41,6 +41,9 @@ sealed class Project(
     var shortContent: String = shortContent
         protected set
 
+    @Column(name = "have-seen-count", nullable = false)
+    var haveSeenCount: Long = 0
+
     @OneToMany(mappedBy = "project")
     var creationList: MutableList<Creation> = creationList
         protected set
