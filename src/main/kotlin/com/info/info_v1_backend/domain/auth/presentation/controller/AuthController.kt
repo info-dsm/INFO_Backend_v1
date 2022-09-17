@@ -19,7 +19,7 @@ import javax.validation.Valid
 import javax.validation.constraints.Pattern
 
 @RestController
-@RequestMapping("/v1/auth")
+@RequestMapping("/api/info/v1/auth")
 @Validated
 class AuthController(
     private val authService: AuthService,
@@ -30,7 +30,8 @@ class AuthController(
     fun sendEmail(
         @RequestParam
         @Pattern(regexp = "[a-zA-Z0-9+\\_.]+@dsm\\.hs\\.kr\$")
-        email: String){
+        email: String
+    ){
         emailService.sendCodeToEmail(email)
     }
 
