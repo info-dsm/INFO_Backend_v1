@@ -20,7 +20,6 @@ data class RegisterCompanyRequest(
     val companyPhone: String,
     @field:Size(min = 30, max = 5, message = "fax번호 길이는 5 ~ 30자여야합니다.")
     val faxAddress: String?,
-    val contactor: ContactorDto,
     val establishedAt: Year,
     @field:Size(max = 20)
     val annualSales: Long,
