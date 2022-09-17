@@ -17,48 +17,48 @@ import org.springframework.stereotype.Component
 
 @Component
 class JobScheduler(
-    private val jobLauncher: JobLauncher,
-    private val jobConfiguration: JobConfiguration,
-    private val jobExplorer: JobExplorer
+//    private val jobLauncher: JobLauncher,
+//    private val jobConfiguration: JobConfiguration,
+//    private val jobExplorer: JobExplorer
 ) {
-
-    private val log = LoggerFactory.getLogger(this.javaClass)
-
-    init {
-        val jobParameters = JobParameters()
-        try {
-            jobLauncher.run(jobConfiguration.studentEmploymentJob(),
-                JobParametersBuilder(jobExplorer)
-                .getNextJobParameters(jobConfiguration.studentEmploymentJob())
-                    .toJobParameters()
-            )
-        } catch (e: JobExecutionAlreadyRunningException) {
-            log.error(e.message)
-        } catch (e: JobInstanceAlreadyCompleteException) {
-            log.error(e.message)
-        } catch (e: JobParametersInvalidException) {
-            log.error(e.message)
-        } catch (e: JobRestartException) {
-            log.error(e.message)
-        }
-    }
-
-    @Scheduled(cron = "0 12 * * *")
-    fun runJob() {
-        val confMap: MutableMap<String, JobParameter> = HashMap()
-        confMap["time"] = JobParameter(System.currentTimeMillis())
-        val jobParameters = JobParameters(confMap)
-        try {
-            jobLauncher.run(jobConfiguration.studentEmploymentJob(), jobParameters)
-        } catch (e: JobExecutionAlreadyRunningException) {
-            log.error(e.message)
-        } catch (e: JobInstanceAlreadyCompleteException) {
-            log.error(e.message)
-        } catch (e: JobParametersInvalidException) {
-            log.error(e.message)
-        } catch (e: JobRestartException) {
-            log.error(e.message)
-        }
-    }
+//
+//    private val log = LoggerFactory.getLogger(this.javaClass)
+//
+//    init {
+//        val jobParameters = JobParameters()
+//        try {
+//            jobLauncher.run(jobConfiguration.studentEmploymentJob(),
+//                JobParametersBuilder(jobExplorer)
+//                .getNextJobParameters(jobConfiguration.studentEmploymentJob())
+//                    .toJobParameters()
+//            )
+//        } catch (e: JobExecutionAlreadyRunningException) {
+//            log.error(e.message)
+//        } catch (e: JobInstanceAlreadyCompleteException) {
+//            log.error(e.message)
+//        } catch (e: JobParametersInvalidException) {
+//            log.error(e.message)
+//        } catch (e: JobRestartException) {
+//            log.error(e.message)
+//        }
+//    }
+//
+//    @Scheduled(cron = "0 12 * * *")
+//    fun runJob() {
+//        val confMap: MutableMap<String, JobParameter> = HashMap()
+//        confMap["time"] = JobParameter(System.currentTimeMillis())
+//        val jobParameters = JobParameters(confMap)
+//        try {
+//            jobLauncher.run(jobConfiguration.studentEmploymentJob(), jobParameters)
+//        } catch (e: JobExecutionAlreadyRunningException) {
+//            log.error(e.message)
+//        } catch (e: JobInstanceAlreadyCompleteException) {
+//            log.error(e.message)
+//        } catch (e: JobParametersInvalidException) {
+//            log.error(e.message)
+//        } catch (e: JobRestartException) {
+//            log.error(e.message)
+//        }
+//    }
 
 }
