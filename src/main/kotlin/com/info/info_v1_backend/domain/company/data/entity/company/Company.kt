@@ -96,6 +96,9 @@ class Company(
     )
     var commentList: MutableList<Comment> = ArrayList()
 
+    fun hireStudentAll(studentList: List<Student>) {
+        this.studentList.addAll(studentList)
+    }
     fun editCompany(request: EditCompanyRequest) {
         this.shortName = request.shortName
         this.fullName = request.fullName

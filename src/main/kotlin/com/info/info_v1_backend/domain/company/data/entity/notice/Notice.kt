@@ -114,6 +114,22 @@ class Notice(
     var workHopeMonth: LocalDate? = workHopeMonth
         protected set
 
+    @Column(name = "notice_is_delete", nullable = false)
+    var isDelete: Boolean = false
+        protected set
+
+    @Column(name = "notice_is_expired", nullable = false)
+    var isExpired: Boolean = false
+        protected set
+
+    fun makeDelete() {
+        this.isDelete = true
+    }
+
+    fun makeExpired() {
+        this.isExpired = true
+    }
+
     fun editNotice(r: EditNoticeRequest) {
         r.businessInformation?.let {
             this.businessInformation = it
