@@ -74,8 +74,8 @@ class AuthController(
     fun reissue(
         @RequestBody
         request: ReissueRequest
-    ){
-        authService.reissue(request)
+    ): TokenResponse{
+       return authService.reissue(request)
     }
 
 }
