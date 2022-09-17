@@ -56,14 +56,6 @@ class AuthController(
         return authService.teacherSignUp(request)
     }
 
-    @PostMapping("/login")
-    fun login(
-        @RequestBody
-        request: LoginRequest
-    ): TokenResponse{
-        return authService.login(request)
-    }
-
     @PostMapping("/changePassword")
     fun password(
         @RequestBody
