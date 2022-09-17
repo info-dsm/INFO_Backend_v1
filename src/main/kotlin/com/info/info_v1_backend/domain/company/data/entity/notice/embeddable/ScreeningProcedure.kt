@@ -15,7 +15,7 @@ class ScreeningProcedure(
     var assignment: Boolean,
     @Column(name = "executive_interview_procedure")
     var executiveInterview: Boolean,
-    @Column(name = "else_procedure")
+    @Column(name = "else_procedure", length = 255)
     var elseProcedure: String?
 ) {
 }
