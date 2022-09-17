@@ -31,6 +31,10 @@ class Pay(
 
     fun editPay(r: PayRequest) {
         this.fieldTrainingPay = r.fieldTrainingPay
-        this.employmentPay = r.employmentPay
+        this.employmentPay = EmploymentPay(
+            r.employmentPay.yearPay,
+            r.employmentPay.monthPay,
+            r.employmentPay.bonus
+        )
     }
 }
