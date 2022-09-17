@@ -1,4 +1,4 @@
-package com.info.info_v1_backend.domain.company.business.dto.request
+package com.info.info_v1_backend.domain.company.business.dto.request.company
 
 import java.time.Year
 import javax.validation.constraints.Max

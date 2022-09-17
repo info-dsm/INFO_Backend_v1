@@ -14,6 +14,7 @@ import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
+import javax.persistence.OneToOne
 
 
 @Entity
@@ -26,8 +27,6 @@ class Notice(
     workRemark: String,
     commuteTime: CommuteTime,
     workTime: WorkTime,
-    fieldTraining: Long,
-    employmentPay: EmploymentPay,
     screeningProcedure: ScreeningProcedure,
     alternativeMilitaryPlan: Boolean,
     mealSupport: MealSupport,
@@ -68,11 +67,8 @@ class Notice(
     @Column(name = "work_time", nullable = false)
     var workTime: WorkTime = workTime
 
-    @Column(name = "field_training", nullable = false)
-    var fieldTraining: Long = fieldTraining
-
-    @Embedded
-    var employmentPay: EmploymentPay = employmentPay
+    @OneToOne
+    var pay: Pay? = null
 
     @Embedded
     var screeningProcedure: ScreeningProcedure = screeningProcedure

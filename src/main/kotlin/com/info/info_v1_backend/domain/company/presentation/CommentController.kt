@@ -1,7 +1,7 @@
 package com.info.info_v1_backend.domain.company.presentation
 
-import com.info.info_v1_backend.domain.company.business.dto.request.EditCommentRequest
-import com.info.info_v1_backend.domain.company.business.dto.request.WriteCommentRequest
+import com.info.info_v1_backend.domain.company.business.dto.request.comment.EditCommentRequest
+import com.info.info_v1_backend.domain.company.business.dto.request.comment.WriteCommentRequest
 import com.info.info_v1_backend.domain.company.business.service.CommentService
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.DeleteMapping

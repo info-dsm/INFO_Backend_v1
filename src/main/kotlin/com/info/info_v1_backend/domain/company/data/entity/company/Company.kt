@@ -1,12 +1,10 @@
 package com.info.info_v1_backend.domain.company.data.entity.company
 
-import com.info.info_v1_backend.domain.auth.data.entity.type.Role
 import com.info.info_v1_backend.domain.auth.data.entity.user.Contactor
 import com.info.info_v1_backend.domain.auth.data.entity.user.Student
-import com.info.info_v1_backend.domain.auth.data.entity.user.User
-import com.info.info_v1_backend.domain.company.business.dto.request.EditCompanyRequest
-import com.info.info_v1_backend.domain.company.business.dto.response.MaximumCompanyResponse
-import com.info.info_v1_backend.domain.company.business.dto.response.MinimumCompanyResponse
+import com.info.info_v1_backend.domain.company.business.dto.request.company.EditCompanyRequest
+import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.company.MinimumCompanyResponse
 import com.info.info_v1_backend.domain.company.data.entity.comment.Comment
 import com.info.info_v1_backend.domain.company.data.entity.notice.Notice
 import com.info.info_v1_backend.global.base.entity.BaseTimeEntity
@@ -138,6 +136,10 @@ class Company(
                 it.toCommentResponse()
             }
         )
+    }
+
+    fun registerNotice(notice: Notice) {
+        this.noticeList.add(notice)
     }
 
 }
