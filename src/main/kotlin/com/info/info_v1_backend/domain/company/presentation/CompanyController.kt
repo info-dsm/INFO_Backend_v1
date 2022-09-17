@@ -4,9 +4,13 @@ import com.info.info_v1_backend.domain.auth.business.service.AuthService
 import com.info.info_v1_backend.domain.auth.business.service.EmailService
 import com.info.info_v1_backend.domain.company.business.dto.request.EditCompanyRequest
 import com.info.info_v1_backend.domain.company.business.dto.request.RegisterCompanyRequest
+import com.info.info_v1_backend.domain.company.business.dto.response.MaximumCompanyResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.MinimumCompanyResponse
 import com.info.info_v1_backend.domain.company.business.service.CompanyService
+import org.springframework.data.domain.Page
 import org.springframework.http.HttpStatus
 import org.springframework.validation.annotation.Validated
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
@@ -37,6 +41,31 @@ class CompanyController(
         @RequestParam id: Long
     ) {
         companyService.editCompany(request, id)
+    }
+
+    @GetMapping("/list")
+    fun getMinimumCompanyList(
+        @RequestParam(defaultValue = "0") idx: Int,
+        @RequestParam size: Int
+    ): Page<MinimumCompanyResponse> {
+        return companyService.getMinimumCompanyList(idx, size)
+    }
+
+    @GetMapping
+    fun getMaximumCompany(
+        @RequestParam id: Long
+    ): MaximumCompanyResponse {
+        return companyService.getMaximumCompany(id)
+    }
+
+    @GetMapping("/user")
+    fun getMaximumCompanyByUserId(@RequestParam id: Long): List<MaximumCompanyResponse> {
+        return companyService.getMaximumCompanyByUserId(id)
+    }
+
+    @GetMapping("/search")
+    fun searchCompany(@RequestParam query: String): List<MinimumCompanyResponse> {
+        return companyService.searchCompany(query)
     }
 
 

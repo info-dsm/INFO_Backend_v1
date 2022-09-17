@@ -13,4 +13,5 @@ interface CompanyService {
     fun getMinimumCompanyList(idx: Int, size: Int): Page<MinimumCompanyResponse>
     fun getMaximumCompany(id: Long): MaximumCompanyResponse
     fun getMaximumCompanyByUserId(id: Long): List<MaximumCompanyResponse>
+    fun searchCompany(query: String): List<MinimumCompanyResponse>
 }
