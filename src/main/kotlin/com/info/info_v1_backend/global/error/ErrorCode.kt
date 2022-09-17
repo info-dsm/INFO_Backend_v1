@@ -31,7 +31,8 @@ enum class ErrorCode(
     STUDENT_CANNOT_OPEN("Student Cannot Open this", HttpStatus.FORBIDDEN),
     IS_NOT_STUDENT("You are not student", HttpStatus.FORBIDDEN),
     STUDENT_ALREADY_WRITTEN_COMMENT("you have Already Written comment", HttpStatus.BAD_REQUEST),
-    COMMENT_NOT_FOUND("Comment Not Found", HttpStatus.NOT_FOUND)
+    COMMENT_NOT_FOUND("Comment Not Found", HttpStatus.NOT_FOUND),
+    NOTICE_NOT_FOUND("Notice Not Found", HttpStatus.NOT_FOUND)
 
 
 
