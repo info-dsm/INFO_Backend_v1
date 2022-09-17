@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component
 
 
 @Component
-class UserCheckUtil(
+class CurrentUtil(
     private val userRepository: UserRepository<User>
 ) {
 
