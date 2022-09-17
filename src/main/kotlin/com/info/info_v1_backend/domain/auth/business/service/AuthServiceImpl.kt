@@ -8,6 +8,9 @@ import com.info.info_v1_backend.domain.auth.data.repository.token.RefreshTokenRe
 import com.info.info_v1_backend.domain.auth.data.repository.user.UserRepository
 import com.info.info_v1_backend.domain.auth.exception.CheckEmailCodeException
 import com.info.info_v1_backend.domain.auth.exception.CheckTeacherCodeException
+import com.info.info_v1_backend.domain.auth.exception.IncorrectPassword
+import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
+import com.info.info_v1_backend.domain.auth.presentation.dto.request.LoginRequest
 import com.info.info_v1_backend.domain.auth.presentation.dto.request.StudentSignUpRequest
 import com.info.info_v1_backend.domain.auth.presentation.dto.request.TeacherSingUpRequest
 import com.info.info_v1_backend.global.security.jwt.TokenProvider
@@ -19,8 +22,7 @@ import org.springframework.stereotype.Service
 class AuthServiceImpl(
     private val passwordEncoder: PasswordEncoder,
     private val checkEmailCodeRepository: CheckEmailCodeRepository,
-    private val studentRepository: UserRepository<Student>,
-    private val teacherRepository: UserRepository<Teacher>,
+    private val userRepository: UserRepository<User>,
     private val tokenProvider: TokenProvider,
     private val refreshTokenRepository: RefreshTokenRepository,
 
@@ -39,7 +41,7 @@ class AuthServiceImpl(
                 req.githubLink,
                 null
             )
-            studentRepository.save(user)
+            userRepository.save(user)
             return tokenProvider.encode(user.id.toString())
         } else throw CheckEmailCodeException(req.emailCheckCode)
     }
@@ -55,9 +57,17 @@ class AuthServiceImpl(
                     req.email,
                     encPw
                 )
-                teacherRepository.save(user)
+                userRepository.save(user)
                 return tokenProvider.encode(user.id.toString())
             } else throw CheckTeacherCodeException(req.teacherCheckCode)
         } else throw CheckEmailCodeException(req.emailCheckCode)
+    }
+
+    override fun login(req: LoginRequest): TokenResponse {
+        val user = userRepository.findByEmail(req.email)
+            .orElse(null)?:throw UserNotFoundException(req.email)
+        if(passwordEncoder.matches(req.password,user.password)){
+            return tokenProvider.encode(user.id.toString())
+        } else throw IncorrectPassword(req.password)
     }
 }
