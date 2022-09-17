@@ -26,7 +26,7 @@ class Notice(
     workRemark: String,
     commuteTime: CommuteTime,
     workTime: WorkTime,
-    fieldTraining: Long,
+    fieldTrainingPay: Long,
     employmentPay: EmploymentPay,
     screeningProcedure: ScreeningProcedure,
     alternativeMilitaryPlan: Boolean,
@@ -67,12 +67,6 @@ class Notice(
 
     @Column(name = "work_time", nullable = false)
     var workTime: WorkTime = workTime
-
-    @Column(name = "field_training", nullable = false)
-    var fieldTraining: Long = fieldTraining
-
-    @Embedded
-    var employmentPay: EmploymentPay = employmentPay
 
     @Embedded
     var screeningProcedure: ScreeningProcedure = screeningProcedure

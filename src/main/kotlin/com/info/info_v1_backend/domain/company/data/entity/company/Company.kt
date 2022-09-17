@@ -140,4 +140,8 @@ class Company(
         )
     }
 
+    fun registerNotice(notice: Notice) {
+        this.noticeList.add(notice)
+    }
+
 }
