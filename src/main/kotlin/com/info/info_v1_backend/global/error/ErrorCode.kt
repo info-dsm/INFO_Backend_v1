@@ -28,7 +28,10 @@ enum class ErrorCode(
     NOT_CONTACTOR("You are Not Contactor", HttpStatus.FORBIDDEN),
     COMPANY_NOT_FOUND("Company Not Found", HttpStatus.NOT_FOUND),
     IS_NOT_CONTACTOR_COMPANY("You are not Contactor Company", HttpStatus.FORBIDDEN),
-    STUDENT_CANNOT_OPEN("Student Cannot Open this", HttpStatus.FORBIDDEN)
+    STUDENT_CANNOT_OPEN("Student Cannot Open this", HttpStatus.FORBIDDEN),
+    IS_NOT_STUDENT("You are not student", HttpStatus.FORBIDDEN),
+    STUDENT_ALREADY_WRITTEN_COMMENT("you have Already Written comment", HttpStatus.BAD_REQUEST),
+    COMMENT_NOT_FOUND("Comment Not Found", HttpStatus.NOT_FOUND)
 
 
 
