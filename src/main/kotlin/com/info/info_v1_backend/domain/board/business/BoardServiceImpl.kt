@@ -5,14 +5,12 @@ import com.info.info_v1_backend.domain.board.business.dto.EmployBoardDto
 import com.info.info_v1_backend.domain.board.business.dto.IndicationDto
 import com.info.info_v1_backend.domain.board.business.dto.PerClassEmployInfoDto
 import com.info.info_v1_backend.domain.board.business.type.ClassInfo
-import com.info.info_v1_backend.global.image.ImageUtil
 import com.info.info_v1_backend.infra.amazon.s3.dto.ImageDto
 import org.springframework.stereotype.Service
 
 @Service
 class BoardServiceImpl(
     private val studentRepository: StudentRepository,
-    private val imageUtil: ImageUtil
 ): BoardService {
 
     private var totalRate = 0
@@ -36,18 +34,18 @@ class BoardServiceImpl(
         var employStudentCnt = 0
 
         studentRepository.findAllByStudentKeyStartingWith("3${classInfo.classNum}").map { student ->
-            student.company?.let {
+            student.company?.let { company ->
                 indicationDtoList.add(
                     IndicationDto(
-                        it.id!!,
-                        it.shortName,
+                        company.id!!,
+                        company.shortName,
                         try {
 
                             ImageDto(
-                                it.photoList.first().let {
-                                    imageUtil.getImageUrl(it.fileKey)
+                                company.photoList.first().let {
+                                    it.fileUrl
                                 },
-                                it.id!!
+                                company.id!!
                                 )
                         } catch (e: NoSuchElementException) {
                             ImageDto(
