@@ -112,9 +112,7 @@ class NoticeServiceImpl(
                             notice
                         )
                     )
-                }. let{
-                    it.editTargetMajor(target)
-                }
+                }.editTargetMajor(target)
             }
         }
 
