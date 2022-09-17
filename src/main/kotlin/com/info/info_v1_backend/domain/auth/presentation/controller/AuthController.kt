@@ -44,16 +44,16 @@ class AuthController(
     fun studentSignUp(
         @RequestBody @Valid
         request: StudentSignUpRequest
-    ):TokenResponse{
-        return authService.studentSignUp(request)
+    ){
+        authService.studentSignUp(request)
     }
 
     @PostMapping("/teacherSingUp")
     fun teacherSignUp(
         @RequestBody @Valid
         request: TeacherSingUpRequest
-    ): TokenResponse{
-        return authService.teacherSignUp(request)
+    ){
+        authService.teacherSignUp(request)
     }
 
     @PostMapping("/changePassword")
