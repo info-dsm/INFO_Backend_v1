@@ -17,6 +17,8 @@ class Company(
     shortName: String,
     fullName: String,
     companyNumber: String,
+    companyPhone: String,
+    faxAddress: String?,
     contactor: Contactor,
     establishedAt: Year,
     annualSales: Long,
@@ -39,6 +41,12 @@ class Company(
 
     @OneToMany
     var photoList: MutableList<File> = ArrayList()
+
+    @Column(name = "company_phone")
+    var companyPhone: String = companyPhone
+
+    @Column(name = "company_fax_address", nullable = true)
+    var faxAddress: String? = faxAddress
 
     @Embedded
     var contactor: Contactor = contactor
