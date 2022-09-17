@@ -1,6 +1,5 @@
 package com.info.info_v1_backend.domain.company.business.service
 
-import com.info.info_v1_backend.domain.auth.data.entity.type.Role
 import com.info.info_v1_backend.domain.company.business.dto.request.EditCompanyRequest
 import com.info.info_v1_backend.domain.company.business.dto.request.RegisterCompanyRequest
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
@@ -8,7 +7,9 @@ import com.info.info_v1_backend.domain.auth.data.entity.user.Contactor
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
 import com.info.info_v1_backend.domain.company.data.repository.CompanyCheckCodeRepository
 import com.info.info_v1_backend.domain.company.data.repository.CompanyRepository
+import com.info.info_v1_backend.domain.company.exception.CompanyNotFoundException
 import com.info.info_v1_backend.domain.company.exception.InvalidCompanyCheckCodeException
+import com.info.info_v1_backend.domain.company.exception.IsNotContactorCompany
 import com.info.info_v1_backend.domain.company.exception.NotContactorException
 import com.info.info_v1_backend.global.util.user.CurrentUtil
 import org.springframework.stereotype.Service
@@ -54,8 +55,16 @@ class CompanyServiceImpl(
         
     }
 
-    override fun editCompany(request: EditCompanyRequest) {
-        TODO("Not yet implemented")
+    override fun editCompany(request: EditCompanyRequest, id: Long) {
+        val current = currentUtil.getCurrentUser()
+
+        if (current is Contactor) {
+            val company = companyRepository.findById(id).orElse(null)?: throw CompanyNotFoundException(id.toString())
+            if (company != current.company) throw IsNotContactorCompany(current.email)
+            company.editCompany(
+                request
+            )
+        } else throw NotContactorException(current.roleList.toString())
     }
 
 

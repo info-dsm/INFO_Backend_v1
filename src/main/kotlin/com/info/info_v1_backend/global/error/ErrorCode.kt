@@ -25,7 +25,9 @@ enum class ErrorCode(
     INVALID_PARAMETER("Null or Invalid Parameter Value Inputted", HttpStatus.BAD_REQUEST),
     CHECK_TEACHER_CODE_ERROR("Error Occurred while Checking Teacher Code", HttpStatus.NOT_FOUND),
     INVALID_COMPANY_CHECK_CODE("Invalid Company Check Code", HttpStatus.BAD_REQUEST),
-    NOT_CONTACTOR("You are Not Contactor", HttpStatus.FORBIDDEN)
+    NOT_CONTACTOR("You are Not Contactor", HttpStatus.FORBIDDEN),
+    COMPANY_NOT_FOUND("Company Not Found", HttpStatus.NOT_FOUND),
+    IS_NOT_CONTACTOR_COMPANY("You are not Contactor Company", HttpStatus.FORBIDDEN)
 
 
 }
