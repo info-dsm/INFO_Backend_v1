@@ -6,5 +6,5 @@ import com.info.info_v1_backend.domain.company.business.dto.request.RegisterComp
 interface CompanyService {
 
     fun registerCompany(request: RegisterCompanyRequest)
-    fun editCompany(request: EditCompanyRequest)
+    fun editCompany(request: EditCompanyRequest, companyId: Long)
 }
