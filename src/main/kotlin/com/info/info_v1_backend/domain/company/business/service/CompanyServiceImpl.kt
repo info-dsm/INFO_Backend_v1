@@ -11,8 +11,8 @@ import com.info.info_v1_backend.domain.auth.exception.StudentCannotOpenException
 import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MinimumCompanyResponse
-import com.info.info_v1_backend.domain.company.data.repository.CompanyCheckCodeRepository
-import com.info.info_v1_backend.domain.company.data.repository.CompanyRepository
+import com.info.info_v1_backend.domain.company.data.repository.company.CompanyCheckCodeRepository
+import com.info.info_v1_backend.domain.company.data.repository.company.CompanyRepository
 import com.info.info_v1_backend.domain.company.exception.CompanyNotFoundException
 import com.info.info_v1_backend.domain.company.exception.InvalidCompanyCheckCodeException
 import com.info.info_v1_backend.domain.company.exception.IsNotContactorCompany

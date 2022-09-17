@@ -14,13 +14,13 @@ import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
+import javax.persistence.OneToMany
 import javax.persistence.OneToOne
 
 
 @Entity
 class Notice(
     company: Company,
-    targetMajorList: MutableList<TargetMajor>,
     businessInformation: String,
     certificateList: MutableList<String>,
     cutLine: Int?,
@@ -46,8 +46,8 @@ class Notice(
     @JoinColumn(name = "id", nullable = false)
     var company: Company = company
 
-    @ElementCollection
-    var targetMajorList: MutableList<TargetMajor> = targetMajorList
+    @OneToMany(mappedBy = "notice")
+    var targetMajorList: MutableList<TargetMajor> = ArrayList()
 
     @Column(name = "business_information")
     var businessInformation: String = businessInformation

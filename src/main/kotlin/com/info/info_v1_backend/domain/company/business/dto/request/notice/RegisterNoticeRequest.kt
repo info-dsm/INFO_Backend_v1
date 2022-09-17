@@ -5,7 +5,7 @@ import com.info.info_v1_backend.domain.company.data.entity.type.WorkTime
 import java.time.LocalDate
 
 data class RegisterNoticeRequest(
-    val targetMajorList: MutableList<TargetMajor>,
+    val targetMajorList: MutableList<TargetMajorRequest>,
     val businessInformation: String,
     val certificateList: MutableList<String>,
     val cutLine: Int?,
