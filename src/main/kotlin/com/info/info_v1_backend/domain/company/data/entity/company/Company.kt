@@ -5,7 +5,11 @@ import com.info.info_v1_backend.domain.auth.data.entity.user.Contactor
 import com.info.info_v1_backend.domain.auth.data.entity.user.Student
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
 import com.info.info_v1_backend.domain.company.business.dto.request.EditCompanyRequest
+import com.info.info_v1_backend.domain.company.business.dto.response.MaximumCompanyResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.MinimumCompanyResponse
+import com.info.info_v1_backend.domain.company.data.entity.comment.Comment
 import com.info.info_v1_backend.domain.company.data.entity.notice.Notice
+import com.info.info_v1_backend.global.base.entity.BaseTimeEntity
 import com.info.info_v1_backend.global.image.entity.File
 import java.time.Year
 import javax.persistence.*
@@ -25,7 +29,7 @@ class Company(
     industryType: String?,
     mainProduct: String?,
     introduction: String,
-){
+): BaseTimeEntity(){
     @Id
     val id: String = companyNumber
 
@@ -85,6 +89,12 @@ class Company(
     var noticeList: MutableList<Notice> = ArrayList()
         protected set
 
+    @Column(name = "employed_count", nullable = false)
+    var employedCount: Int = 0
+
+    @OneToMany(cascade = [CascadeType.REMOVE])
+    var commentList: MutableList<Comment> = ArrayList()
+
     fun editCompany(request: EditCompanyRequest) {
         this.shortName = request.shortName
         this.fullName = request.fullName
@@ -98,5 +108,31 @@ class Company(
         this.introduction = request.introduction
     }
 
+
+    fun toMinimumCompanyResponse(): MinimumCompanyResponse {
+        return MinimumCompanyResponse(
+            this.shortName,
+            this.fullName,
+            this.photoList.map {
+                it.toImageDto()
+            },
+            this.introduction
+        )
+    }
+
+    fun toMaximumCompanyResponse(): MaximumCompanyResponse {
+        return MaximumCompanyResponse(
+            this.shortName,
+            this.fullName,
+            this.photoList.map {
+                it.toImageDto()
+            },
+            this.introduction,
+            this.employedCount,
+            this.commentList.map {
+                it.toCommentResponse()
+            }
+        )
+    }
 
 }
