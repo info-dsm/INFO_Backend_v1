@@ -9,7 +9,7 @@ interface NoticeService {
     fun registerNotice(request: RegisterNoticeRequest)
     fun editNotice(request: EditNoticeRequest, noticeId: Long)
     fun deleteNotice(noticeId: Long)
-    fun closeNotice(request: CloseNoticeRequest)
+    fun closeNotice(request: CloseNoticeRequest, noticeId: Long)
     fun getMinimumNotice(idx: Int, size: Int)
     fun getMaximumNotice(id: Long)
     fun searchNotice(query: String)

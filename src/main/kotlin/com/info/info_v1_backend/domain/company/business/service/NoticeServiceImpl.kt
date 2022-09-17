@@ -1,6 +1,10 @@
 package com.info.info_v1_backend.domain.company.business.service
 
 import com.info.info_v1_backend.domain.auth.data.entity.user.Contactor
+import com.info.info_v1_backend.domain.auth.data.entity.user.Student
+import com.info.info_v1_backend.domain.auth.data.entity.user.User
+import com.info.info_v1_backend.domain.auth.data.repository.user.StudentRepository
+import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.CloseNoticeRequest
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.EditNoticeRequest
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.RegisterNoticeRequest
@@ -23,7 +27,8 @@ class NoticeServiceImpl(
     private val currentUtil: CurrentUtil,
     private val noticeRepository: NoticeRepository,
     private val payRepository: PayRepository,
-    private val targetMajorRepository: TargetMajorRepository
+    private val targetMajorRepository: TargetMajorRepository,
+    private val studentRepository: StudentRepository
 ): NoticeService {
 
     override fun registerNotice(r: RegisterNoticeRequest) {
@@ -101,7 +106,7 @@ class NoticeServiceImpl(
     override fun editNotice(request: EditNoticeRequest, noticeId: Long) {
         val current = currentUtil.getCurrentUser()
         val notice = noticeRepository.findById(noticeId).orElse(null)?: throw NoticeNotFoundException(noticeId.toString())
-        if ((current is Contactor) && (current.company?.noticeList?.contains(notice) == true)) throw IsNotContactorCompany(current.company.toString())
+        if (checkAuthentication(current, notice))
 
         request.targetMajorList.map {
             target -> {
@@ -139,13 +144,29 @@ class NoticeServiceImpl(
     }
 
     override fun deleteNotice(noticeId: Long) {
-        TODO("Not yet implemented")
+        val current = currentUtil.getCurrentUser()
+        val notice = noticeRepository.findById(noticeId).orElse(null)?: throw NoticeNotFoundException(noticeId.toString())
+        if (checkAuthentication(current, notice))
+        notice.makeDelete()
     }
 
-    override fun closeNotice(request: CloseNoticeRequest) {
-        TODO("Not yet implemented")
+    override fun closeNotice(request: CloseNoticeRequest, noticeId: Long) {
+        val current = currentUtil.getCurrentUser()
+        val notice = noticeRepository.findById(noticeId).orElse(null)?: throw NoticeNotFoundException(noticeId.toString())
+        if (checkAuthentication(current, notice))
+        notice.makeExpired()
+
+        val studentList: MutableList<Student> = ArrayList()
+        request.studentIdList.map {
+            studentList.add(studentRepository.findById(it).orElse(null)?: throw UserNotFoundException(it.toString()))
+        }
+        notice.company.hireStudentAll(studentList.toList())
+
     }
 
+    private fun checkAuthentication(current: User, notice: Notice): Boolean {
+        return ((current is Contactor) && (current.company?.noticeList?.contains(notice) == true))
+    }
     override fun getMinimumNotice(idx: Int, size: Int) {
         TODO("Not yet implemented")
     }
