@@ -99,7 +99,9 @@ class NoticeServiceImpl(
     }
 
     override fun editNotice(request: EditNoticeRequest, noticeId: Long) {
+        val current = currentUtil.getCurrentUser()
         val notice = noticeRepository.findById(noticeId).orElse(null)?: throw NoticeNotFoundException(noticeId.toString())
+        if ((current is Contactor) && (current.company?.noticeList?.contains(notice) == true)) throw IsNotContactorCompany(current.company.toString())
 
         request.targetMajorList.map {
             target -> {
