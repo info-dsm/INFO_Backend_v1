@@ -22,7 +22,5 @@ data class ContactorDto (
     val email: String,
     @field:Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d~!@#\$%^&*()+|=]{8,30}\$")
     val password: String,
-    @field:Size(min = 30, max = 5, message = "fax번호 길이는 5 ~ 30자여야합니다.")
-    val faxAddress: String?
 
 )
