@@ -1,11 +1,10 @@
 package com.info.info_v1_backend.domain.company.data.entity.comment
 
 import com.info.info_v1_backend.domain.auth.data.entity.user.Student
-import com.info.info_v1_backend.domain.company.business.dto.request.EditCommentRequest
-import com.info.info_v1_backend.domain.company.business.dto.response.CommentResponse
+import com.info.info_v1_backend.domain.company.business.dto.request.comment.EditCommentRequest
+import com.info.info_v1_backend.domain.company.business.dto.response.comment.CommentResponse
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
 import com.info.info_v1_backend.global.base.entity.BaseAuthorEntity
-import com.info.info_v1_backend.global.base.entity.BaseTimeEntity
 import javax.persistence.CascadeType
 import javax.persistence.Column
 import javax.persistence.Entity

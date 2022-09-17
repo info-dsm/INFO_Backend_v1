@@ -1,4 +1,4 @@
-package com.info.info_v1_backend.domain.company.business.dto.request
+package com.info.info_v1_backend.domain.company.business.dto.request.comment
 
 import javax.validation.constraints.Size
 

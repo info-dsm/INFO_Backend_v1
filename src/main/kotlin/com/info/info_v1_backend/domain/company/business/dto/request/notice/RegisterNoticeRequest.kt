@@ -1,4 +1,4 @@
-package com.info.info_v1_backend.domain.company.business.dto.request
+package com.info.info_v1_backend.domain.company.business.dto.request.notice
 
 import com.info.info_v1_backend.domain.company.data.entity.notice.embeddable.*
 import com.info.info_v1_backend.domain.company.data.entity.type.WorkTime

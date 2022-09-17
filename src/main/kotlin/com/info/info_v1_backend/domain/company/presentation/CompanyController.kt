@@ -1,11 +1,10 @@
 package com.info.info_v1_backend.domain.company.presentation
 
-import com.info.info_v1_backend.domain.auth.business.service.AuthService
 import com.info.info_v1_backend.domain.auth.business.service.EmailService
-import com.info.info_v1_backend.domain.company.business.dto.request.EditCompanyRequest
-import com.info.info_v1_backend.domain.company.business.dto.request.RegisterCompanyRequest
-import com.info.info_v1_backend.domain.company.business.dto.response.MaximumCompanyResponse
-import com.info.info_v1_backend.domain.company.business.dto.response.MinimumCompanyResponse
+import com.info.info_v1_backend.domain.company.business.dto.request.company.EditCompanyRequest
+import com.info.info_v1_backend.domain.company.business.dto.request.company.RegisterCompanyRequest
+import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.company.MinimumCompanyResponse
 import com.info.info_v1_backend.domain.company.business.service.CompanyService
 import org.springframework.data.domain.Page
 import org.springframework.http.HttpStatus
@@ -13,7 +12,6 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam

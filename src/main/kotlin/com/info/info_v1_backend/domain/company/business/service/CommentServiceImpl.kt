@@ -2,11 +2,9 @@ package com.info.info_v1_backend.domain.company.business.service
 
 import com.info.info_v1_backend.domain.auth.data.entity.user.Student
 import com.info.info_v1_backend.domain.auth.exception.IsNotStudentException
-import com.info.info_v1_backend.domain.company.business.dto.request.EditCommentRequest
-import com.info.info_v1_backend.domain.company.business.dto.request.WriteCommentRequest
-import com.info.info_v1_backend.domain.company.business.dto.response.CommentResponse
+import com.info.info_v1_backend.domain.company.business.dto.request.comment.EditCommentRequest
+import com.info.info_v1_backend.domain.company.business.dto.request.comment.WriteCommentRequest
 import com.info.info_v1_backend.domain.company.data.entity.comment.Comment
-import com.info.info_v1_backend.domain.company.data.entity.company.Company
 import com.info.info_v1_backend.domain.company.data.repository.CommentRepository
 import com.info.info_v1_backend.domain.company.data.repository.CompanyRepository
 import com.info.info_v1_backend.domain.company.exception.CommentNotFoundException
