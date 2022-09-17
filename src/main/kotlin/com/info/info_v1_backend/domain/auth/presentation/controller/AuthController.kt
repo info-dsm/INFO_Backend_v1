@@ -70,5 +70,12 @@ class AuthController(
     ){
         authService.editPassword(request)
     }
+    @PostMapping("/reissue")
+    fun reissue(
+        @RequestBody
+        request: ReissueRequest
+    ){
+        authService.reissue(request)
+    }
 
 }

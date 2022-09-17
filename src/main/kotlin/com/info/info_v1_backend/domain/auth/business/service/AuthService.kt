@@ -12,4 +12,6 @@ interface AuthService {
     fun teacherSignUp(req: TeacherSingUpRequest): TokenResponse
     fun login(req: LoginRequest): TokenResponse
     fun editPassword(req: EditPasswordRequest)
+    fun reissue(req: ReissueRequest): TokenResponse
+
 }

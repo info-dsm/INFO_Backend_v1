@@ -15,6 +15,7 @@ import com.info.info_v1_backend.domain.auth.presentation.dto.request.StudentSign
 import com.info.info_v1_backend.domain.auth.presentation.dto.request.TeacherSingUpRequest
 import com.info.info_v1_backend.global.security.jwt.TokenProvider
 import com.info.info_v1_backend.global.security.jwt.data.TokenResponse
+import com.info.info_v1_backend.global.security.jwt.exception.ExpiredTokenException
 import com.info.info_v1_backend.global.util.user.UserCheckUtil
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -78,5 +79,18 @@ class AuthServiceImpl(
             val encPw = passwordEncoder.encode(req.password)
             user.editPassword(encPw)
         } else CheckPasswordCodeException(req.code)
+    }
+    override fun reissue(req: ReissueRequest): TokenResponse {
+        if(tokenProvider.isExpired(req.refreshToken)) throw ExpiredTokenException(req.refreshToken)
+
+        val userId = tokenProvider.decodeBody(req.accessToken).subject
+        val user = userRepository.findById(userId.toLong()).orElse(null) ?: throw UserNotFoundException(userId)
+        val tokenResponse = tokenProvider.encode(user.id.toString())
+        val token = RefreshToken(user.id.toString(), tokenResponse.refreshToken)
+
+        refreshTokenRepository.findById(user.id.toString()).map {
+            it.reset(token.token)
+        }.orElse(null) ?: refreshTokenRepository.save(token)
+        return tokenResponse
     }
 }
