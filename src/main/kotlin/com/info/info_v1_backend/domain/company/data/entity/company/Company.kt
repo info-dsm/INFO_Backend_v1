@@ -5,6 +5,7 @@ import com.info.info_v1_backend.domain.auth.data.entity.user.Student
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
 import com.info.info_v1_backend.domain.company.data.entity.notice.Notice
 import com.info.info_v1_backend.global.image.entity.File
+import java.time.Year
 import java.util.Date
 import javax.persistence.*
 
@@ -16,9 +17,8 @@ class Company(
     shortName: String,
     fullName: String,
     companyNumber: String,
-    password: String,
     contactor: Contactor,
-    establishedAt: Date,
+    establishedAt: Year,
     annualSales: Long,
     workerCount: Int,
     industryType: String?,
@@ -27,7 +27,7 @@ class Company(
 ): User(
     fullName,
     contactor.name,
-    password,
+    contactor.password,
     Role.COMPANY
 ){
 
@@ -51,7 +51,7 @@ class Company(
     var companyNumber: String = companyNumber
 
     @Column(name = "company_established_at", nullable = false)
-    var establishedAt: Date = establishedAt
+    var establishedAt: Year = establishedAt
 
     @Column(name = "company_annual_sales", nullable = false)
     var annualSales: Long = annualSales
