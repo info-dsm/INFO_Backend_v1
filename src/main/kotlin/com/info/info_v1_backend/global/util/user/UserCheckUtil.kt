@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class UserCheckUtil(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository<User>
 ) {
 
     fun getCurrentSubject(): String {
@@ -17,8 +17,8 @@ class UserCheckUtil(
     }
 
     fun getCurrentUser(): User {
-        val subject = getCurrentSubject()
-        return userRepository.findById(subject).orElse(null)?: throw UserNotFoundException(subject)
+        val subject = getCurrentSubject().toLong()
+        return userRepository.findById(subject).orElse(null)?: throw UserNotFoundException(subject.toString())
     }
 
 }

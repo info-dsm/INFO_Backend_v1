@@ -1,7 +1,7 @@
 package com.info.info_v1_backend.domain.auth.data.entity.user
 
 import com.info.info_v1_backend.domain.auth.data.entity.type.Role
-import com.info.info_v1_backend.domain.team.data.Affiliation
+import com.info.info_v1_backend.domain.auth.presentation.dto.request.EditPasswordRequest
 import com.info.info_v1_backend.global.base.entity.BaseTimeEntity
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -72,8 +72,8 @@ abstract class User(
         return !this.isDeleted
     }
 
-
-
-
+    fun editPassword(password: String){
+        this.password = password
+    }
 
 }
