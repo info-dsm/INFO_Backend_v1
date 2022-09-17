@@ -10,7 +10,7 @@ import javax.persistence.Id
 
 @Entity
 class File(
-    fileKey: String,
+    fileUrl: String,
     fileType: FileType,
     extension: String
 
@@ -19,9 +19,8 @@ class File(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null
 
-    @Column(name = "file_key", nullable = false)
-    var fileKey: String = fileKey
-        protected set
+    @Column(name = "file_url", nullable = false)
+    var fileUrl: String = fileUrl
 
     @Column(name = "file_type", nullable = false)
     var fileType: FileType = fileType

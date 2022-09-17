@@ -21,7 +21,8 @@ enum class ErrorCode(
     PROJECT_NOT_FOUND("Project Not Found", HttpStatus.NOT_FOUND),
     ALREADY_SAME_NAME_PROJECT_EXISTS("Already Same Name Project Exists.", HttpStatus.BAD_REQUEST),
     USER_ALREADY_EXISTS("User Already Exists", HttpStatus.BAD_REQUEST),
-    INVALID_PARAMETER("Null or Invalid Parameter Value Inputted", HttpStatus.BAD_REQUEST)
+    INVALID_PARAMETER("Null or Invalid Parameter Value Inputted", HttpStatus.BAD_REQUEST),
+    CHECK_TEACHER_CODE_ERROR("Error Occurred while Checking Teacher Code", HttpStatus.NOT_FOUND),
 
 
 }
