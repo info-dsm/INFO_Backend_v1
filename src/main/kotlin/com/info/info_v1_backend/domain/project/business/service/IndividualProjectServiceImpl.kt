@@ -17,7 +17,6 @@ class IndividualProjectServiceImpl(
         return ProjectListResponse(individualRepository.findAll(
             Sort.by(Sort.Direction.DESC, "createdBy"))
             .stream()
-            .filter { it.status == ProjectStatus.APPROVE }
             .map{
                 ProjectResponse(
                 name = it.name,
@@ -34,7 +33,6 @@ class IndividualProjectServiceImpl(
         return ProjectListResponse(individualRepository.findAll(
             Sort.by(Sort.Direction.DESC, "haveSeenCount"))
             .stream()
-            .filter { it.status == ProjectStatus.APPROVE }
             .map{
                 ProjectResponse(
                     name = it.name,
