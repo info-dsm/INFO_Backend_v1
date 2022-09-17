@@ -12,10 +12,13 @@ import com.info.info_v1_backend.domain.company.data.repository.notice.PayReposit
 import com.info.info_v1_backend.domain.company.data.repository.notice.TargetMajorRepository
 import com.info.info_v1_backend.domain.company.exception.CompanyNotFoundException
 import com.info.info_v1_backend.domain.company.exception.IsNotContactorCompany
+import com.info.info_v1_backend.domain.company.exception.NoticeNotFoundException
 import com.info.info_v1_backend.global.util.user.CurrentUtil
 import org.springframework.stereotype.Service
+import javax.transaction.Transactional
 
 @Service
+@Transactional
 class NoticeServiceImpl(
     private val currentUtil: CurrentUtil,
     private val noticeRepository: NoticeRepository,
@@ -95,8 +98,42 @@ class NoticeServiceImpl(
         } else throw IsNotContactorCompany(current.roleList.toString())
     }
 
-    override fun editNotice(request: EditNoticeRequest) {
-        TODO("Not yet implemented")
+    override fun editNotice(request: EditNoticeRequest, noticeId: Long) {
+        val notice = noticeRepository.findById(noticeId).orElse(null)?: throw NoticeNotFoundException(noticeId.toString())
+
+        request.targetMajorList.map {
+            target -> {
+                targetMajorRepository.findFirstByNoticeAndMajorOrderByCreatedDateDesc(notice, target.majorType)
+                    .orElse(null)?: let {
+                    targetMajorRepository.save(
+                        TargetMajor(
+                            target.majorType,
+                            target.count,
+                            notice
+                        )
+                    )
+                }.editTargetMajor(target)
+            }
+        }
+
+        payRepository.findById(noticeId).orElse(null)?: let {
+            payRepository.save(
+                Pay(
+                    request.pay.fieldTrainingPay,
+                    EmploymentPay(
+                        request.pay.employmentPay.yearPay,
+                        request.pay.employmentPay.monthPay,
+                        request.pay.employmentPay.bonus,
+                    ),
+                    notice
+                )
+            )
+        }. let{
+            pay -> pay.editPay(request.pay)
+        }
+
+
+        notice.editNotice(request)
     }
 
     override fun deleteNotice(noticeId: Long) {
