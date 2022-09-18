@@ -130,7 +130,7 @@ class NoticeServiceImpl(
 
         request.targetMajorList.map {
             target -> {
-                targetMajorRepository.findFirstByNoticeAndMajorOrderByCreatedDateDesc(notice, target.majorType)
+                targetMajorRepository.findFirstByNoticeAndMajorOrderBycreatedAtDesc(notice, target.majorType)
                     .orElse(null)?: let {
                     targetMajorRepository.save(
                         TargetMajor(

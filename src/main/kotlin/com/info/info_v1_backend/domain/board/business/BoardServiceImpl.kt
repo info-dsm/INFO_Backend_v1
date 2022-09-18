@@ -45,7 +45,7 @@ class BoardServiceImpl(
                                 company.photoList.first().let {
                                     it.fileUrl
                                 },
-                                company.id!!
+                                company.photoList.first().id!!
                                 )
                         } catch (e: NoSuchElementException) {
                             ImageDto(

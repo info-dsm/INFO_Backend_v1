@@ -2,7 +2,6 @@ package com.info.info_v1_backend.domain.project.data.entity.project
 
 import com.info.info_v1_backend.domain.project.data.entity.Creation
 import com.info.info_v1_backend.domain.project.data.entity.type.ProjectStatus
-import com.info.info_v1_backend.domain.team.data.entity.Team
 import javax.persistence.Column
 import javax.persistence.DiscriminatorValue
 import javax.persistence.ElementCollection

@@ -15,12 +15,12 @@ abstract class BaseTimeEntity {
 
     @CreatedDate
     @Column(name = "created_at")
-    open var createdDate: LocalDateTime? = null
+    open var createdAt: LocalDateTime? = null
         protected set
 
     @LastModifiedDate
     @Column(name = "update_at")
-    open var updateDate: LocalDateTime? = null
+    open var updatedAt: LocalDateTime? = null
         protected set
 
 
