@@ -1,12 +1,11 @@
 package com.info.info_v1_backend.domain.project.business.controller
 
+import com.info.info_v1_backend.domain.project.business.controller.dto.request.RegisteredProjectCreateRequest
 import com.info.info_v1_backend.domain.project.business.controller.dto.response.MaximumProjectResponse
 import com.info.info_v1_backend.domain.project.business.controller.dto.response.MinimumProjectListResponse
 import com.info.info_v1_backend.domain.project.business.service.RegisteredProjectService
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/info/v1/project/registered")
@@ -25,5 +24,11 @@ class RegisteredProjectController(private val registeredProjectService: Register
     @GetMapping("/maximum/{project-id}")
     fun getMaximumProject(@PathVariable("project-id") id: Long): MaximumProjectResponse {
         return registeredProjectService.getMaximumProject(id)
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    fun writeRegisteredProject(@RequestBody request: RegisteredProjectCreateRequest){
+        registeredProjectService.writeRegisteredProject(request)
     }
 }
