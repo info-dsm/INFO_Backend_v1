@@ -2,13 +2,7 @@ package com.info.info_v1_backend.domain.project.data.entity.project
 
 import com.info.info_v1_backend.domain.project.data.entity.Creation
 import com.info.info_v1_backend.domain.project.data.entity.type.ProjectStatus
-import com.info.info_v1_backend.domain.team.data.entity.Team
-import javax.persistence.Column
-import javax.persistence.DiscriminatorValue
-import javax.persistence.ElementCollection
-import javax.persistence.Entity
-import javax.persistence.Inheritance
-import javax.persistence.InheritanceType
+import javax.persistence.*
 
 
 @Entity
@@ -19,7 +13,7 @@ class RegisteredProject(
     shortContent: String,
     purpose: String,
     theoreticalBackground: MutableList<String>,
-    processList:  MutableList<String>,
+    processList: MutableList<String>,
     result: String,
     conclusion: String,
     referenceList: MutableList<String>,

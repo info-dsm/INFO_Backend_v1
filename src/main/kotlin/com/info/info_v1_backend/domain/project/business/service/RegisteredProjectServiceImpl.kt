@@ -1,13 +1,20 @@
 package com.info.info_v1_backend.domain.project.business.service
 
+import com.info.info_v1_backend.domain.auth.data.repository.user.StudentRepository
+import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
+import com.info.info_v1_backend.domain.project.business.controller.dto.request.RegisteredProjectCreateRequest
 import com.info.info_v1_backend.domain.project.business.controller.dto.response.MaximumProjectResponse
 import com.info.info_v1_backend.domain.project.business.controller.dto.response.MinimumProjectListResponse
 import com.info.info_v1_backend.domain.project.business.controller.dto.response.MinimumProjectResponse
+import com.info.info_v1_backend.domain.project.data.entity.Creation
 import com.info.info_v1_backend.domain.project.data.entity.project.RegisteredProject
 import com.info.info_v1_backend.domain.project.data.entity.type.ProjectStatus
+import com.info.info_v1_backend.domain.project.data.repository.CreationRepository
 import com.info.info_v1_backend.domain.project.data.repository.ProjectRepository
+import com.info.info_v1_backend.domain.project.exception.NotHaveAccessProjectException
 import com.info.info_v1_backend.domain.project.exception.ProjectNotFoundException
 import com.info.info_v1_backend.domain.project.exception.ProjectStatusWaitingException
+import com.info.info_v1_backend.global.util.user.CurrentUtil
 import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -15,7 +22,10 @@ import java.util.stream.Collectors
 
 @Service
 class RegisteredProjectServiceImpl(
-    private val registeredProjectRepository: ProjectRepository<RegisteredProject>
+    private val registeredProjectRepository: ProjectRepository<RegisteredProject>,
+    private val currentUtil: CurrentUtil,
+    private val userRepository: StudentRepository,
+    private val creationRepository: CreationRepository
     ): RegisteredProjectService {
 
     override fun getMinimumLatestOrderProjectList(): MinimumProjectListResponse {
@@ -77,6 +87,46 @@ class RegisteredProjectServiceImpl(
             haveSeenCount = p.haveSeenCount,
             githubLinkList = p.codeLinkList
         )
+    }
+
+    override fun writeRegisteredProject(request: RegisteredProjectCreateRequest) {
+        verifyUser(request.studentIdList)
+        val c = request.studentIdList.stream()
+            .map { creationRepository.save(
+                Creation(
+                project = null,
+                student = userRepository.findByIdOrNull(it)
+                    ?: throw UserNotFoundException("$it :: not found")
+            )
+            )}
+            .collect(Collectors.toList())
+
+        val p = registeredProjectRepository.save(
+            RegisteredProject(
+            name = request.name,
+            shortContent = request.shortContent,
+            purpose = request.purpose,
+            theoreticalBackground = request.theoreticalBackground,
+            codeLinkList = request.githubLinkList,
+            processList = request.processList,
+            result = request.result,
+            conclusion = request.conclusion,
+            referenceList = request.referenceList,
+            tagList = request.tagList,
+            creationList = c
+        ))
+        c.map {
+            it.id?.let {it1 -> creationRepository.findByIdOrNull(it1)
+                ?.editCreation(project = p)
+            }
+        }
+    }
+
+    private fun verifyUser(studentIdList: List<Long>) {
+        if(studentIdList.stream()
+                .anyMatch { currentUtil.getCurrentUser() == userRepository.findById(it) }){
+            throw NotHaveAccessProjectException("작성자가 프로젝트에 참여하지 않음")
+        }
     }
 
 }
