@@ -1,12 +1,10 @@
 package com.info.info_v1_backend.domain.company.data.entity.company
 
-import com.info.info_v1_backend.domain.auth.data.entity.type.Role
 import com.info.info_v1_backend.domain.auth.data.entity.user.Contactor
 import com.info.info_v1_backend.domain.auth.data.entity.user.Student
-import com.info.info_v1_backend.domain.auth.data.entity.user.User
-import com.info.info_v1_backend.domain.company.business.dto.request.EditCompanyRequest
-import com.info.info_v1_backend.domain.company.business.dto.response.MaximumCompanyResponse
-import com.info.info_v1_backend.domain.company.business.dto.response.MinimumCompanyResponse
+import com.info.info_v1_backend.domain.company.business.dto.request.company.EditCompanyRequest
+import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.company.MinimumCompanyResponse
 import com.info.info_v1_backend.domain.company.data.entity.comment.Comment
 import com.info.info_v1_backend.domain.company.data.entity.notice.Notice
 import com.info.info_v1_backend.global.base.entity.BaseTimeEntity
@@ -29,6 +27,8 @@ class Company(
     industryType: String?,
     mainProduct: String?,
     introduction: String,
+    address: String,
+    companyPlace: String
 ): BaseTimeEntity(){
     @Id
     val id: String = companyNumber
@@ -98,22 +98,58 @@ class Company(
     )
     var commentList: MutableList<Comment> = ArrayList()
 
+    @Column(name = "company_address", nullable = false)
+    var address: String = address
+        protected set
+    @Column(name = "company_place", nullable = false)
+    var companyPlace: String = companyPlace
+
+    fun hireStudentAll(studentList: List<Student>) {
+        this.studentList.addAll(studentList)
+    }
     fun editCompany(request: EditCompanyRequest) {
-        this.shortName = request.shortName
-        this.fullName = request.fullName
-        this.companyPhone = request.companyPhone
-        this.faxAddress = request.faxAddress
-        this.establishedAt = request.establishedAt
-        this.annualSales = request.annualSales
-        this.workerCount = request.workerCount
-        this.industryType = request.industryType
-        this.mainProduct = request.mainProduct
-        this.introduction = request.introduction
+        request.shortName?. let {
+            this.shortName = it
+        }
+        request.fullName?. let{
+            this.fullName = it
+        }
+        request.companyPhone?. let{
+            this.companyPhone = it
+        }
+        request.faxAddress?. let{
+            this.faxAddress = it
+        }
+        request.establishedAt?. let{
+            this.establishedAt = it
+        }
+        request.annualSales?. let{
+            this.annualSales = it
+        }
+        request.workerCount?. let {
+            this.workerCount = it
+        }
+        request.industryType?. let{
+            this.industryType = it
+        }
+        request.mainProduct?. let{
+            this.mainProduct = it
+        }
+        request.introduction?. let{
+            this.introduction = it
+        }
+        request.address?. let{
+            this.address = it
+        }
+        request.companyPlace?. let{
+            this.companyPlace = it
+        }
     }
 
 
     fun toMinimumCompanyResponse(): MinimumCompanyResponse {
         return MinimumCompanyResponse(
+            this.id,
             this.shortName,
             this.fullName,
             this.photoList.map {
@@ -125,19 +161,30 @@ class Company(
 
     fun toMaximumCompanyResponse(): MaximumCompanyResponse {
         return MaximumCompanyResponse(
+            this.id,
             this.shortName,
             this.fullName,
             this.photoList.map {
                 it.toImageDto()
             },
+            this.establishedAt,
+            this.annualSales,
             this.introduction,
             this.employedCount,
+            this.industryType,
+            this.mainProduct,
+            this.address,
+            this.companyPlace,
             this.commentList.filter {
                 !it.isDeleted
             }.map {
                 it.toCommentResponse()
             }
         )
+    }
+
+    fun registerNotice(notice: Notice) {
+        this.noticeList.add(notice)
     }
 
 }

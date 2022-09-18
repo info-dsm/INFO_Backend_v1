@@ -1,9 +1,7 @@
 package com.info.info_v1_backend.domain.company.business.service
 
-import com.info.info_v1_backend.domain.company.business.dto.request.EditCommentRequest
-import com.info.info_v1_backend.domain.company.business.dto.request.WriteCommentRequest
-import com.info.info_v1_backend.domain.company.business.dto.response.CommentResponse
-import com.info.info_v1_backend.domain.company.data.entity.company.Company
+import com.info.info_v1_backend.domain.company.business.dto.request.comment.EditCommentRequest
+import com.info.info_v1_backend.domain.company.business.dto.request.comment.WriteCommentRequest
 
 interface CommentService {
 

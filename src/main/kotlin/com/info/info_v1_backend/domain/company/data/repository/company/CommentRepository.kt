@@ -1,4 +1,4 @@
-package com.info.info_v1_backend.domain.company.data.repository
+package com.info.info_v1_backend.domain.company.data.repository.company
 
 import com.info.info_v1_backend.domain.auth.data.entity.user.Student
 import com.info.info_v1_backend.domain.company.data.entity.comment.Comment

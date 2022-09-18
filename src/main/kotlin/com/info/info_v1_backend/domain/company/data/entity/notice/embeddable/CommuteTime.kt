@@ -1,5 +1,6 @@
 package com.info.info_v1_backend.domain.company.data.entity.notice.embeddable
 
+import com.info.info_v1_backend.domain.company.business.dto.request.notice.CommuteTimeRequest
 import javax.persistence.Column
 import javax.persistence.Embeddable
 
@@ -14,5 +15,11 @@ class CommuteTime(
     @Column(name = "end_time", nullable = false)
     var endTime = endTime
 
+    fun toCommuteTimeRequest(): CommuteTimeRequest {
+        return CommuteTimeRequest(
+            this.startTime,
+            this.endTime
+        )
+    }
 
 }
