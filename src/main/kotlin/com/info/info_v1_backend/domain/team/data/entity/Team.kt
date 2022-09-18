@@ -1,6 +1,7 @@
 package com.info.info_v1_backend.domain.team.data.entity
 
 import com.info.info_v1_backend.domain.auth.data.entity.user.Student
+import com.info.info_v1_backend.domain.team.business.dto.request.EditTeamRequest
 import com.info.info_v1_backend.global.base.entity.BaseAuthorEntity
 import java.time.YearMonth
 import javax.persistence.CascadeType
@@ -28,20 +29,32 @@ class Team(
         protected set
 
     @Column(name = "team_established_at")
-    val establishedAt: YearMonth = establishedAt
+    var establishedAt: YearMonth = establishedAt
+        protected set
 
 
     @Column(name = "team_github_link", nullable = true)
     var githubLink: String? = githubLink
+        protected set
 
     @OneToMany(cascade = [CascadeType.REMOVE])
     var affiliation: MutableList<Affiliation> = ArrayList()
 
     @ManyToOne(cascade = [CascadeType.REMOVE])
     var header: Student = header
+        protected set
 
-
-    //header 있어야함
+    fun editTeam(r: EditTeamRequest) {
+        r.name?. let {
+            this.name = it
+        }
+        r.establishedAt?. let{
+            this.establishedAt = it
+        }
+        r.githubLink?. let{
+            this.githubLink = it
+        }
+    }
 
 
 }
