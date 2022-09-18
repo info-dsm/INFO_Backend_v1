@@ -82,5 +82,10 @@ abstract class User(
     fun editPassword(password: String){
         this.password = password
     }
+    fun changeEmail(email: String){
+        email?.let {
+            this.email = it
+        }
+    }
 
 }

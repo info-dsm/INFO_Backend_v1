@@ -25,12 +25,13 @@ import org.springframework.web.bind.annotation.RestController
 @Validated
 class CompanyController(
     private val companyService: CompanyService,
-    private val emailService: EmailService
 ) {
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    fun registerCompany(@RequestBody request: RegisterCompanyRequest) {
+    fun registerCompany(
+        @RequestBody request: RegisterCompanyRequest
+    ) {
         companyService.registerCompany(request)
     }
 
@@ -38,7 +39,7 @@ class CompanyController(
     @ResponseStatus(HttpStatus.OK)
     fun editCompany(
         @RequestBody request: EditCompanyRequest,
-        @RequestParam id: Long
+        @RequestParam(required = true) id: Long
     ) {
         companyService.editCompany(request, id)
     }
@@ -46,25 +47,29 @@ class CompanyController(
     @GetMapping("/list")
     fun getMinimumCompanyList(
         @RequestParam(defaultValue = "0") idx: Int,
-        @RequestParam size: Int
+        @RequestParam(defaultValue = "10") size: Int
     ): Page<MinimumCompanyResponse> {
         return companyService.getMinimumCompanyList(idx, size)
     }
 
     @GetMapping
     fun getMaximumCompany(
-        @RequestParam id: Long
+        @RequestParam(required = true) id: Long
     ): MaximumCompanyResponse {
         return companyService.getMaximumCompany(id)
     }
 
     @GetMapping("/user")
-    fun getMaximumCompanyByUserId(@RequestParam id: Long): List<MaximumCompanyResponse> {
+    fun getMaximumCompanyByUserId(
+        @RequestParam(required = true) id: Long
+    ): List<MaximumCompanyResponse> {
         return companyService.getMaximumCompanyByUserId(id)
     }
 
     @GetMapping("/search")
-    fun searchCompany(@RequestParam query: String): List<MinimumCompanyResponse> {
+    fun searchCompany(
+        @RequestParam(required = true) query: String
+    ): List<MinimumCompanyResponse> {
         return companyService.searchCompany(query)
     }
 

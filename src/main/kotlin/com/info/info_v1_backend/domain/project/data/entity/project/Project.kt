@@ -1,5 +1,6 @@
 package com.info.info_v1_backend.domain.project.data.entity.project
 
+import com.info.info_v1_backend.domain.auth.presentation.dto.response.ProjectList
 import com.info.info_v1_backend.domain.project.data.entity.Creation
 import com.info.info_v1_backend.domain.project.data.entity.type.ProjectStatus
 import com.info.info_v1_backend.domain.team.data.entity.Team
@@ -61,5 +62,13 @@ sealed class Project(
     @Column(name = "project_status")
     var status: ProjectStatus = projectStatus
         protected set
+
+    fun toProjectList(): ProjectList{
+        return ProjectList(
+                this.name,
+                this.codeLinkList,
+                this.status,
+        )
+    }
 
 }

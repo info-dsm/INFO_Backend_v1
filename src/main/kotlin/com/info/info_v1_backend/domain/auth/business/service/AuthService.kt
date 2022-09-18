@@ -1,6 +1,8 @@
 package com.info.info_v1_backend.domain.auth.business.service
 
 import com.info.info_v1_backend.domain.auth.presentation.dto.request.*
+import com.info.info_v1_backend.domain.auth.presentation.dto.response.GetUserInfo
+import com.info.info_v1_backend.domain.auth.presentation.dto.response.MinimumStudentList
 import com.info.info_v1_backend.global.security.jwt.data.TokenResponse
 
 interface AuthService {
@@ -12,5 +14,9 @@ interface AuthService {
     fun editPassword(req: EditPasswordRequest)
     fun reissue(req: ReissueRequest): TokenResponse
     fun deleteMe()
+    fun getUserInfo(userName: String?):GetUserInfo
+    fun editMyInfo(request: EditMyInfo)
+    fun getStudentList(): MinimumStudentList
+    fun changeEmail(request: ChangeEmailRequest)
 
 }
