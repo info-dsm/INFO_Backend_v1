@@ -4,6 +4,7 @@ import com.info.info_v1_backend.domain.project.data.entity.Creation
 import com.info.info_v1_backend.domain.project.data.entity.type.ProjectStatus
 import com.info.info_v1_backend.domain.team.data.Team
 import com.info.info_v1_backend.global.base.entity.BaseAuthorEntity
+import com.info.info_v1_backend.global.image.entity.File
 import javax.persistence.CascadeType
 import javax.persistence.Column
 import javax.persistence.DiscriminatorColumn
@@ -41,8 +42,9 @@ sealed class Project(
     var shortContent: String = shortContent
         protected set
 
-    @Column(name = "have-seen-count", nullable = false)
+    @Column(name = "have_seen_count", nullable = false)
     var haveSeenCount: Long = 0
+        protected set
 
     @OneToMany(mappedBy = "project")
     var creationList: MutableList<Creation> = creationList
@@ -65,4 +67,7 @@ sealed class Project(
     var status: ProjectStatus = projectStatus
         protected set
 
+    @OneToMany(mappedBy = "project", cascade = [CascadeType.REMOVE])
+    var imageLinkList: MutableList<File>? = null
+        protected set
 }
