@@ -1,4 +1,4 @@
-package com.info.info_v1_backend.domain.team.data
+package com.info.info_v1_backend.domain.team.data.entity
 
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
 import com.info.info_v1_backend.global.base.entity.BaseTimeEntity
