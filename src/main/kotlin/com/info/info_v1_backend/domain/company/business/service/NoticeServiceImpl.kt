@@ -11,18 +11,22 @@ import com.info.info_v1_backend.domain.company.business.dto.request.notice.Regis
 import com.info.info_v1_backend.domain.company.business.dto.response.notice.MaximumNoticeResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.notice.MinimumNoticeResponse
 import com.info.info_v1_backend.domain.company.data.entity.notice.Notice
+import com.info.info_v1_backend.domain.company.data.entity.notice.NoticeSearchDocument
 import com.info.info_v1_backend.domain.company.data.entity.notice.Pay
 import com.info.info_v1_backend.domain.company.data.entity.notice.embeddable.*
 import com.info.info_v1_backend.domain.company.data.repository.notice.NoticeRepository
+import com.info.info_v1_backend.domain.company.data.repository.notice.NoticeSearchDocumentRepository
 import com.info.info_v1_backend.domain.company.data.repository.notice.PayRepository
 import com.info.info_v1_backend.domain.company.data.repository.notice.TargetMajorRepository
 import com.info.info_v1_backend.domain.company.exception.CompanyNotFoundException
 import com.info.info_v1_backend.domain.company.exception.IsNotContactorCompany
 import com.info.info_v1_backend.domain.company.exception.NoticeNotFoundException
+import com.info.info_v1_backend.global.error.common.NoAuthenticationException
 import com.info.info_v1_backend.global.util.user.CurrentUtil
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
+import org.springframework.data.mongodb.core.query.TextCriteria
 import org.springframework.stereotype.Service
 import javax.transaction.Transactional
 
@@ -33,7 +37,8 @@ class NoticeServiceImpl(
     private val noticeRepository: NoticeRepository,
     private val payRepository: PayRepository,
     private val targetMajorRepository: TargetMajorRepository,
-    private val studentRepository: StudentRepository
+    private val studentRepository: StudentRepository,
+    private val noticeSearchDocumentRepository: NoticeSearchDocumentRepository
 ): NoticeService {
 
     override fun registerNotice(r: RegisterNoticeRequest) {
@@ -103,6 +108,16 @@ class NoticeServiceImpl(
                             )
                         }
                     }
+                    noticeSearchDocumentRepository.findByNoticeId(notice.id!!).orElse(null)?: let{
+                        noticeSearchDocumentRepository.save(
+                            NoticeSearchDocument(
+                                r.businessInformation,
+                                notice.id!!,
+                                notice.company.fullName,
+                                notice.company.id
+                            )
+                        )
+                    }
                 }
             }
         } else throw IsNotContactorCompany(current.roleList.toString())
@@ -111,7 +126,7 @@ class NoticeServiceImpl(
     override fun editNotice(request: EditNoticeRequest, noticeId: Long) {
         val current = currentUtil.getCurrentUser()
         val notice = noticeRepository.findById(noticeId).orElse(null)?: throw NoticeNotFoundException(noticeId.toString())
-        if (checkAuthentication(current, notice))
+        if (checkAuthentication(current, notice)) throw NoAuthenticationException(current.roleList.toString())
 
         request.targetMajorList.map {
             target -> {
@@ -148,6 +163,18 @@ class NoticeServiceImpl(
             pay ->
             request.pay?.let { pay?.editPay(it) }
         }
+        noticeSearchDocumentRepository.findByNoticeId(
+            noticeId
+        ).orElse(null)?: let{
+        noticeSearchDocumentRepository.save(
+            NoticeSearchDocument(
+                notice.businessInformation,
+                notice.id!!,
+                notice.company.fullName,
+                notice.company.id
+            )
+        )
+    }.editBusinessInfo(request.businessInformation)
 
 
         notice.editNotice(request)
@@ -156,14 +183,14 @@ class NoticeServiceImpl(
     override fun deleteNotice(noticeId: Long) {
         val current = currentUtil.getCurrentUser()
         val notice = noticeRepository.findById(noticeId).orElse(null)?: throw NoticeNotFoundException(noticeId.toString())
-        if (checkAuthentication(current, notice))
+        if (checkAuthentication(current, notice)) throw NoAuthenticationException(current.roleList.toString())
         noticeRepository.delete(notice)
     }
 
     override fun closeNotice(request: CloseNoticeRequest, noticeId: Long) {
         val current = currentUtil.getCurrentUser()
         val notice = noticeRepository.findById(noticeId).orElse(null)?: throw NoticeNotFoundException(noticeId.toString())
-        if (checkAuthentication(current, notice))
+        if (checkAuthentication(current, notice)) throw NoAuthenticationException(current.roleList.toString())
         notice.makeExpired()
 
         val studentList: MutableList<Student> = ArrayList()
@@ -191,6 +218,17 @@ class NoticeServiceImpl(
     }
 
     override fun searchMinimumNoticeList(query: String): List<MinimumNoticeResponse> {
-        TODO("Not yet implemented")
+        val criteria = TextCriteria()
+        criteria.matchingAny(query)
+
+        val minimumNoticeResponseList: MutableList<MinimumNoticeResponse> = ArrayList()
+        noticeSearchDocumentRepository.findAllBy(criteria, PageRequest.of(0, 20)).map {
+        noticeSearchDocument ->
+            noticeRepository.findById(noticeSearchDocument.noticeId).orElse(null)?.let{
+                minimumNoticeResponseList.add(it.toMinimumNoticeResponse())
+            }
+        }
+        
+        return minimumNoticeResponseList
     }
 }
