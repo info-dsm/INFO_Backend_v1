@@ -1,13 +1,17 @@
 package com.info.info_v1_backend.global.image.entity
 
+import com.info.info_v1_backend.domain.project.data.entity.project.Project
 import com.info.info_v1_backend.global.base.entity.BaseAuthorEntity
 import com.info.info_v1_backend.global.image.entity.type.FileType
+import javax.persistence.CascadeType
 import com.info.info_v1_backend.infra.amazon.s3.dto.ImageDto
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
+import javax.persistence.JoinColumn
+import javax.persistence.ManyToOne
 
 @Entity
 class File(
@@ -31,6 +35,11 @@ class File(
     var extention: String = extension
         protected set
 
+    @ManyToOne
+    @JoinColumn(name = "project_id")
+    var projectId: Project? = null
+        protected set
+        
     fun toImageDto(): ImageDto {
         return ImageDto(
             this.fileUrl,

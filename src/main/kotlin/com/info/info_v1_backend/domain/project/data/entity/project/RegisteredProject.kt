@@ -24,14 +24,12 @@ class RegisteredProject(
     conclusion: String,
     referenceList: MutableList<String>,
     creationList: MutableList<Creation>,
-    developTeam: Team,
     codeLinkList: MutableList<String>,
     tagList: MutableList<String>
 ): Project(
     name,
     shortContent,
     creationList,
-    developTeam,
     codeLinkList,
     tagList,
     ProjectStatus.WAITING
