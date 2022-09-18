@@ -9,9 +9,11 @@ import com.info.info_v1_backend.domain.company.business.service.CompanyService
 import org.springframework.data.domain.Page
 import org.springframework.http.HttpStatus
 import org.springframework.validation.annotation.Validated
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -69,6 +71,21 @@ class CompanyController(
         @RequestParam(required = true) query: String
     ): List<MinimumCompanyResponse> {
         return companyService.searchCompany(query)
+    }
+
+    @PutMapping("/contactor")
+    fun addContactor(
+        @RequestParam(required = true) newContactorEmail: String
+    ) {
+        companyService.addContactor(newContactorEmail)
+    }
+
+    @DeleteMapping("/contactor")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun removeContactor(
+        @RequestParam(required = true) targetContactorEmail: String
+    ) {
+        companyService.removeContactor(targetContactorEmail)
     }
 
 

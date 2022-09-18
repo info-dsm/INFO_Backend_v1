@@ -8,6 +8,8 @@ import org.springframework.data.domain.Page
 
 interface CompanyService {
 
+    fun addContactor(newContactorEmail: String)
+    fun removeContactor(targetContactorEmail: String)
     fun registerCompany(request: RegisterCompanyRequest)
     fun editCompany(request: EditCompanyRequest, companyId: Long)
     fun getMinimumCompanyList(idx: Int, size: Int): Page<MinimumCompanyResponse>

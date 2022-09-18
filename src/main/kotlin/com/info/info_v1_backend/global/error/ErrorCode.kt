@@ -34,7 +34,9 @@ enum class ErrorCode(
     COMMENT_NOT_FOUND("Comment Not Found", HttpStatus.NOT_FOUND),
     NOTICE_NOT_FOUND("Notice Not Found", HttpStatus.NOT_FOUND),
     TEAM_NOT_FOUND("Team Not Found", HttpStatus.NOT_FOUND),
-    NO_AUTHENTICATION("you have No Authentication", HttpStatus.FORBIDDEN)
+    NO_AUTHENTICATION("you have No Authentication", HttpStatus.FORBIDDEN),
+    CONTACTOR_NOT_FOUND("Contactor Not Found", HttpStatus.NOT_FOUND),
+    CONTACTOR_MUST_LEAVE_LEAST_AT_ONE_ON_COMPANY("Contactor Must leave least at one on company", HttpStatus.BAD_REQUEST)
 
 
 

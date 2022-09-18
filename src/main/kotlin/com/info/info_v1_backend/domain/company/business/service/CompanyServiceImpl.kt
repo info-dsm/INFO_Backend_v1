@@ -5,18 +5,18 @@ import com.info.info_v1_backend.domain.company.business.dto.request.company.Regi
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
 import com.info.info_v1_backend.domain.auth.data.entity.user.Contactor
 import com.info.info_v1_backend.domain.auth.data.entity.user.Student
+import com.info.info_v1_backend.domain.auth.data.entity.user.Teacher
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
 import com.info.info_v1_backend.domain.auth.data.repository.user.UserRepository
+import com.info.info_v1_backend.domain.auth.exception.ContactorNotFoundException
 import com.info.info_v1_backend.domain.auth.exception.StudentCannotOpenException
 import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MinimumCompanyResponse
 import com.info.info_v1_backend.domain.company.data.repository.company.CompanyCheckCodeRepository
 import com.info.info_v1_backend.domain.company.data.repository.company.CompanyRepository
-import com.info.info_v1_backend.domain.company.exception.CompanyNotFoundException
-import com.info.info_v1_backend.domain.company.exception.InvalidCompanyCheckCodeException
-import com.info.info_v1_backend.domain.company.exception.IsNotContactorCompany
-import com.info.info_v1_backend.domain.company.exception.NotContactorException
+import com.info.info_v1_backend.domain.company.exception.*
+import com.info.info_v1_backend.global.error.common.NoAuthenticationException
 import com.info.info_v1_backend.global.util.user.CurrentUtil
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -30,8 +30,26 @@ class CompanyServiceImpl(
     private val companyRepository: CompanyRepository,
     private val companyCheckCodeRepository: CompanyCheckCodeRepository,
     private val currentUtil: CurrentUtil,
-    private val studentRepository: UserRepository<Student>
+    private val studentRepository: UserRepository<Student>,
+    private val contactorRepository: UserRepository<Contactor>
 ): CompanyService {
+    override fun addContactor(newContactorEmail: String) {
+        val current = currentUtil.getCurrentUser()
+        if ((current is Contactor) && current.company?.contactorList?.contains(current) == true) {
+            val newContactor = contactorRepository.findByEmail(newContactorEmail).orElse(null)?: throw ContactorNotFoundException(newContactorEmail)
+            current.company!!.contactorList.add(newContactor)
+        } else throw NoAuthenticationException(current.roleList.toString())
+    }
+
+    override fun removeContactor(targetContactorEmail: String) {
+        val current = currentUtil.getCurrentUser()
+        if ((current is Contactor) && (current.company?.contactorList?.contains(current) == true)) {
+            if (current.company!!.contactorList.size <= 1) throw ContactorMustLeaveLeastAtOneOnCompanyException(current.company!!.contactorList.size.toString())
+            val targetContactor = contactorRepository.findByEmail(targetContactorEmail).orElse(null)?: throw ContactorNotFoundException(targetContactorEmail)
+            if (targetContactor.company != current.company) throw NoAuthenticationException(current.company.toString())
+            current.company!!.contactorList.remove(targetContactor)
+        } else throw NoAuthenticationException(current.roleList.toString())
+    }
 
     override fun registerCompany(request: RegisterCompanyRequest) {
         //checkEmailCode 로직 추가
