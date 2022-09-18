@@ -4,6 +4,7 @@ import com.info.info_v1_backend.domain.auth.business.service.AuthService
 import com.info.info_v1_backend.domain.auth.business.service.EmailService
 import com.info.info_v1_backend.domain.auth.presentation.dto.request.*
 import com.info.info_v1_backend.domain.auth.presentation.dto.response.GetUserInfo
+import com.info.info_v1_backend.domain.auth.presentation.dto.response.MinimumStudentList
 import com.info.info_v1_backend.global.security.jwt.data.TokenResponse
 import com.info.info_v1_backend.global.util.user.CurrentUtil
 import org.springframework.validation.annotation.Validated
@@ -90,7 +91,7 @@ class AuthController(
     ){
         authService.editMyInfo(request)
     }
-    @GetMapping("/studentInfo")
+    @GetMapping("/me")
     fun getStudentInfo(
             @RequestParam(required = false)
             name: String?
@@ -98,4 +99,8 @@ class AuthController(
         return authService.getUserInfo(name)
     }
 
+    @PostMapping("/getStudentList")
+    fun getStudentList(): MinimumStudentList{
+        return authService.getStudentList()
+    }
 }

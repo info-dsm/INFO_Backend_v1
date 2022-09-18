@@ -11,10 +11,7 @@ import com.info.info_v1_backend.domain.auth.data.repository.user.StudentReposito
 import com.info.info_v1_backend.domain.auth.data.repository.user.UserRepository
 import com.info.info_v1_backend.domain.auth.exception.*
 import com.info.info_v1_backend.domain.auth.presentation.dto.request.*
-import com.info.info_v1_backend.domain.auth.presentation.dto.response.GetContactor
-import com.info.info_v1_backend.domain.auth.presentation.dto.response.GetStudentInfo
-import com.info.info_v1_backend.domain.auth.presentation.dto.response.GetTeacherInfo
-import com.info.info_v1_backend.domain.auth.presentation.dto.response.GetUserInfo
+import com.info.info_v1_backend.domain.auth.presentation.dto.response.*
 import com.info.info_v1_backend.global.security.jwt.TokenProvider
 import com.info.info_v1_backend.global.security.jwt.data.TokenResponse
 import com.info.info_v1_backend.global.security.jwt.exception.ExpiredTokenException
@@ -179,6 +176,13 @@ class AuthServiceImpl(
                     ?: throw UserNotFoundException(current.id.toString())
             user.editMyInfo(request)
         } else throw IsNotStudentException(current.roleList.toString())
+    }
+
+    override fun getStudentList(): MinimumStudentList {
+        val list =  studentRepository.findAllByStartingWith().map {
+            it.toMinimumStudent()
+        }
+        return MinimumStudentList(list)
     }
 
 }
