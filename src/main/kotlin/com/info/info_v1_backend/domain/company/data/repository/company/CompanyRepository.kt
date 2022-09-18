@@ -7,8 +7,8 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import java.util.Optional
 
-interface CompanyRepository: JpaRepository<Company, Long> {
+interface CompanyRepository: JpaRepository<Company, String> {
 
     fun findAllByStudentListContains(student: Student): List<Company>
-    fun findByIdAndStudentListContains(id: Long, student: Student): Optional<Company>
+    fun findByIdAndStudentListContains(id: String, student: Student): Optional<Company>
 }

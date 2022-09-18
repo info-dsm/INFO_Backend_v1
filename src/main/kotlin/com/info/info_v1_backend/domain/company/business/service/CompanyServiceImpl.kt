@@ -13,14 +13,21 @@ import com.info.info_v1_backend.domain.auth.exception.StudentCannotOpenException
 import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MinimumCompanyResponse
+import com.info.info_v1_backend.domain.company.data.entity.company.CompanySearchDocument
+import com.info.info_v1_backend.domain.company.data.entity.notice.NoticeSearchDocument
 import com.info.info_v1_backend.domain.company.data.repository.company.CompanyCheckCodeRepository
 import com.info.info_v1_backend.domain.company.data.repository.company.CompanyRepository
+import com.info.info_v1_backend.domain.company.data.repository.company.CompanySearchDocumentRepository
+import com.info.info_v1_backend.domain.company.data.repository.notice.NoticeSearchDocumentRepository
 import com.info.info_v1_backend.domain.company.exception.*
 import com.info.info_v1_backend.global.error.common.NoAuthenticationException
 import com.info.info_v1_backend.global.util.user.CurrentUtil
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
+import org.springframework.data.mongodb.core.query.TextCriteria
+import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.stereotype.Service
 import javax.transaction.Transactional
 
@@ -31,7 +38,9 @@ class CompanyServiceImpl(
     private val companyCheckCodeRepository: CompanyCheckCodeRepository,
     private val currentUtil: CurrentUtil,
     private val studentRepository: UserRepository<Student>,
-    private val contactorRepository: UserRepository<Contactor>
+    private val contactorRepository: UserRepository<Contactor>,
+    private val companySearchDocumentRepository: CompanySearchDocumentRepository,
+    private val noticeSearchDocumentRepository: NoticeSearchDocumentRepository
 ): CompanyService {
     override fun addContactor(newContactorEmail: String) {
         val current = currentUtil.getCurrentUser()
@@ -64,7 +73,7 @@ class CompanyServiceImpl(
 
         if (current !is Contactor) throw NotContactorException(current.roleList.toString())
 
-        companyRepository.save(
+        val company = companyRepository.save(
             Company(
                 request.shortName,
                 request.fullName,
@@ -82,10 +91,17 @@ class CompanyServiceImpl(
                 request.companyPlace
             )
         )
+
+        companySearchDocumentRepository.save(
+            CompanySearchDocument(
+                company.fullName,
+                company.id,
+            )
+        )
         
     }
 
-    override fun editCompany(request: EditCompanyRequest, id: Long) {
+    override fun editCompany(request: EditCompanyRequest, id: String) {
         val current = currentUtil.getCurrentUser()
 
         if (current is Contactor) {
@@ -94,6 +110,27 @@ class CompanyServiceImpl(
             company.editCompany(
                 request
             )
+            request.fullName?. let { fullName: String ->
+                {
+                    companySearchDocumentRepository.findByCompanyId(company.id).orElse(null)
+                        ?.let { companySearchDocument: CompanySearchDocument ->
+                            {
+                                companySearchDocument.changeCompanyName(fullName)
+                            }
+                        }
+                        ?: companySearchDocumentRepository.save(
+                            CompanySearchDocument(
+                                company.fullName,
+                                company.id
+                            )
+                        )
+                    noticeSearchDocumentRepository.findAllByCompanyId(company.id).map {
+                        noticeSearchDocument -> {
+                            noticeSearchDocument.editCompanyName(request.fullName)
+                        }
+                    }
+                }
+            }
         } else throw NotContactorException(current.roleList.toString())
     }
 
@@ -103,7 +140,7 @@ class CompanyServiceImpl(
         }
     }
 
-    override fun getMaximumCompany(id: Long): MaximumCompanyResponse {
+    override fun getMaximumCompany(id: String): MaximumCompanyResponse {
         return (companyRepository.findById(id).orElse(null)?: throw CompanyNotFoundException(id.toString()))
             .toMaximumCompanyResponse()
 
@@ -126,7 +163,21 @@ class CompanyServiceImpl(
     }
 
     override fun searchCompany(query: String): List<MinimumCompanyResponse> {
-        TODO("Not yet implemented")
+        val companySearchDocumentList = companySearchDocumentRepository.findByCompanyNameOrderByTextScoreDesc(query, PageRequest.of(0, 20))
+            .toList()
+
+        val minimumCompanyResponseList: MutableList<MinimumCompanyResponse> = ArrayList()
+        companySearchDocumentList.map {
+            companySearchDocument: CompanySearchDocument ->
+            companyRepository.findById(companySearchDocument.companyId).orElse(null)?. let{
+                company:Company ->
+                minimumCompanyResponseList.add(
+                    company.toMinimumCompanyResponse()
+                )
+            }
+
+        }
+        return minimumCompanyResponseList
     }
 
 
