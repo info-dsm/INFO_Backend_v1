@@ -1,8 +1,8 @@
-package com.info.info_v1_backend.domain.project.business.controller
+package com.info.info_v1_backend.domain.project.presentation
 
-import com.info.info_v1_backend.domain.project.business.controller.dto.request.IndividualProjectRequest
-import com.info.info_v1_backend.domain.project.business.controller.dto.response.MaximumProjectResponse
-import com.info.info_v1_backend.domain.project.business.controller.dto.response.MinimumProjectListResponse
+import com.info.info_v1_backend.domain.project.business.dto.request.IndividualProjectRequest
+import com.info.info_v1_backend.domain.project.business.dto.response.MaximumProjectResponse
+import com.info.info_v1_backend.domain.project.business.dto.response.MinimumProjectListResponse
 import com.info.info_v1_backend.domain.project.business.service.IndividualProjectService
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/info/v1/project/individual")
 class IndividualProjectController(private val individualProjectService: IndividualProjectService) {
 
-    @GetMapping("/minimum/latest-order}")
+    @GetMapping("/minimum/latest-order")
     fun getMinimumLatestOrderProjectList(): MinimumProjectListResponse {
         return individualProjectService.getMinimumLatestOrderProjectList();
     }

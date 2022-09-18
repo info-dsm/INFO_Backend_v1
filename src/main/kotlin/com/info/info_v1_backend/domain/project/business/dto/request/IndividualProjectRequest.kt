@@ -1,4 +1,4 @@
-package com.info.info_v1_backend.domain.project.business.controller.dto.request
+package com.info.info_v1_backend.domain.project.business.dto.request
 
 import com.info.info_v1_backend.domain.project.data.entity.Creation
 

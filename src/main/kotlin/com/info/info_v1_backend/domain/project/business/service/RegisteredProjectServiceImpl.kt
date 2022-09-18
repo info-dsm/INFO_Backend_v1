@@ -1,8 +1,8 @@
 package com.info.info_v1_backend.domain.project.business.service
 
-import com.info.info_v1_backend.domain.project.business.controller.dto.response.MaximumProjectResponse
-import com.info.info_v1_backend.domain.project.business.controller.dto.response.MinimumProjectListResponse
-import com.info.info_v1_backend.domain.project.business.controller.dto.response.MinimumProjectResponse
+import com.info.info_v1_backend.domain.project.business.dto.response.MaximumProjectResponse
+import com.info.info_v1_backend.domain.project.business.dto.response.MinimumProjectListResponse
+import com.info.info_v1_backend.domain.project.business.dto.response.MinimumProjectResponse
 import com.info.info_v1_backend.domain.project.data.entity.project.RegisteredProject
 import com.info.info_v1_backend.domain.project.data.entity.type.ProjectStatus
 import com.info.info_v1_backend.domain.project.data.repository.ProjectRepository

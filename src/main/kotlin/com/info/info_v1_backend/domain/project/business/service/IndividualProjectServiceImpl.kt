@@ -2,10 +2,10 @@ package com.info.info_v1_backend.domain.project.business.service
 
 import com.info.info_v1_backend.domain.auth.data.repository.user.StudentRepository
 import com.info.info_v1_backend.domain.auth.data.repository.user.UserRepository
-import com.info.info_v1_backend.domain.project.business.controller.dto.request.IndividualProjectRequest
-import com.info.info_v1_backend.domain.project.business.controller.dto.response.MaximumProjectResponse
-import com.info.info_v1_backend.domain.project.business.controller.dto.response.MinimumProjectListResponse
-import com.info.info_v1_backend.domain.project.business.controller.dto.response.MinimumProjectResponse
+import com.info.info_v1_backend.domain.project.business.dto.request.IndividualProjectRequest
+import com.info.info_v1_backend.domain.project.business.dto.response.MaximumProjectResponse
+import com.info.info_v1_backend.domain.project.business.dto.response.MinimumProjectListResponse
+import com.info.info_v1_backend.domain.project.business.dto.response.MinimumProjectResponse
 import com.info.info_v1_backend.domain.project.data.entity.Creation
 import com.info.info_v1_backend.domain.project.data.entity.project.IndividualProject
 import com.info.info_v1_backend.domain.project.data.entity.type.ProjectStatus
