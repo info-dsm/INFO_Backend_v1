@@ -1,4 +1,4 @@
-package com.info.info_v1_backend.domain.project.business.controller.dto
+package com.info.info_v1_backend.domain.project.business.controller.dto.response
 
 import com.info.info_v1_backend.domain.project.data.entity.type.ProjectStatus
 import com.info.info_v1_backend.global.image.entity.File

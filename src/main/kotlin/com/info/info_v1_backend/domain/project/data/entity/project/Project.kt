@@ -23,7 +23,6 @@ sealed class Project(
     name: String,
     shortContent: String,
     creationList: MutableList<Creation>,
-    developTeam: Team,
     codeLinkList: MutableList<String>,
     tagList: MutableList<String>,
     projectStatus: ProjectStatus
@@ -48,11 +47,6 @@ sealed class Project(
 
     @OneToMany(mappedBy = "project")
     var creationList: MutableList<Creation> = creationList
-        protected set
-
-    @ManyToOne(cascade = [CascadeType.REMOVE])
-    @JoinColumn(name = "team_id")
-    var developTeam: Team = developTeam
         protected set
 
     @ElementCollection

@@ -1,13 +1,19 @@
 package com.info.info_v1_backend.domain.project.business.service
 
-import com.info.info_v1_backend.domain.project.business.controller.dto.MaximumProjectResponse
-import com.info.info_v1_backend.domain.project.business.controller.dto.MinimumProjectListResponse
-import com.info.info_v1_backend.domain.project.business.controller.dto.MinimumProjectResponse
+import com.info.info_v1_backend.domain.auth.data.repository.user.StudentRepository
+import com.info.info_v1_backend.domain.auth.data.repository.user.UserRepository
+import com.info.info_v1_backend.domain.project.business.controller.dto.request.IndividualProjectRequest
+import com.info.info_v1_backend.domain.project.business.controller.dto.response.MaximumProjectResponse
+import com.info.info_v1_backend.domain.project.business.controller.dto.response.MinimumProjectListResponse
+import com.info.info_v1_backend.domain.project.business.controller.dto.response.MinimumProjectResponse
+import com.info.info_v1_backend.domain.project.data.entity.Creation
 import com.info.info_v1_backend.domain.project.data.entity.project.IndividualProject
 import com.info.info_v1_backend.domain.project.data.entity.type.ProjectStatus
+import com.info.info_v1_backend.domain.project.data.repository.CreationRepository
 import com.info.info_v1_backend.domain.project.data.repository.ProjectRepository
+import com.info.info_v1_backend.domain.project.exception.NotHaveAccessProjectException
 import com.info.info_v1_backend.domain.project.exception.ProjectNotFoundException
-import com.info.info_v1_backend.domain.project.exception.ProjectStatusWaitingException
+import com.info.info_v1_backend.global.util.user.UserCheckUtil
 import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -15,7 +21,10 @@ import java.util.stream.Collectors
 
 @Service
 class IndividualProjectServiceImpl(
-    private val individualRepository: ProjectRepository<IndividualProject>
+    private val individualRepository: ProjectRepository<IndividualProject>,
+    private val userCheckUtil: UserCheckUtil,
+    private val userRepository: StudentRepository,
+    private val creationRepository: CreationRepository
     ): IndividualProjectService{
 
     override fun getMinimumLatestOrderProjectList   (): MinimumProjectListResponse {
@@ -34,7 +43,8 @@ class IndividualProjectServiceImpl(
                 updatedBy = it.updatedBy,
                 shortContent = it.shortContent,
                 githubLinkList = it.codeLinkList
-            )}.collect(Collectors.toList()))
+            )
+            }.collect(Collectors.toList()))
     }
 
     override fun getMinimumNumberOfViewsProjectList(): MinimumProjectListResponse {
@@ -53,7 +63,8 @@ class IndividualProjectServiceImpl(
                     updatedBy = it.updatedBy,
                     shortContent = it.shortContent,
                     githubLinkList = it.codeLinkList
-                )}.collect(Collectors.toList()))
+                )
+            }.collect(Collectors.toList()))
     }
 
     override fun getMaximumProject(id: Long): MaximumProjectResponse {
@@ -72,6 +83,26 @@ class IndividualProjectServiceImpl(
             haveSeenCount = p.haveSeenCount,
             githubLinkList = p.codeLinkList
         )
+    }
+
+    override fun writeIndividualProject(request: IndividualProjectRequest) {
+        if(request.creationList.stream()
+                .anyMatch { userCheckUtil.getCurrentUser() == request.creationList }){
+            throw NotHaveAccessProjectException("작성자가 프로젝트에 참여하지 않음")
+        }
+        val creations = request.creationList.stream()
+            .map { creationRepository.save(Creation(
+                project = it.project,
+                student = it.student
+            ))}
+            .collect(Collectors.toList())
+        individualRepository.save(IndividualProject(
+            name = request.name,
+            shortContent = request.shortContent,
+            creationList = creations,
+            codeLinkList = request.githubLinkList,
+            tagList = request.tagList
+        ))
     }
 
 }

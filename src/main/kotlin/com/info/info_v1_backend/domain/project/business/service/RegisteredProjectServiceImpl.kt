@@ -1,8 +1,8 @@
 package com.info.info_v1_backend.domain.project.business.service
 
-import com.info.info_v1_backend.domain.project.business.controller.dto.MaximumProjectResponse
-import com.info.info_v1_backend.domain.project.business.controller.dto.MinimumProjectListResponse
-import com.info.info_v1_backend.domain.project.business.controller.dto.MinimumProjectResponse
+import com.info.info_v1_backend.domain.project.business.controller.dto.response.MaximumProjectResponse
+import com.info.info_v1_backend.domain.project.business.controller.dto.response.MinimumProjectListResponse
+import com.info.info_v1_backend.domain.project.business.controller.dto.response.MinimumProjectResponse
 import com.info.info_v1_backend.domain.project.data.entity.project.RegisteredProject
 import com.info.info_v1_backend.domain.project.data.entity.type.ProjectStatus
 import com.info.info_v1_backend.domain.project.data.repository.ProjectRepository
@@ -24,7 +24,8 @@ class RegisteredProjectServiceImpl(
             .by(Sort.Direction.DESC, "createdBy"))
             .stream()
             .filter { it.status == ProjectStatus.APPROVE }
-            .map{MinimumProjectResponse(
+            .map{
+                MinimumProjectResponse(
                 name = it.name,
                 haveSeenCount = it.haveSeenCount,
                 createAt = it.createdDate,
@@ -33,7 +34,8 @@ class RegisteredProjectServiceImpl(
                 updatedBy = it.updatedBy,
                 shortContent = it.shortContent,
                 githubLinkList = it.codeLinkList
-            )}.collect(Collectors.toList()))
+            )
+            }.collect(Collectors.toList()))
     }
 
     override fun getMinimumNumberOfViewsProjectList(): MinimumProjectListResponse {
@@ -42,7 +44,8 @@ class RegisteredProjectServiceImpl(
             .by(Sort.Direction.DESC, "haveSeenCount"))
             .stream()
             .filter { it.status != ProjectStatus.APPROVE }
-            .map{MinimumProjectResponse(
+            .map{
+                MinimumProjectResponse(
                 name = it.name,
                 haveSeenCount = it.haveSeenCount,
                 createAt = it.createdDate,
@@ -51,7 +54,8 @@ class RegisteredProjectServiceImpl(
                 updatedBy = it.updatedBy,
                 shortContent = it.shortContent,
                 githubLinkList = it.codeLinkList
-            )}.collect(Collectors.toList()))
+            )
+            }.collect(Collectors.toList()))
     }
 
     override fun getMaximumProject(id: Long): MaximumProjectResponse {

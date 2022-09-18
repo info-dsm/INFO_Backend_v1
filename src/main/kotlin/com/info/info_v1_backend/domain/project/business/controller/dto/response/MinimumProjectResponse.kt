@@ -1,4 +1,4 @@
-package com.info.info_v1_backend.domain.project.business.controller.dto
+package com.info.info_v1_backend.domain.project.business.controller.dto.response
 
 import java.time.LocalDateTime
 

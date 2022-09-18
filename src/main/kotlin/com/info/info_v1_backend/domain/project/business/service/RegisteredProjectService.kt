@@ -1,7 +1,7 @@
 package com.info.info_v1_backend.domain.project.business.service
 
-import com.info.info_v1_backend.domain.project.business.controller.dto.MaximumProjectResponse
-import com.info.info_v1_backend.domain.project.business.controller.dto.MinimumProjectListResponse
+import com.info.info_v1_backend.domain.project.business.controller.dto.response.MaximumProjectResponse
+import com.info.info_v1_backend.domain.project.business.controller.dto.response.MinimumProjectListResponse
 
 interface RegisteredProjectService {
 
