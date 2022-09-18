@@ -46,8 +46,8 @@ class Company(
     @Column(name = "company_fax_address", nullable = true)
     var faxAddress: String? = faxAddress
 
-    @OneToOne
-    var contactor: Contactor = contactor
+    @OneToMany(mappedBy = "company")
+    var contactorList: MutableList<Contactor> = ArrayList()
 
     @OneToMany
     var studentList: MutableList<Student> = ArrayList()
@@ -71,6 +71,10 @@ class Company(
 
     @OneToMany(mappedBy = "company", cascade = [CascadeType.REMOVE])
     var noticeList: MutableList<Notice> = ArrayList()
+
+    init {
+        this.contactorList.add(contactor)
+    }
 
 
 }

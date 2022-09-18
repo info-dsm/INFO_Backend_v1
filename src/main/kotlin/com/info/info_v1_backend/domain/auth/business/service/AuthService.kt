@@ -11,5 +11,6 @@ interface AuthService {
     fun login(req: LoginRequest): TokenResponse
     fun editPassword(req: EditPasswordRequest)
     fun reissue(req: ReissueRequest): TokenResponse
+    fun deleteMe()
 
 }

@@ -118,4 +118,8 @@ class AuthServiceImpl(
         }.orElse(null) ?: refreshTokenRepository.save(token)
         return tokenResponse
     }
+
+    override fun deleteMe() {
+        userRepository.delete(current.getCurrentUser())
+    }
 }
