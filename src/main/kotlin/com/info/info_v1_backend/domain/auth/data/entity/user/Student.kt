@@ -3,7 +3,7 @@ package com.info.info_v1_backend.domain.auth.data.entity.user
 import com.info.info_v1_backend.domain.auth.data.entity.type.Role
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
 import com.info.info_v1_backend.domain.project.data.entity.Creation
-import com.info.info_v1_backend.domain.team.data.Affiliation
+import com.info.info_v1_backend.domain.team.data.entity.Affiliation
 import javax.persistence.*
 
 

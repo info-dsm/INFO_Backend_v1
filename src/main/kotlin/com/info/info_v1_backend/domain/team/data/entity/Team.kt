@@ -1,20 +1,24 @@
-package com.info.info_v1_backend.domain.team.data
+package com.info.info_v1_backend.domain.team.data.entity
 
+import com.info.info_v1_backend.domain.auth.data.entity.user.Student
 import com.info.info_v1_backend.global.base.entity.BaseAuthorEntity
-import java.time.LocalDate
+import java.time.YearMonth
 import javax.persistence.CascadeType
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
+import javax.persistence.JoinColumn
+import javax.persistence.ManyToOne
 import javax.persistence.OneToMany
 
 @Entity
 class Team(
     name: String,
-    establishedAt: LocalDate,
-    githubLink: String
+    establishedAt: YearMonth,
+    githubLink: String,
+    header: Student
 ): BaseAuthorEntity() {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null
@@ -24,13 +28,18 @@ class Team(
         protected set
 
     @Column(name = "team_established_at")
-    val establishedAt: LocalDate = establishedAt
+    val establishedAt: YearMonth = establishedAt
+
 
     @Column(name = "team_github_link", nullable = true)
     var githubLink: String? = githubLink
 
     @OneToMany(cascade = [CascadeType.REMOVE])
     var affiliation: MutableList<Affiliation> = ArrayList()
+
+    @ManyToOne(cascade = [CascadeType.REMOVE])
+    var header: Student = header
+
 
     //header 있어야함
 
