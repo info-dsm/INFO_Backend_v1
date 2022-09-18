@@ -1,5 +1,6 @@
 package com.info.info_v1_backend.domain.project.data.entity.project
 
+import com.info.info_v1_backend.domain.project.business.controller.dto.request.EditRegisteredProjectDto
 import com.info.info_v1_backend.domain.project.data.entity.Creation
 import com.info.info_v1_backend.domain.project.data.entity.type.ProjectStatus
 import javax.persistence.*
@@ -51,5 +52,49 @@ class RegisteredProject(
     @ElementCollection
     var referenceList: MutableList<String> = referenceList
 
+    fun editRegisteredProject(request: EditRegisteredProjectDto){
+        request.id?. let {
+            this.id = it
+        }
+        request.name?. let {
+            this.name = it
+        }
+        request.shortContent?. let {
+            this.shortContent = it
+        }
+        request.haveSeenCount?. let {
+            this.haveSeenCount = it
+        }
+        request.status?. let {
+            this.status = it
+        }
+        request.purpose?. let {
+            this.purpose = it
+        }
+        request.theoreticalBackground?. let {
+            this.theoreticalBackground = it
+        }
+        request.processList?. let {
+            this.processList = it
+        }
+        request.result?. let {
+            this.result = it
+        }
+        request.conclusion?. let {
+            this.result = it
+        }
+        request.referenceList?. let {
+            this.referenceList = it
+        }
+        request.creationList?. let {
+            this.creationList = it
+        }
+        request.codeLinkList?. let {
+            this.codeLinkList = it
+        }
+        request.tagList?. let {
+            this.tagList = it
+        }
+    }
 
 }

@@ -1,6 +1,7 @@
 package com.info.info_v1_backend.domain.project.business.controller
 
 import com.info.info_v1_backend.domain.project.business.controller.dto.request.RegisteredProjectCreateRequest
+import com.info.info_v1_backend.domain.project.business.controller.dto.request.RegisteredProjectEditRequest
 import com.info.info_v1_backend.domain.project.business.controller.dto.response.MaximumProjectResponse
 import com.info.info_v1_backend.domain.project.business.controller.dto.response.MinimumProjectListResponse
 import com.info.info_v1_backend.domain.project.business.service.RegisteredProjectService
@@ -30,5 +31,10 @@ class RegisteredProjectController(private val registeredProjectService: Register
     @ResponseStatus(HttpStatus.CREATED)
     fun writeRegisteredProject(@RequestBody request: RegisteredProjectCreateRequest){
         registeredProjectService.writeRegisteredProject(request)
+    }
+
+    @PatchMapping
+    fun editRegisteredProject(@RequestBody request: RegisteredProjectEditRequest){
+        registeredProjectService.editRegisteredProject(request)
     }
 }

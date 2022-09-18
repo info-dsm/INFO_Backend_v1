@@ -2,7 +2,9 @@ package com.info.info_v1_backend.domain.project.business.service
 
 import com.info.info_v1_backend.domain.auth.data.repository.user.StudentRepository
 import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
+import com.info.info_v1_backend.domain.project.business.controller.dto.request.EditRegisteredProjectDto
 import com.info.info_v1_backend.domain.project.business.controller.dto.request.RegisteredProjectCreateRequest
+import com.info.info_v1_backend.domain.project.business.controller.dto.request.RegisteredProjectEditRequest
 import com.info.info_v1_backend.domain.project.business.controller.dto.response.MaximumProjectResponse
 import com.info.info_v1_backend.domain.project.business.controller.dto.response.MinimumProjectListResponse
 import com.info.info_v1_backend.domain.project.business.controller.dto.response.MinimumProjectResponse
@@ -31,7 +33,7 @@ class RegisteredProjectServiceImpl(
     override fun getMinimumLatestOrderProjectList(): MinimumProjectListResponse {
         //security config에서 url로 authentication필요
         return MinimumProjectListResponse(registeredProjectRepository.findAll(Sort
-            .by(Sort.Direction.DESC, "createdBy"))
+            .by(Sort.Direction.DESC, "createdAt"))
             .stream()
             .filter { it.status == ProjectStatus.APPROVE }
             .map{
@@ -75,6 +77,23 @@ class RegisteredProjectServiceImpl(
         if (p.status == ProjectStatus.WAITING) {
             throw ProjectStatusWaitingException("$id :: status waiting")
         }
+        p.editRegisteredProject(
+            EditRegisteredProjectDto(
+                id = null,
+                name = null,
+                shortContent = null,
+                haveSeenCount = p.haveSeenCount + 1,
+                status = null,
+                purpose = null,
+                theoreticalBackground = null,
+                processList = null,
+                result = null,
+                conclusion = null,
+                referenceList = null,
+                creationList = null,
+                codeLinkList = null,
+                tagList = null
+        ))
         return MaximumProjectResponse(
             name = p.name,
             imageLink = p.imageLinkList,
@@ -91,15 +110,13 @@ class RegisteredProjectServiceImpl(
 
     override fun writeRegisteredProject(request: RegisteredProjectCreateRequest) {
         verifyUser(request.studentIdList)
-        val c = request.studentIdList.stream()
+        val c = request.studentIdList
             .map { creationRepository.save(
                 Creation(
                 project = null,
                 student = userRepository.findByIdOrNull(it)
                     ?: throw UserNotFoundException("$it :: not found")
-            )
-            )}
-            .collect(Collectors.toList())
+            ))}.toList().toMutableList()
 
         val p = registeredProjectRepository.save(
             RegisteredProject(
@@ -120,6 +137,42 @@ class RegisteredProjectServiceImpl(
                 ?.editCreation(project = p)
             }
         }
+    }
+
+    override fun editRegisteredProject(request: RegisteredProjectEditRequest) {
+        verifyUser(request.studentIdList)
+
+        val p = registeredProjectRepository.findByIdOrNull(request.projectId)
+            ?: throw ProjectNotFoundException("${request.projectId} :: not found")
+
+        p.creationList
+            .map { it.id?.let { it1 -> creationRepository.deleteById(it1) } }
+
+        val c = request.studentIdList
+            .map { creationRepository.save(
+                Creation(
+                    project = p,
+                    student = userRepository.findById(it).orElse(null)
+                ) ) }.toList().toMutableList()
+
+        p.editRegisteredProject(
+            EditRegisteredProjectDto(
+                id = null,
+                name = request.name,
+                shortContent = request.shortContent,
+                haveSeenCount = null,
+                status = null,
+                purpose = request.purpose,
+                theoreticalBackground = request.theoreticalBackground,
+                processList = request.processList,
+                result = request.result,
+                conclusion = request.conclusion,
+                referenceList = request.referenceList,
+                creationList = c,
+                codeLinkList = request.githubLinkList,
+                tagList = request.tagList
+            )
+        )
     }
 
     private fun verifyUser(studentIdList: List<Long>) {
