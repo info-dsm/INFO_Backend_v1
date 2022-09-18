@@ -25,7 +25,7 @@ class CommentController(
     @ResponseStatus(HttpStatus.CREATED)
     fun writeComment(
         @RequestBody request: WriteCommentRequest,
-        @RequestParam companyId: Long
+        @RequestParam(required = true) companyId: Long
     ) {
         commentService.writeComment(request, companyId)
     }
@@ -34,14 +34,16 @@ class CommentController(
     @ResponseStatus(HttpStatus.OK)
     fun editComment(
         @RequestBody request: EditCommentRequest,
-        @RequestParam commentId: Long
+        @RequestParam(required = true) commentId: Long
     ) {
         commentService.editComment(request, commentId)
     }
 
     @DeleteMapping
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    fun deleteComment(@RequestParam id: Long) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deleteComment(
+        @RequestParam id: Long
+    ) {
         commentService.deleteComment(id)
     }
 
