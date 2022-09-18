@@ -23,6 +23,6 @@ data class EditNoticeRequest(
     var isAlwaysOpen: Boolean?,
     var interviewHopeMonth: LocalDate?,
     var workHopeMonth: LocalDate?,
-    var pay: PayRequest
+    var pay: PayRequest?,
 
 )

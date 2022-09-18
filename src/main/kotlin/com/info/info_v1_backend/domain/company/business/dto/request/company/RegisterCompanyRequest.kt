@@ -33,6 +33,10 @@ data class RegisterCompanyRequest(
         message = "회사 소개는 10자 이상이여야합니다."
     )
     val introduction: String,
+
+    val address: String,
+    val companyPlace: String,
+
     @field:Size(min = 6, max = 6)
     val companyCheckCode: String,
     @field:Size(min = 4, max = 4)

@@ -8,6 +8,8 @@ import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.CloseNoticeRequest
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.EditNoticeRequest
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.RegisterNoticeRequest
+import com.info.info_v1_backend.domain.company.business.dto.response.notice.MaximumNoticeResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.notice.MinimumNoticeResponse
 import com.info.info_v1_backend.domain.company.data.entity.notice.Notice
 import com.info.info_v1_backend.domain.company.data.entity.notice.Pay
 import com.info.info_v1_backend.domain.company.data.entity.notice.embeddable.*
@@ -18,6 +20,9 @@ import com.info.info_v1_backend.domain.company.exception.CompanyNotFoundExceptio
 import com.info.info_v1_backend.domain.company.exception.IsNotContactorCompany
 import com.info.info_v1_backend.domain.company.exception.NoticeNotFoundException
 import com.info.info_v1_backend.global.util.user.CurrentUtil
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import javax.transaction.Transactional
 
@@ -124,19 +129,24 @@ class NoticeServiceImpl(
         }
 
         payRepository.findById(noticeId).orElse(null)?: let {
-            payRepository.save(
+            request.pay?.let {
                 Pay(
-                    request.pay.fieldTrainingPay,
+                    it.fieldTrainingPay,
                     EmploymentPay(
-                        request.pay.employmentPay.yearPay,
-                        request.pay.employmentPay.monthPay,
-                        request.pay.employmentPay.bonus,
+                        it.employmentPay.yearPay,
+                        it.employmentPay.monthPay,
+                        it.employmentPay.bonus,
                     ),
                     notice
                 )
-            )
+            }?.let { createdPay:Pay ->
+                payRepository.save(
+                    createdPay
+                )
+            }
         }. let{
-            pay -> pay.editPay(request.pay)
+            pay ->
+            request.pay?.let { pay?.editPay(it) }
         }
 
 
@@ -147,7 +157,7 @@ class NoticeServiceImpl(
         val current = currentUtil.getCurrentUser()
         val notice = noticeRepository.findById(noticeId).orElse(null)?: throw NoticeNotFoundException(noticeId.toString())
         if (checkAuthentication(current, notice))
-        notice.makeDelete()
+        noticeRepository.delete(notice)
     }
 
     override fun closeNotice(request: CloseNoticeRequest, noticeId: Long) {
@@ -167,12 +177,17 @@ class NoticeServiceImpl(
     private fun checkAuthentication(current: User, notice: Notice): Boolean {
         return ((current is Contactor) && (current.company?.noticeList?.contains(notice) == true))
     }
-    override fun getMinimumNotice(idx: Int, size: Int) {
-        TODO("Not yet implemented")
+    override fun getMinimumNotice(idx: Int, size: Int, isExpired: Boolean): Page<MinimumNoticeResponse> {
+        if (isExpired) return noticeRepository.findAll(PageRequest.of(idx, size, Sort.by("created_at").descending())).map {
+            it.toMinimumNoticeResponse()
+        }
+        return noticeRepository.findAllByExpiredIsNot(false, PageRequest.of(idx, size, Sort.by("created_at").descending())).map {
+            it.toMinimumNoticeResponse()
+        }
     }
 
-    override fun getMaximumNotice(id: Long) {
-        TODO("Not yet implemented")
+    override fun getMaximumNotice(id: Long): MaximumNoticeResponse {
+        return (noticeRepository.findById(id).orElse(null)?: throw NoticeNotFoundException(id.toString())).toMaximumNoticeResponse()
     }
 
     override fun searchNotice(query: String) {

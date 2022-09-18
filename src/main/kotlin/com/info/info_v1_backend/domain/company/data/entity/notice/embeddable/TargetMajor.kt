@@ -34,5 +34,12 @@ class TargetMajor(
         this.count = r.count
     }
 
+    fun toTargetMajorRequest(): TargetMajorRequest {
+        return TargetMajorRequest(
+            this.major,
+            this.count
+        )
+    }
+
 
 }
