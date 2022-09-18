@@ -13,9 +13,9 @@ interface NoticeService {
     fun editNotice(request: EditNoticeRequest, noticeId: Long)
     fun deleteNotice(noticeId: Long)
     fun closeNotice(request: CloseNoticeRequest, noticeId: Long)
-    fun getMinimumNotice(idx: Int, size: Int, isExpired: Boolean): Page<MinimumNoticeResponse>
+    fun getMinimumNoticeList(idx: Int, size: Int, isExpired: Boolean): Page<MinimumNoticeResponse>
     fun getMaximumNotice(id: Long): MaximumNoticeResponse
-    fun searchNotice(query: String)
+    fun searchMinimumNoticeList(query: String): List<MinimumNoticeResponse>
 
 
 }
