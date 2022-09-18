@@ -177,7 +177,7 @@ class AuthServiceImpl(
     }
 
     override fun getStudentList(): MinimumStudentList {
-        val list =  studentRepository.findAllByStartingWith().map {
+        val list =  studentRepository.findAll().map {
             it.toMinimumStudent()
         }
         return MinimumStudentList(list)
