@@ -17,6 +17,7 @@ enum class ErrorCode(
 
     //403
     PROJECT_STATUS_WAITING("Still Waiting For Approval", HttpStatus.FORBIDDEN),
+    NOT_HAVE_ACCESS_TO_THE_PROJECT("Not Have Access To The project", HttpStatus.FORBIDDEN),
 
     //404
     HEADER_NOT_FOUND("Header Not Found", HttpStatus.NOT_FOUND),
