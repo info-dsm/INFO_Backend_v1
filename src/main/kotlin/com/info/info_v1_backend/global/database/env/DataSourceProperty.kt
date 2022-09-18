@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConstructorBinding
 
 @ConfigurationProperties("datasource")
 @ConstructorBinding
-data class DataSourceListProperty(
+data class DataSourceProperty (
     val mongo: NosqlSourceProperty
 
 )
