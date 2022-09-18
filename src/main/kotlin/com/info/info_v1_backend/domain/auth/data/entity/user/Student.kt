@@ -2,6 +2,7 @@ package com.info.info_v1_backend.domain.auth.data.entity.user
 
 import com.info.info_v1_backend.domain.auth.data.entity.type.Role
 import com.info.info_v1_backend.domain.auth.presentation.dto.request.EditMyInfo
+import com.info.info_v1_backend.domain.auth.presentation.dto.response.MinimumStudentList
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
 import com.info.info_v1_backend.domain.project.data.entity.Creation
 import com.info.info_v1_backend.domain.team.data.entity.Affiliation
@@ -55,5 +56,14 @@ class Student(
             this.githubLink
         }
     }
+
+    fun toMinimumStudent(): MinimumStudentList.MinimumStudent{
+        return MinimumStudentList.MinimumStudent(
+                this.name,
+                this.studentKey,
+                this.id!!
+        )
+    }
+
 
 }

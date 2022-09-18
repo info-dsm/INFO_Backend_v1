@@ -7,6 +7,6 @@ import java.util.Optional
 interface StudentRepository: JpaRepository<Student, Long> {
 
     fun findAllByStudentKeyStartingWith(studentKey: String): List<Student>
-
+    fun findAllByStartingWith(): List<Student>
     fun findByName(name: String) : Optional<Student>
 }
