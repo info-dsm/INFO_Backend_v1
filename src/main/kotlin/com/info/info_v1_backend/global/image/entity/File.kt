@@ -2,6 +2,7 @@ package com.info.info_v1_backend.global.image.entity
 
 import com.info.info_v1_backend.global.base.entity.BaseAuthorEntity
 import com.info.info_v1_backend.global.image.entity.type.FileType
+import com.info.info_v1_backend.infra.amazon.s3.dto.ImageDto
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
@@ -30,5 +31,11 @@ class File(
     var extention: String = extension
         protected set
 
+    fun toImageDto(): ImageDto {
+        return ImageDto(
+            this.fileUrl,
+            this.id!!
+        )
+    }
 
 }
