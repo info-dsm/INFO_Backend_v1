@@ -7,7 +7,7 @@ import com.info.info_v1_backend.domain.company.business.dto.response.company.Max
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MinimumCompanyResponse
 import com.info.info_v1_backend.domain.company.data.entity.comment.Comment
 import com.info.info_v1_backend.domain.company.data.entity.notice.Notice
-import com.info.info_v1_backend.global.base.entity.BaseTimeEntity
+import com.info.info_v1_backend.global.base.entity.BaseAuthorEntity
 import com.info.info_v1_backend.global.image.entity.File
 import java.time.Year
 import javax.persistence.*
@@ -29,7 +29,7 @@ class Company(
     introduction: String,
     address: String,
     companyPlace: String
-): BaseTimeEntity(){
+): BaseAuthorEntity() {
     @Id
     val id: String = companyNumber
 

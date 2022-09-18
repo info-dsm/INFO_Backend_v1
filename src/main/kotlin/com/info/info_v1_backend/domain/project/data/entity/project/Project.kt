@@ -3,7 +3,6 @@ package com.info.info_v1_backend.domain.project.data.entity.project
 import com.info.info_v1_backend.domain.auth.presentation.dto.response.ProjectList
 import com.info.info_v1_backend.domain.project.data.entity.Creation
 import com.info.info_v1_backend.domain.project.data.entity.type.ProjectStatus
-import com.info.info_v1_backend.domain.team.data.entity.Team
 import com.info.info_v1_backend.global.base.entity.BaseAuthorEntity
 import com.info.info_v1_backend.global.image.entity.File
 import javax.persistence.CascadeType
@@ -14,8 +13,6 @@ import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
-import javax.persistence.JoinColumn
-import javax.persistence.ManyToOne
 import javax.persistence.OneToMany
 
 @Entity
@@ -63,7 +60,7 @@ sealed class Project(
         protected set
 
     @OneToMany(mappedBy = "project", cascade = [CascadeType.REMOVE])
-    var imageLinkList: MutableList<File>? = null
+    var photoList: MutableList<File> = ArrayList()
         protected set
 
     fun toProjectList(): ProjectList{

@@ -8,5 +8,5 @@ import java.util.Optional
 
 interface TargetMajorRepository: JpaRepository<TargetMajor, Long> {
 
-    fun findFirstByNoticeAndMajorOrderByCreatedDateDesc(notice: Notice, major: MajorType): Optional<TargetMajor>
+    fun findFirstByNoticeAndMajorOrderBycreatedAtDesc(notice: Notice, major: MajorType): Optional<TargetMajor>
 }

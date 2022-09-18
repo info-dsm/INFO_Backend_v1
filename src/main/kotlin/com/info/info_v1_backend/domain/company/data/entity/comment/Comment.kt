@@ -48,6 +48,7 @@ class Comment(
 
     fun toCommentResponse(): CommentResponse {
         return CommentResponse(
+            this.id!!,
             this.content
         )
     }
