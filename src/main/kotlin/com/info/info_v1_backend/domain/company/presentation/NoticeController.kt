@@ -75,7 +75,7 @@ class NoticeController(
         return noticeService.getMaximumNotice(id)
     }
 
-    @GetMapping
+    @GetMapping("/search")
     fun searchMinimumNotice(
         @RequestParam query: String
     ): List<MinimumNoticeResponse> {
