@@ -24,6 +24,6 @@ class IndividualProject(
     creationList,
     codeLinkList,
     tagList,
-    ProjectStatus.INDIVIDUAL
+    ProjectStatus.APPROVE
 ) {
 }
