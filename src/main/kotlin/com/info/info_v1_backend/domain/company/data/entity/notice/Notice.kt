@@ -1,9 +1,14 @@
 package com.info.info_v1_backend.domain.company.data.entity.notice
 
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.EditNoticeRequest
+import com.info.info_v1_backend.domain.company.business.dto.response.notice.MaximumNoticeResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.notice.MinimumNoticeResponse
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
 import com.info.info_v1_backend.domain.company.data.entity.notice.embeddable.*
 import com.info.info_v1_backend.domain.company.data.entity.type.WorkTime
+import com.info.info_v1_backend.global.base.entity.BaseAuthorEntity
+import org.hibernate.annotations.SQLDelete
+import org.hibernate.annotations.Where
 import java.time.LocalDate
 import javax.persistence.CascadeType
 import javax.persistence.Column
@@ -20,6 +25,8 @@ import javax.persistence.OneToOne
 
 
 @Entity
+@SQLDelete(sql = "UPDATE shop SET notice_is_delete = true WHERE id = ?")
+@Where(clause = "notice_is_delete = false")
 class Notice(
     company: Company,
     businessInformation: String,
@@ -38,7 +45,7 @@ class Notice(
     interviewHopeMonth: LocalDate?,
     workHopeMonth: LocalDate?
 
-) {
+): BaseAuthorEntity() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null
@@ -122,12 +129,51 @@ class Notice(
     var isExpired: Boolean = false
         protected set
 
-    fun makeDelete() {
-        this.isDelete = true
-    }
+    var isPayOpen: Boolean = false
+        protected set
+
 
     fun makeExpired() {
         this.isExpired = true
+    }
+
+    fun toMinimumNoticeResponse(): MinimumNoticeResponse {
+        return MinimumNoticeResponse(
+            this.id!!,
+            this.company.toMinimumCompanyResponse(),
+            this.targetMajorList.map {
+                it.toTargetMajorRequest()
+            }.toList(),
+            this.businessInformation,
+            this.certificateList,
+            this.cutLine,
+            this.personalRemark
+        )
+    }
+
+    fun toMaximumNoticeResponse(): MaximumNoticeResponse {
+        return MaximumNoticeResponse(
+            this.id!!,
+            this.company.toMaximumCompanyResponse(),
+            this.targetMajorList.map {
+                it.toTargetMajorRequest()
+            }.toList(),
+            this.deadLine,
+            this.businessInformation,
+            this.certificateList,
+            this.cutLine,
+            this.personalRemark,
+            this.commuteTime.toCommuteTimeRequest(),
+            this.workTime,
+            if (this.isPayOpen) {
+                this.pay?.toPayRequest()
+            } else null,
+            this.screeningProcedure.toScreeningProcedureRequest(),
+            this.alternativeMilitaryPlan,
+            this.mealSupport.toMealSupportRequest(),
+            this.welfare.toWelfareRequest(),
+            this.needDocuments
+        )
     }
 
     fun editNotice(r: EditNoticeRequest) {

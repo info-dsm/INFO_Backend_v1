@@ -1,5 +1,6 @@
 package com.info.info_v1_backend.domain.company.data.entity.notice.embeddable
 
+import com.info.info_v1_backend.domain.company.business.dto.request.notice.ScreeningProcedureRequest
 import javax.persistence.Column
 import javax.persistence.Embeddable
 
@@ -18,4 +19,15 @@ class ScreeningProcedure(
     @Column(name = "else_procedure", length = 255)
     var elseProcedure: String?
 ) {
+
+    fun toScreeningProcedureRequest(): ScreeningProcedureRequest {
+        return ScreeningProcedureRequest(
+            this.document,
+            this.technicalInterview,
+            this.physicalCheck,
+            this.assignment,
+            this.executiveInterview,
+            this.elseProcedure
+        )
+    }
 }

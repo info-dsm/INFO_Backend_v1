@@ -59,7 +59,9 @@ class CompanyServiceImpl(
                 request.workerCount,
                 request.industryType,
                 request.mainProduct,
-                request.introduction
+                request.introduction,
+                request.address,
+                request.companyPlace
             )
         )
         
@@ -103,6 +105,10 @@ class CompanyServiceImpl(
                 it.toMaximumCompanyResponse()
             }
         }
+    }
+
+    override fun searchCompany(query: String): List<MinimumCompanyResponse> {
+        TODO("Not yet implemented")
     }
 
 

@@ -37,4 +37,11 @@ class Pay(
             r.employmentPay.bonus
         )
     }
+
+    fun toPayRequest(): PayRequest {
+        return PayRequest(
+            this.fieldTrainingPay,
+            this.employmentPay.toEmploymentPay(),
+        )
+    }
 }

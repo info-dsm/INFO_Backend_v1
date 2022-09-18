@@ -3,6 +3,9 @@ package com.info.info_v1_backend.domain.company.business.service
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.CloseNoticeRequest
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.EditNoticeRequest
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.RegisterNoticeRequest
+import com.info.info_v1_backend.domain.company.business.dto.response.notice.MaximumNoticeResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.notice.MinimumNoticeResponse
+import org.springframework.data.domain.Page
 
 interface NoticeService {
 
@@ -10,8 +13,8 @@ interface NoticeService {
     fun editNotice(request: EditNoticeRequest, noticeId: Long)
     fun deleteNotice(noticeId: Long)
     fun closeNotice(request: CloseNoticeRequest, noticeId: Long)
-    fun getMinimumNotice(idx: Int, size: Int)
-    fun getMaximumNotice(id: Long)
+    fun getMinimumNotice(idx: Int, size: Int, isExpired: Boolean): Page<MinimumNoticeResponse>
+    fun getMaximumNotice(id: Long): MaximumNoticeResponse
     fun searchNotice(query: String)
 
 
