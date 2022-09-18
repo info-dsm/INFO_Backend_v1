@@ -103,7 +103,7 @@ class AuthServiceImpl(
             throw CheckEmailCodeException(user.email)).code == req.code){
             val encPw = passwordEncoder.encode(req.password)
             user.editPassword(encPw)
-        } else CheckPasswordCodeException(req.code)
+        } else throw CheckPasswordCodeException(req.code)
     }
     override fun reissue(req: ReissueRequest): TokenResponse {
         if(tokenProvider.isExpired(req.refreshToken)) throw ExpiredTokenException(req.refreshToken)
@@ -117,5 +117,9 @@ class AuthServiceImpl(
             it.reset(token.token)
         }.orElse(null) ?: refreshTokenRepository.save(token)
         return tokenResponse
+    }
+
+    override fun deleteMe() {
+        userRepository.delete(current.getCurrentUser())
     }
 }

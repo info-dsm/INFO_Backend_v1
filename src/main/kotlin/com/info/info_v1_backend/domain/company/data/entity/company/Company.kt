@@ -57,9 +57,8 @@ class Company(
     var faxAddress: String? = faxAddress
         protected set
 
-    @OneToOne
-    var contactor: Contactor = contactor
-        protected set
+    @OneToMany(mappedBy = "company")
+    var contactorList: MutableList<Contactor> = ArrayList()
 
     @OneToMany
     var studentList: MutableList<Student> = ArrayList()
@@ -91,6 +90,12 @@ class Company(
 
     @Column(name = "employed_count", nullable = false)
     var employedCount: Int = 0
+
+
+    init {
+        this.contactorList.add(contactor)
+    }
+
 
     @OneToMany(
         cascade = [CascadeType.REMOVE],
@@ -186,5 +191,6 @@ class Company(
     fun registerNotice(notice: Notice) {
         this.noticeList.add(notice)
     }
+
 
 }

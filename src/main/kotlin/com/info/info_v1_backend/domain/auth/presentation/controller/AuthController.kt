@@ -10,6 +10,7 @@ import com.info.info_v1_backend.domain.auth.presentation.dto.request.TeacherSing
 import com.info.info_v1_backend.global.security.jwt.data.TokenResponse
 import com.info.info_v1_backend.global.util.user.CurrentUtil
 import org.springframework.validation.annotation.Validated
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -44,16 +45,16 @@ class AuthController(
     fun studentSignUp(
         @RequestBody @Valid
         request: StudentSignUpRequest
-    ):TokenResponse{
-        return authService.studentSignUp(request)
+    ){
+        authService.studentSignUp(request)
     }
 
     @PostMapping("/teacherSingUp")
     fun teacherSignUp(
         @RequestBody @Valid
         request: TeacherSingUpRequest
-    ): TokenResponse{
-        return authService.teacherSignUp(request)
+    ){
+        authService.teacherSignUp(request)
     }
 
     @PostMapping("/changePassword")
@@ -77,6 +78,11 @@ class AuthController(
         request: LoginRequest
     ): TokenResponse{
         return authService.login(request)
+    }
+
+    @DeleteMapping("/me")
+    fun deleteMe() {
+        authService.deleteMe()
     }
 
 }

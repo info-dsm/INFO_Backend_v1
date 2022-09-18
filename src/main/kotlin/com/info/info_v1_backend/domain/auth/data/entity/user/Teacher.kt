@@ -1,6 +1,8 @@
 package com.info.info_v1_backend.domain.auth.data.entity.user
 
 import com.info.info_v1_backend.domain.auth.data.entity.type.Role
+import org.hibernate.annotations.OnDelete
+import org.hibernate.annotations.OnDeleteAction
 import javax.persistence.DiscriminatorValue
 import javax.persistence.Entity
 import javax.persistence.Inheritance
@@ -9,7 +11,7 @@ import javax.persistence.InheritanceType
 
 @Entity
 @DiscriminatorValue("teacher")
-@Inheritance(strategy = InheritanceType.JOINED)
+@OnDelete(action = OnDeleteAction.CASCADE)
 class Teacher(
     name: String,
     email: String,
