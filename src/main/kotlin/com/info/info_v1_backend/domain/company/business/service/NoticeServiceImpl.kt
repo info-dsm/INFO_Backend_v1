@@ -177,7 +177,7 @@ class NoticeServiceImpl(
     private fun checkAuthentication(current: User, notice: Notice): Boolean {
         return ((current is Contactor) && (current.company?.noticeList?.contains(notice) == true))
     }
-    override fun getMinimumNotice(idx: Int, size: Int, isExpired: Boolean): Page<MinimumNoticeResponse> {
+    override fun getMinimumNoticeList(idx: Int, size: Int, isExpired: Boolean): Page<MinimumNoticeResponse> {
         if (isExpired) return noticeRepository.findAll(PageRequest.of(idx, size, Sort.by("created_at").descending())).map {
             it.toMinimumNoticeResponse()
         }
@@ -190,7 +190,7 @@ class NoticeServiceImpl(
         return (noticeRepository.findById(id).orElse(null)?: throw NoticeNotFoundException(id.toString())).toMaximumNoticeResponse()
     }
 
-    override fun searchNotice(query: String) {
+    override fun searchMinimumNoticeList(query: String): List<MinimumNoticeResponse> {
         TODO("Not yet implemented")
     }
 }
