@@ -13,7 +13,7 @@ import com.info.info_v1_backend.domain.auth.presentation.dto.request.*
 import com.info.info_v1_backend.global.security.jwt.TokenProvider
 import com.info.info_v1_backend.global.security.jwt.data.TokenResponse
 import com.info.info_v1_backend.global.security.jwt.exception.ExpiredTokenException
-import com.info.info_v1_backend.global.util.user.UserCheckUtil
+import com.info.info_v1_backend.global.util.user.CurrentUtil
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 
@@ -24,7 +24,7 @@ class AuthServiceImpl(
     private val userRepository: UserRepository<User>,
     private val tokenProvider: TokenProvider,
     private val refreshTokenRepository: RefreshTokenRepository,
-    private val current: UserCheckUtil,
+    private val current: CurrentUtil,
 
     ) : AuthService {
     override fun studentSignUp(req: StudentSignUpRequest) {

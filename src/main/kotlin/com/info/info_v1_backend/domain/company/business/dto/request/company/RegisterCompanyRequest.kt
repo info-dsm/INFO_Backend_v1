@@ -1,4 +1,4 @@
-package com.info.info_v1_backend.domain.company.business.dto.request
+package com.info.info_v1_backend.domain.company.business.dto.request.company
 
 import java.time.Year
 import javax.validation.constraints.Max
@@ -20,7 +20,6 @@ data class RegisterCompanyRequest(
     val companyPhone: String,
     @field:Size(min = 30, max = 5, message = "fax번호 길이는 5 ~ 30자여야합니다.")
     val faxAddress: String?,
-    val contactor: ContactorDto,
     val establishedAt: Year,
     @field:Size(max = 20)
     val annualSales: Long,
@@ -34,6 +33,10 @@ data class RegisterCompanyRequest(
         message = "회사 소개는 10자 이상이여야합니다."
     )
     val introduction: String,
+
+    val address: String,
+    val companyPlace: String,
+
     @field:Size(min = 6, max = 6)
     val companyCheckCode: String,
     @field:Size(min = 4, max = 4)

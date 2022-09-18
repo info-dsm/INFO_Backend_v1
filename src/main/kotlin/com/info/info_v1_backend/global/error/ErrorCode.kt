@@ -24,7 +24,18 @@ enum class ErrorCode(
     USER_ALREADY_EXISTS("User Already Exists", HttpStatus.BAD_REQUEST),
     INVALID_PARAMETER("Null or Invalid Parameter Value Inputted", HttpStatus.BAD_REQUEST),
     CHECK_TEACHER_CODE_ERROR("Error Occurred while Checking Teacher Code", HttpStatus.NOT_FOUND),
-    INVALID_COMPANY_CHECK_CODE("Invalid Company Check Code", HttpStatus.BAD_REQUEST)
+    INVALID_COMPANY_CHECK_CODE("Invalid Company Check Code", HttpStatus.BAD_REQUEST),
+    NOT_CONTACTOR("You are Not Contactor", HttpStatus.FORBIDDEN),
+    COMPANY_NOT_FOUND("Company Not Found", HttpStatus.NOT_FOUND),
+    IS_NOT_CONTACTOR_COMPANY("You are not Contactor Company", HttpStatus.FORBIDDEN),
+    STUDENT_CANNOT_OPEN("Student Cannot Open this", HttpStatus.FORBIDDEN),
+    IS_NOT_STUDENT("You are not student", HttpStatus.FORBIDDEN),
+    STUDENT_ALREADY_WRITTEN_COMMENT("you have Already Written comment", HttpStatus.BAD_REQUEST),
+    COMMENT_NOT_FOUND("Comment Not Found", HttpStatus.NOT_FOUND),
+    NOTICE_NOT_FOUND("Notice Not Found", HttpStatus.NOT_FOUND),
+    TEAM_NOT_FOUND("Team Not Found", HttpStatus.NOT_FOUND),
+    NO_AUTHENTICATION("you have No Authentication", HttpStatus.FORBIDDEN)
+
 
 
 }

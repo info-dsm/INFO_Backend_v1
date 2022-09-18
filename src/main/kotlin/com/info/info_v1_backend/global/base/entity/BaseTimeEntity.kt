@@ -14,12 +14,12 @@ import javax.persistence.MappedSuperclass
 abstract class BaseTimeEntity {
 
     @CreatedDate
-    @Column(name = "created_date")
+    @Column(name = "created_at")
     open var createdDate: LocalDateTime? = null
         protected set
 
     @LastModifiedDate
-    @Column(name = "update_date")
+    @Column(name = "update_at")
     open var updateDate: LocalDateTime? = null
         protected set
 

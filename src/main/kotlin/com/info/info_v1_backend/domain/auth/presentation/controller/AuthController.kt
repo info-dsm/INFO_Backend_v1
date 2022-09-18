@@ -8,7 +8,7 @@ import com.info.info_v1_backend.domain.auth.presentation.dto.request.ReissueRequ
 import com.info.info_v1_backend.domain.auth.presentation.dto.request.StudentSignUpRequest
 import com.info.info_v1_backend.domain.auth.presentation.dto.request.TeacherSingUpRequest
 import com.info.info_v1_backend.global.security.jwt.data.TokenResponse
-import com.info.info_v1_backend.global.util.user.UserCheckUtil
+import com.info.info_v1_backend.global.util.user.CurrentUtil
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -25,7 +25,7 @@ import javax.validation.constraints.Pattern
 class AuthController(
     private val authService: AuthService,
     private val emailService: EmailService,
-    private val current: UserCheckUtil,
+    private val current: CurrentUtil,
 ) {
     @PostMapping("/email")
     fun sendEmail(
