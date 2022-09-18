@@ -34,6 +34,7 @@ class IndividualProjectServiceImpl(
             .filter { it.status == ProjectStatus.APPROVE }
             .map{
                 MinimumProjectResponse(
+                    it.id!!,
                     it.name,
                     it.createdAt,
                     it.updatedAt,
@@ -54,6 +55,7 @@ class IndividualProjectServiceImpl(
             .filter { it.status == ProjectStatus.APPROVE }
             .map{
                 MinimumProjectResponse(
+                    it.id!!,
                     it.name,
                     it.createdAt,
                     it.updatedAt,

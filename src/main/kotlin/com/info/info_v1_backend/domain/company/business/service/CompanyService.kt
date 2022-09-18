@@ -5,6 +5,7 @@ import com.info.info_v1_backend.domain.company.business.dto.request.company.Regi
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MinimumCompanyResponse
 import org.springframework.data.domain.Page
+import org.springframework.web.multipart.MultipartFile
 
 interface CompanyService {
 
@@ -16,4 +17,8 @@ interface CompanyService {
     fun getMaximumCompany(id: String): MaximumCompanyResponse
     fun getMaximumCompanyByUserId(id: Long): List<MaximumCompanyResponse>
     fun searchCompany(query: String): List<MinimumCompanyResponse>
+    fun addCompanyPhoto(multipartFile: MultipartFile, companyId: String)
+    fun removeCompanyPhoto(companyId: String, fileId: Long)
+
+
 }

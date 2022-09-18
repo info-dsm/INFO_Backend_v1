@@ -1,34 +1,35 @@
 package com.info.info_v1_backend.domain.company.business.service
 
-import com.info.info_v1_backend.domain.company.business.dto.request.company.EditCompanyRequest
-import com.info.info_v1_backend.domain.company.business.dto.request.company.RegisterCompanyRequest
-import com.info.info_v1_backend.domain.company.data.entity.company.Company
 import com.info.info_v1_backend.domain.auth.data.entity.user.Contactor
 import com.info.info_v1_backend.domain.auth.data.entity.user.Student
-import com.info.info_v1_backend.domain.auth.data.entity.user.Teacher
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
 import com.info.info_v1_backend.domain.auth.data.repository.user.UserRepository
 import com.info.info_v1_backend.domain.auth.exception.ContactorNotFoundException
 import com.info.info_v1_backend.domain.auth.exception.StudentCannotOpenException
 import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
+import com.info.info_v1_backend.domain.company.business.dto.request.company.EditCompanyRequest
+import com.info.info_v1_backend.domain.company.business.dto.request.company.RegisterCompanyRequest
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MinimumCompanyResponse
+import com.info.info_v1_backend.domain.company.data.entity.company.Company
 import com.info.info_v1_backend.domain.company.data.entity.company.CompanySearchDocument
-import com.info.info_v1_backend.domain.company.data.entity.notice.NoticeSearchDocument
 import com.info.info_v1_backend.domain.company.data.repository.company.CompanyCheckCodeRepository
 import com.info.info_v1_backend.domain.company.data.repository.company.CompanyRepository
 import com.info.info_v1_backend.domain.company.data.repository.company.CompanySearchDocumentRepository
 import com.info.info_v1_backend.domain.company.data.repository.notice.NoticeSearchDocumentRepository
 import com.info.info_v1_backend.domain.company.exception.*
 import com.info.info_v1_backend.global.error.common.NoAuthenticationException
+import com.info.info_v1_backend.global.image.entity.File
+import com.info.info_v1_backend.global.image.entity.type.FileType
+import com.info.info_v1_backend.global.image.exception.FileNotFoundException
+import com.info.info_v1_backend.global.image.repository.FileRepository
 import com.info.info_v1_backend.global.util.user.CurrentUtil
+import com.info.info_v1_backend.infra.amazon.s3.S3Util
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
-import org.springframework.data.mongodb.core.query.TextCriteria
-import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.stereotype.Service
+import org.springframework.web.multipart.MultipartFile
 import javax.transaction.Transactional
 
 @Service
@@ -40,7 +41,9 @@ class CompanyServiceImpl(
     private val studentRepository: UserRepository<Student>,
     private val contactorRepository: UserRepository<Contactor>,
     private val companySearchDocumentRepository: CompanySearchDocumentRepository,
-    private val noticeSearchDocumentRepository: NoticeSearchDocumentRepository
+    private val noticeSearchDocumentRepository: NoticeSearchDocumentRepository,
+    private val s3Util: S3Util,
+    private val fileRepository: FileRepository
 ): CompanyService {
     override fun addContactor(newContactorEmail: String) {
         val current = currentUtil.getCurrentUser()
@@ -178,6 +181,41 @@ class CompanyServiceImpl(
 
         }
         return minimumCompanyResponseList
+    }
+
+    override fun addCompanyPhoto(multipartFile: MultipartFile, companyId: String) {
+        val current: User = currentUtil.getCurrentUser()
+        if (current is Contactor) {
+            current.company?.let {
+                val url = s3Util.uploadFile(multipartFile, "company", companyId)
+                val fileName = multipartFile.originalFilename!!
+
+                val ext: String = fileName.substring(fileName.lastIndexOf(".") + 1)
+
+                fileRepository.save(
+                    File(
+                        url,
+                        FileType.IMAGE,
+                        ext,
+                        null,
+                        it
+                    )
+                )
+            }
+        }
+        throw NoAuthenticationException(current.roleList.toString())
+    }
+
+    override fun removeCompanyPhoto(companyId: String, fileId: Long) {
+        val current = currentUtil.getCurrentUser()
+        if (current is Contactor) {
+            current.company?.let{
+                val image = fileRepository.findById(fileId).orElse(null)
+                    ?: throw FileNotFoundException(fileId.toString())
+                fileRepository.delete(image)
+            }
+        }
+        throw CompanyNotFoundException(fileId.toString())
     }
 
 
