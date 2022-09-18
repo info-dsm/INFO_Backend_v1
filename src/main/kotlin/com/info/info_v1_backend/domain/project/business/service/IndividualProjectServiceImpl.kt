@@ -1,8 +1,10 @@
 package com.info.info_v1_backend.domain.project.business.service
 
 import com.info.info_v1_backend.domain.auth.data.repository.user.StudentRepository
-import com.info.info_v1_backend.domain.auth.data.repository.user.UserRepository
-import com.info.info_v1_backend.domain.project.business.controller.dto.request.IndividualProjectRequest
+import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
+import com.info.info_v1_backend.domain.project.business.controller.dto.request.EditProjectRequest
+import com.info.info_v1_backend.domain.project.business.controller.dto.request.IndividualProjectCreateRequest
+import com.info.info_v1_backend.domain.project.business.controller.dto.request.IndividualProjectEditRequest
 import com.info.info_v1_backend.domain.project.business.controller.dto.response.MaximumProjectResponse
 import com.info.info_v1_backend.domain.project.business.controller.dto.response.MinimumProjectListResponse
 import com.info.info_v1_backend.domain.project.business.controller.dto.response.MinimumProjectResponse
@@ -13,7 +15,7 @@ import com.info.info_v1_backend.domain.project.data.repository.CreationRepositor
 import com.info.info_v1_backend.domain.project.data.repository.ProjectRepository
 import com.info.info_v1_backend.domain.project.exception.NotHaveAccessProjectException
 import com.info.info_v1_backend.domain.project.exception.ProjectNotFoundException
-import com.info.info_v1_backend.global.util.user.UserCheckUtil
+import com.info.info_v1_backend.global.util.user.CurrentUtil
 import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -22,7 +24,7 @@ import java.util.stream.Collectors
 @Service
 class IndividualProjectServiceImpl(
     private val individualRepository: ProjectRepository<IndividualProject>,
-    private val userCheckUtil: UserCheckUtil,
+    private val currentUtil: CurrentUtil,
     private val userRepository: StudentRepository,
     private val creationRepository: CreationRepository
     ): IndividualProjectService{
@@ -85,24 +87,62 @@ class IndividualProjectServiceImpl(
         )
     }
 
-    override fun writeIndividualProject(request: IndividualProjectRequest) {
-        if(request.creationList.stream()
-                .anyMatch { userCheckUtil.getCurrentUser() == request.creationList }){
-            throw NotHaveAccessProjectException("작성자가 프로젝트에 참여하지 않음")
-        }
-        val creations = request.creationList.stream()
+    override fun writeIndividualProject(request: IndividualProjectCreateRequest) {
+        verifyUser(request.studentIdList)
+        val c = request.studentIdList.stream()
             .map { creationRepository.save(Creation(
-                project = it.project,
-                student = it.student
+                project = null,
+                student = userRepository.findByIdOrNull(it)
+                    ?: throw UserNotFoundException("$it :: not found")
             ))}
             .collect(Collectors.toList())
-        individualRepository.save(IndividualProject(
+
+        val p = individualRepository.save(IndividualProject(
             name = request.name,
             shortContent = request.shortContent,
-            creationList = creations,
             codeLinkList = request.githubLinkList,
-            tagList = request.tagList
+            tagList = request.tagList,
+            creationList = c
         ))
+
+        c.map {
+            it.id?.let {it1 -> creationRepository.findByIdOrNull(it1)
+                    ?.editCreation(project = p)
+            }
+        }
+    }
+
+    override fun editIndividualProject(request: IndividualProjectEditRequest) {
+        verifyUser(request.studentIdList)
+        val p = individualRepository.findByIdOrNull(request.projectId)
+            ?: throw ProjectNotFoundException("${request.projectId} :: not found")
+        p.creationList
+            .map { it.id?.let { it1 -> creationRepository.deleteById(it1) } }
+        val c = request.studentIdList
+            .map { creationRepository.save(
+                Creation(
+                    project = p,
+                    student = userRepository.findById(it).orElse(null)
+                ) ) }.toList()
+        p.editProject(
+            EditProjectRequest(
+                id = p.id,
+                name = request.name,
+                shortContent = request.shortContent,
+                haveSeenCount = p.haveSeenCount,
+                creationList = c,
+                codeLinkList = request.githubLinkList,
+                tagList = request.tagList,
+                status = null
+            )
+        )
+    }
+
+    private fun verifyUser(studentIdList: List<Long>) {
+        if(studentIdList.stream()
+                .anyMatch { currentUtil.getCurrentUser() == userRepository.findById(it) }){
+            throw NotHaveAccessProjectException("작성자가 프로젝트에 참여하지 않음")
+        }
     }
 
 }

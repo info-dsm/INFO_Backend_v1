@@ -1,12 +1,11 @@
 package com.info.info_v1_backend.domain.project.business.controller.dto.request
 
-import com.info.info_v1_backend.domain.project.data.entity.Creation
-
-data class IndividualProjectRequest(
+data class IndividualProjectEditRequest(
+    val projectId: Long,
     val imageLinkList: MutableList<String>?,
     val name: String,
     val shortContent: String,
     val githubLinkList: MutableList<String>,
-    val creationList: MutableList<Creation>,
+    val studentIdList: MutableList<Long>,
     val tagList: MutableList<String>
 )
