@@ -32,7 +32,9 @@ enum class ErrorCode(
     IS_NOT_STUDENT("You are not student", HttpStatus.FORBIDDEN),
     STUDENT_ALREADY_WRITTEN_COMMENT("you have Already Written comment", HttpStatus.BAD_REQUEST),
     COMMENT_NOT_FOUND("Comment Not Found", HttpStatus.NOT_FOUND),
-    NOTICE_NOT_FOUND("Notice Not Found", HttpStatus.NOT_FOUND)
+    NOTICE_NOT_FOUND("Notice Not Found", HttpStatus.NOT_FOUND),
+    TEAM_NOT_FOUND("Team Not Found", HttpStatus.NOT_FOUND),
+    NO_AUTHENTICATION("you have No Authentication", HttpStatus.FORBIDDEN)
 
 
 
