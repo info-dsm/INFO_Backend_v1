@@ -1,7 +1,7 @@
 package com.info.info_v1_backend.global.util.image
 
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
-import com.info.info_v1_backend.domain.project.business.service.ProjectServiceImpl
+import com.info.info_v1_backend.domain.project.business.service.RegisteredProjectServiceImpl
 import com.info.info_v1_backend.domain.project.data.entity.Image
 import com.sun.imageio.plugins.common.ImageUtil
 import org.springframework.stereotype.Service
@@ -20,7 +20,7 @@ class UploadFileServiceImpl(
         target.addLogoImg(
             Image(
                 image.originalFilename?:"UNTITLED",
-                imageUtil.uploadFile(image, ProjectServiceImpl.IMAGE_ROOT_NAME, target.getIdentity())
+                imageUtil.uploadFile(image, RegisteredProjectServiceImpl.IMAGE_ROOT_NAME, target.getIdentity())
             )
 
         )
@@ -36,7 +36,7 @@ class UploadFileServiceImpl(
             parsedImageList.add(
                 Image(
                     it.originalFilename?:"UNTITLED",
-                    imageUtil.uploadFile(it, ProjectServiceImpl.IMAGE_ROOT_NAME, target.getIdentity())
+                    imageUtil.uploadFile(it, RegisteredProjectServiceImpl.IMAGE_ROOT_NAME, target.getIdentity())
                 )
             )
         }

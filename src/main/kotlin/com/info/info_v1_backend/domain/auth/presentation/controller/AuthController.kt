@@ -2,15 +2,15 @@ package com.info.info_v1_backend.domain.auth.presentation.controller
 
 import com.info.info_v1_backend.domain.auth.business.service.AuthService
 import com.info.info_v1_backend.domain.auth.business.service.EmailService
-import com.info.info_v1_backend.domain.auth.presentation.dto.request.EditPasswordRequest
-import com.info.info_v1_backend.domain.auth.presentation.dto.request.LoginRequest
-import com.info.info_v1_backend.domain.auth.presentation.dto.request.ReissueRequest
-import com.info.info_v1_backend.domain.auth.presentation.dto.request.StudentSignUpRequest
-import com.info.info_v1_backend.domain.auth.presentation.dto.request.TeacherSingUpRequest
+import com.info.info_v1_backend.domain.auth.presentation.dto.request.*
+import com.info.info_v1_backend.domain.auth.presentation.dto.response.GetUserInfo
+import com.info.info_v1_backend.domain.auth.presentation.dto.response.MinimumStudentList
 import com.info.info_v1_backend.global.security.jwt.data.TokenResponse
 import com.info.info_v1_backend.global.util.user.CurrentUtil
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -84,5 +84,30 @@ class AuthController(
     fun deleteMe() {
         authService.deleteMe()
     }
+    @PatchMapping("/me")
+    fun editMyInfo(
+            @RequestBody
+            request: EditMyInfo
+    ){
+        authService.editMyInfo(request)
+    }
+    @GetMapping("/me")
+    fun getStudentInfo(
+            @RequestParam(required = false)
+            name: String?
+    ): GetUserInfo {
+        return authService.getUserInfo(name)
+    }
 
+    @PostMapping("/getStudentList")
+    fun getStudentList(): MinimumStudentList{
+        return authService.getStudentList()
+    }
+    @PostMapping("/changeEmail")
+    fun changeEmail(
+            @RequestBody
+            req: ChangeEmailRequest
+    ){
+        authService.changeEmail(req)
+    }
 }
