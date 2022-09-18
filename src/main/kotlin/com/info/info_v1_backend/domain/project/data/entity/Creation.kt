@@ -1,6 +1,7 @@
 package com.info.info_v1_backend.domain.project.data.entity
 
 import com.info.info_v1_backend.domain.auth.data.entity.user.Student
+import com.info.info_v1_backend.domain.auth.presentation.dto.response.ProjectList
 import com.info.info_v1_backend.domain.project.data.entity.project.Project
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
@@ -28,7 +29,6 @@ class Creation(
     @JoinColumn(name = "user_id")
     var student: Student = student
         protected set
-
 
 
 }

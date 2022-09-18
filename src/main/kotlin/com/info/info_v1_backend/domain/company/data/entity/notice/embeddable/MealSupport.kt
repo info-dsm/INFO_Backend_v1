@@ -1,5 +1,6 @@
 package com.info.info_v1_backend.domain.company.data.entity.notice.embeddable
 
+import com.info.info_v1_backend.domain.company.business.dto.request.notice.MealSupportRequest
 import javax.persistence.Column
 import javax.persistence.Embeddable
 
@@ -14,4 +15,13 @@ class MealSupport(
     @Column(name = "dinner_meal_support")
     var dinner: Boolean
 ) {
+
+    fun toMealSupportRequest(): MealSupportRequest {
+        return MealSupportRequest(
+            this.mealSupportPay,
+            this.breakfast,
+            this.lunch,
+            this.dinner
+        )
+    }
 }

@@ -4,6 +4,7 @@ import com.info.info_v1_backend.domain.project.data.entity.project.Project
 import com.info.info_v1_backend.global.base.entity.BaseAuthorEntity
 import com.info.info_v1_backend.global.image.entity.type.FileType
 import javax.persistence.CascadeType
+import com.info.info_v1_backend.infra.amazon.s3.dto.ImageDto
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
@@ -38,4 +39,12 @@ class File(
     @JoinColumn(name = "project_id")
     var projectId: Project? = null
         protected set
+        
+    fun toImageDto(): ImageDto {
+        return ImageDto(
+            this.fileUrl,
+            this.id!!
+        )
+    }
+
 }
