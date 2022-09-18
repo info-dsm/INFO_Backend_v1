@@ -13,7 +13,7 @@ import com.info.info_v1_backend.domain.project.data.repository.CreationRepositor
 import com.info.info_v1_backend.domain.project.data.repository.ProjectRepository
 import com.info.info_v1_backend.domain.project.exception.NotHaveAccessProjectException
 import com.info.info_v1_backend.domain.project.exception.ProjectNotFoundException
-import com.info.info_v1_backend.global.util.user.UserCheckUtil
+import com.info.info_v1_backend.global.util.user.CurrentUtil
 import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -22,7 +22,7 @@ import java.util.stream.Collectors
 @Service
 class IndividualProjectServiceImpl(
     private val individualRepository: ProjectRepository<IndividualProject>,
-    private val userCheckUtil: UserCheckUtil,
+    private val currentUtil: CurrentUtil,
     private val userRepository: StudentRepository,
     private val creationRepository: CreationRepository
     ): IndividualProjectService{
@@ -87,7 +87,7 @@ class IndividualProjectServiceImpl(
 
     override fun writeIndividualProject(request: IndividualProjectRequest) {
         if(request.creationList.stream()
-                .anyMatch { userCheckUtil.getCurrentUser() == request.creationList }){
+                .anyMatch { currentUtil.getCurrentUser() == request.creationList }){
             throw NotHaveAccessProjectException("작성자가 프로젝트에 참여하지 않음")
         }
         val creations = request.creationList.stream()
