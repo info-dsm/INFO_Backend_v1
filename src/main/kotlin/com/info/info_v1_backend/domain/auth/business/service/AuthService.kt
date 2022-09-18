@@ -17,5 +17,6 @@ interface AuthService {
     fun getUserInfo(userName: String?):GetUserInfo
     fun editMyInfo(request: EditMyInfo)
     fun getStudentList(): MinimumStudentList
+    fun changeEmail(request: ChangeEmailRequest)
 
 }

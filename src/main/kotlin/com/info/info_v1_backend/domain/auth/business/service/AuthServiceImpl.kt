@@ -185,4 +185,12 @@ class AuthServiceImpl(
         return MinimumStudentList(list)
     }
 
+    override fun changeEmail(request: ChangeEmailRequest) {
+        val current = current.getCurrentUser()
+        if (current !is Student) {
+            if (passwordEncoder.matches(request.password, current.password)) {
+                current.changeEmail(request.email)
+            } else throw IncorrectPassword(request.password)
+        } else throw IsNotContactorOrTeacher(current.roleList.toString())
+    }
 }

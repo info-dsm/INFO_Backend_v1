@@ -36,7 +36,8 @@ enum class ErrorCode(
     TEAM_NOT_FOUND("Team Not Found", HttpStatus.NOT_FOUND),
     NO_AUTHENTICATION("you have No Authentication", HttpStatus.FORBIDDEN),
     CONTACTOR_NOT_FOUND("Contactor Not Found", HttpStatus.NOT_FOUND),
-    CONTACTOR_MUST_LEAVE_LEAST_AT_ONE_ON_COMPANY("Contactor Must leave least at one on company", HttpStatus.BAD_REQUEST)
+    CONTACTOR_MUST_LEAVE_LEAST_AT_ONE_ON_COMPANY("Contactor Must leave least at one on company", HttpStatus.BAD_REQUEST),
+    IS_NOT_CONTACTOR_OR_TEACHER("Is Not Contactor Or Teacher", HttpStatus.NOT_FOUND),
 
 
 
