@@ -1,7 +1,6 @@
 package com.info.info_v1_backend.domain.project.business.service
 
 import com.info.info_v1_backend.domain.auth.data.repository.user.StudentRepository
-import com.info.info_v1_backend.domain.auth.data.repository.user.UserRepository
 import com.info.info_v1_backend.domain.project.business.dto.request.IndividualProjectRequest
 import com.info.info_v1_backend.domain.project.business.dto.response.MaximumProjectResponse
 import com.info.info_v1_backend.domain.project.business.dto.response.MinimumProjectListResponse
@@ -10,7 +9,6 @@ import com.info.info_v1_backend.domain.project.data.entity.Creation
 import com.info.info_v1_backend.domain.project.data.entity.project.IndividualProject
 import com.info.info_v1_backend.domain.project.data.entity.type.ProjectStatus
 import com.info.info_v1_backend.domain.project.data.repository.CreationRepository
-import com.info.info_v1_backend.domain.project.data.repository.ProjectRepository
 import com.info.info_v1_backend.domain.project.exception.NotHaveAccessProjectException
 import com.info.info_v1_backend.domain.project.exception.ProjectNotFoundException
 import com.info.info_v1_backend.global.util.user.CurrentUtil
@@ -30,20 +28,20 @@ class IndividualProjectServiceImpl(
     override fun getMinimumLatestOrderProjectList   (): MinimumProjectListResponse {
         //security config에서 url로 authentication필요
         return MinimumProjectListResponse(individualRepository.findAll(
-            Sort.by(Sort.Direction.DESC, "createdBy"))
+            Sort.by("createdAt").descending())
             .stream()
-            .filter { it.status == ProjectStatus.INDIVIDUAL }
+            .filter { it.status == ProjectStatus.APPROVE }
             .map{
                 MinimumProjectResponse(
-                name = it.name,
-                haveSeenCount = it.haveSeenCount,
-                createAt = it.createdDate,
-                updateAt = it.updateDate,
-                createdBy = it.createdBy,
-                updatedBy = it.updatedBy,
-                shortContent = it.shortContent,
-                githubLinkList = it.codeLinkList
-            )
+                    it.name,
+                    it.createdAt,
+                    it.updatedAt,
+                    it.createdBy,
+                    it.updatedBy,
+                    it.shortContent,
+                    it.haveSeenCount,
+                    it.codeLinkList,
+                )
             }.collect(Collectors.toList()))
     }
 
@@ -52,17 +50,17 @@ class IndividualProjectServiceImpl(
         return MinimumProjectListResponse(individualRepository.findAll(
             Sort.by(Sort.Direction.DESC, "haveSeenCount"))
             .stream()
-            .filter { it.status == ProjectStatus.INDIVIDUAL }
+            .filter { it.status == ProjectStatus.APPROVE }
             .map{
                 MinimumProjectResponse(
-                    name = it.name,
-                    haveSeenCount = it.haveSeenCount,
-                    createAt = it.createdDate,
-                    updateAt = it.updateDate,
-                    createdBy = it.createdBy,
-                    updatedBy = it.updatedBy,
-                    shortContent = it.shortContent,
-                    githubLinkList = it.codeLinkList
+                    it.name,
+                    it.createdAt,
+                    it.updatedAt,
+                    it.createdBy,
+                    it.updatedBy,
+                    it.shortContent,
+                    it.haveSeenCount,
+                    it.codeLinkList,
                 )
             }.collect(Collectors.toList()))
     }
@@ -72,37 +70,44 @@ class IndividualProjectServiceImpl(
         val p = individualRepository.findByIdOrNull(id)
             ?: throw ProjectNotFoundException("$id :: not found")
         return MaximumProjectResponse(
-            name = p.name,
-            imageLink = p.imageLinkList,
-            createBy = p.createdBy,
-            updateBy = p.updatedBy,
-            createAt = p.createdDate,
-            updateAt = p.updateDate,
-            projectStatus = ProjectStatus.INDIVIDUAL,
-            shortContent = p.shortContent,
-            haveSeenCount = p.haveSeenCount,
-            githubLinkList = p.codeLinkList
+            p.photoList.map { 
+                it.toImageDto()
+            },
+            p.name,
+            p.createdAt,
+            p.updatedAt,
+            p.createdBy,
+            p.updatedBy,
+            p.status,
+            p.shortContent,
+            p.haveSeenCount,
+            p.codeLinkList
         )
     }
 
     override fun writeIndividualProject(request: IndividualProjectRequest) {
-        if(request.creationList.stream()
-                .anyMatch { currentUtil.getCurrentUser() == request.creationList }){
-            throw NotHaveAccessProjectException("작성자가 프로젝트에 참여하지 않음")
+        val current = currentUtil.getCurrentUser()
+        if(request.creationList.any { it.student == current }){
+            val creations = request.creationList.stream()
+                .map { 
+                    creationRepository.save(
+                        Creation(
+                            it.project,
+                            it.student
+                        )
+                    )
+                }.collect(Collectors.toList())
+            individualRepository.save(
+                IndividualProject(
+                    request.name,
+                    request.shortContent,
+                    creations,
+                    request.githubLinkList,
+                    request.tagList
+                )
+            )
         }
-        val creations = request.creationList.stream()
-            .map { creationRepository.save(Creation(
-                project = it.project,
-                student = it.student
-            ))}
-            .collect(Collectors.toList())
-        individualRepository.save(IndividualProject(
-            name = request.name,
-            shortContent = request.shortContent,
-            creationList = creations,
-            codeLinkList = request.githubLinkList,
-            tagList = request.tagList
-        ))
+        throw NotHaveAccessProjectException("작성자가 프로젝트에 참여하지 않음")
     }
 
 }
