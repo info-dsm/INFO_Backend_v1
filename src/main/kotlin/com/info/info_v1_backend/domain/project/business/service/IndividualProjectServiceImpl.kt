@@ -2,7 +2,7 @@ package com.info.info_v1_backend.domain.project.business.service
 
 import com.info.info_v1_backend.domain.auth.data.repository.user.StudentRepository
 import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
-import com.info.info_v1_backend.domain.project.business.controller.dto.request.EditProjectRequest
+import com.info.info_v1_backend.domain.project.business.controller.dto.request.EditIndividualProjectDto
 import com.info.info_v1_backend.domain.project.business.controller.dto.request.IndividualProjectCreateRequest
 import com.info.info_v1_backend.domain.project.business.controller.dto.request.IndividualProjectEditRequest
 import com.info.info_v1_backend.domain.project.business.controller.dto.response.MaximumProjectResponse
@@ -32,7 +32,7 @@ class IndividualProjectServiceImpl(
     override fun getMinimumLatestOrderProjectList   (): MinimumProjectListResponse {
         //security config에서 url로 authentication필요
         return MinimumProjectListResponse(individualRepository.findAll(
-            Sort.by(Sort.Direction.DESC, "createdBy"))
+            Sort.by(Sort.Direction.DESC, "createdAt"))
             .stream()
             .filter { it.status == ProjectStatus.INDIVIDUAL }
             .map{
@@ -73,6 +73,17 @@ class IndividualProjectServiceImpl(
         //security config에서 url로 authentication필요
         val p = individualRepository.findByIdOrNull(id)
             ?: throw ProjectNotFoundException("$id :: not found")
+        p.editIndividualProject(
+            EditIndividualProjectDto(
+                id = null,
+                name = null,
+                shortContent = null,
+                haveSeenCount = p.haveSeenCount + 1,
+                creationList = null,
+                codeLinkList = null,
+                tagList = null,
+                status = null
+            ))
         return MaximumProjectResponse(
             name = p.name,
             imageLink = p.imageLinkList,
@@ -124,8 +135,8 @@ class IndividualProjectServiceImpl(
                     project = p,
                     student = userRepository.findById(it).orElse(null)
                 ) ) }.toList()
-        p.editProject(
-            EditProjectRequest(
+        p.editIndividualProject(
+            EditIndividualProjectDto(
                 id = p.id,
                 name = request.name,
                 shortContent = request.shortContent,

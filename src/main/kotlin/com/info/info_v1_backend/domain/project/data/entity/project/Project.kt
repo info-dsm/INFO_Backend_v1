@@ -1,7 +1,6 @@
 package com.info.info_v1_backend.domain.project.data.entity.project
 
 import com.info.info_v1_backend.domain.auth.presentation.dto.response.ProjectList
-import com.info.info_v1_backend.domain.project.business.controller.dto.request.EditProjectRequest
 import com.info.info_v1_backend.domain.project.data.entity.Creation
 import com.info.info_v1_backend.domain.project.data.entity.type.ProjectStatus
 import com.info.info_v1_backend.global.base.entity.BaseAuthorEntity
@@ -62,33 +61,6 @@ sealed class Project(
                 this.codeLinkList,
                 this.status,
         )
-    }
-
-    fun editProject(request: EditProjectRequest){
-        request.id?. let {
-            this.id = it
-        }
-        request.name?. let {
-            this.name = it
-        }
-        request.shortContent?. let {
-            this.shortContent = it
-        }
-        request.haveSeenCount?. let {
-            this.haveSeenCount = it
-        }
-        request.creationList?. let{
-            this.creationList = it
-        }
-        request.codeLinkList?. let {
-            this.codeLinkList = it
-        }
-        request.tagList?. let {
-            this.tagList = it
-        }
-        request.status?.let {
-            this.status = it
-        }
     }
 
 }
