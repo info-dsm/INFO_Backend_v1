@@ -137,7 +137,7 @@ class AuthServiceImpl(
                         user.githubLink,
                         user.isHired,
                         user.creationList?.map {
-                            it.project.toProjectList()
+                            it.project!!.toProjectList()
                         },
                         user.company?.toMinimumCompanyResponse()
                 )
@@ -159,7 +159,6 @@ class AuthServiceImpl(
                         user.company?.toMinimumCompanyResponse()
                 )
             }
-
             else -> {
                 throw UserNotFoundException(user.email)
             }
