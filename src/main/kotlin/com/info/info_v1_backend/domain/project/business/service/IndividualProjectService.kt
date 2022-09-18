@@ -1,6 +1,7 @@
 package com.info.info_v1_backend.domain.project.business.service
 
-import com.info.info_v1_backend.domain.project.business.controller.dto.request.IndividualProjectRequest
+import com.info.info_v1_backend.domain.project.business.controller.dto.request.IndividualProjectCreateRequest
+import com.info.info_v1_backend.domain.project.business.controller.dto.request.IndividualProjectEditRequest
 import com.info.info_v1_backend.domain.project.business.controller.dto.response.MaximumProjectResponse
 import com.info.info_v1_backend.domain.project.business.controller.dto.response.MinimumProjectListResponse
 
@@ -12,6 +13,8 @@ interface IndividualProjectService {
 
     fun getMaximumProject(id: Long): MaximumProjectResponse
 
-    fun writeIndividualProject(request: IndividualProjectRequest)
+    fun writeIndividualProject(request: IndividualProjectCreateRequest)
+
+    fun editIndividualProject(request: IndividualProjectEditRequest)
 
 }
