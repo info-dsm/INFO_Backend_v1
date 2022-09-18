@@ -10,6 +10,7 @@ import javax.persistence.*
 
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "user_type")
 abstract class User(
     name: String,

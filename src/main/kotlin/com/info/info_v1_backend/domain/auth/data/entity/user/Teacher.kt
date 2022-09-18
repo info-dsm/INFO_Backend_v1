@@ -9,7 +9,6 @@ import javax.persistence.InheritanceType
 
 @Entity
 @DiscriminatorValue("teacher")
-@Inheritance(strategy = InheritanceType.JOINED)
 class Teacher(
     name: String,
     email: String,
