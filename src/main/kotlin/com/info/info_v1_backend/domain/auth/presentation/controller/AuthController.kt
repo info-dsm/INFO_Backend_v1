@@ -103,4 +103,11 @@ class AuthController(
     fun getStudentList(): MinimumStudentList{
         return authService.getStudentList()
     }
+    @PostMapping("/changeEmail")
+    fun changeEmail(
+            @RequestBody
+            req: ChangeEmailRequest
+    ){
+        authService.changeEmail(req)
+    }
 }
