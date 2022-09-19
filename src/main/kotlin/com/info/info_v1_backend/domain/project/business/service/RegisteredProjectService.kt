@@ -17,4 +17,6 @@ interface RegisteredProjectService {
 
     fun editRegisteredProject(request: RegisteredProjectEditRequest)
 
+    fun getWaitingMinimumProject()
+
 }
