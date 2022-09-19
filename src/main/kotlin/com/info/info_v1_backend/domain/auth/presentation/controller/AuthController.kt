@@ -64,6 +64,15 @@ class AuthController(
         authService.teacherSignUp(request)
     }
 
+    @PostMapping("/contactorSignUp")
+    fun contactorSignUp(
+        @RequestBody @Valid
+        request: ContactorSignupRequest
+    ){
+        authService.contactorSignup(request)
+    }
+
+
     @PostMapping("/changePassword")
     fun password(
         @RequestBody
