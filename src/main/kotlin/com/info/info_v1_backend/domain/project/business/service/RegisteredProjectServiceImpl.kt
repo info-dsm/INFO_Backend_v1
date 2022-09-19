@@ -1,13 +1,12 @@
 package com.info.info_v1_backend.domain.project.business.service
 
+import com.info.info_v1_backend.domain.auth.data.entity.type.Role
 import com.info.info_v1_backend.domain.auth.data.repository.user.StudentRepository
 import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
 import com.info.info_v1_backend.domain.project.business.controller.dto.request.EditRegisteredProjectDto
 import com.info.info_v1_backend.domain.project.business.controller.dto.request.RegisteredProjectCreateRequest
 import com.info.info_v1_backend.domain.project.business.controller.dto.request.RegisteredProjectEditRequest
-import com.info.info_v1_backend.domain.project.business.controller.dto.response.MaximumProjectResponse
-import com.info.info_v1_backend.domain.project.business.controller.dto.response.MinimumProjectListResponse
-import com.info.info_v1_backend.domain.project.business.controller.dto.response.MinimumProjectResponse
+import com.info.info_v1_backend.domain.project.business.controller.dto.response.*
 import com.info.info_v1_backend.domain.project.data.entity.Creation
 import com.info.info_v1_backend.domain.project.data.entity.project.RegisteredProject
 import com.info.info_v1_backend.domain.project.data.entity.type.ProjectStatus
@@ -16,7 +15,9 @@ import com.info.info_v1_backend.domain.project.data.repository.ProjectRepository
 import com.info.info_v1_backend.domain.project.exception.NotHaveAccessProjectException
 import com.info.info_v1_backend.domain.project.exception.ProjectNotFoundException
 import com.info.info_v1_backend.domain.project.exception.ProjectStatusWaitingException
+import com.info.info_v1_backend.global.error.common.ForbiddenException
 import com.info.info_v1_backend.global.util.user.CurrentUtil
+import io.undertow.util.BadRequestException
 import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -93,7 +94,8 @@ class RegisteredProjectServiceImpl(
                 creationList = null,
                 codeLinkList = null,
                 tagList = null
-        ))
+        )
+        )
         return MaximumProjectResponse(
             name = p.name,
             imageLink = p.imageLinkList,
@@ -182,4 +184,21 @@ class RegisteredProjectServiceImpl(
         }
     }
 
+    override fun getWaitingMinimumProject() {
+        if(!currentUtil.getCurrentUser().roleList
+            .stream()
+            .anyMatch { it == Role.TEACHER }){
+            throw ForbiddenException("${currentUtil.getCurrentUser()} :: 권한 오류")
+        }
+        val list = registeredProjectRepository.findAll(Sort.by(Sort.Direction.ASC, "createAt"))
+            .filter { it.status == ProjectStatus.WAITING }
+            .map {
+                    WaitingMinimumProjectResponse(
+                        id = it.id?: throw BadRequestException("$it :: id가 null입니다"),
+                        name = it.name,
+                    )
+            }
+            .toMutableList()
+        WaitingMinimumListProjectResponse(list)
+    }
 }

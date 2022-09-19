@@ -37,4 +37,9 @@ class RegisteredProjectController(private val registeredProjectService: Register
     fun editRegisteredProject(@RequestBody request: RegisteredProjectEditRequest){
         registeredProjectService.editRegisteredProject(request)
     }
+
+    @GetMapping("/waiting")
+    fun getWaitingMinimumProject(){
+        registeredProjectService.getWaitingMinimumProject()
+    }
 }
