@@ -1,5 +1,6 @@
 package com.info.info_v1_backend.domain.project.data.entity.project
 
+import com.info.info_v1_backend.domain.project.business.controller.dto.request.EditIndividualProjectDto
 import com.info.info_v1_backend.domain.project.data.entity.Creation
 import com.info.info_v1_backend.domain.project.data.entity.type.ProjectStatus
 import javax.persistence.DiscriminatorValue
@@ -25,4 +26,33 @@ class IndividualProject(
     tagList,
     ProjectStatus.APPROVE
 ) {
+    fun editIndividualProject(request: EditIndividualProjectDto){
+        request.id?. let {
+            this.id = it
+        }
+        request.imageLinkList?.let {
+            this.imageLinkList =it
+        }
+        request.name?. let {
+            this.name = it
+        }
+        request.shortContent?. let {
+            this.shortContent = it
+        }
+        request.haveSeenCount?. let {
+            this.haveSeenCount = it
+        }
+        request.creationList?. let{
+            this.creationList = it.toMutableList()
+        }
+        request.codeLinkList?. let {
+            this.codeLinkList = it
+        }
+        request.tagList?. let {
+            this.tagList = it
+        }
+        request.status?.let {
+            this.status = it
+        }
+    }
 }
