@@ -4,6 +4,7 @@ import com.info.info_v1_backend.domain.auth.data.entity.type.Role
 import com.info.info_v1_backend.domain.auth.data.repository.user.StudentRepository
 import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
 import com.info.info_v1_backend.domain.project.business.controller.dto.request.EditRegisteredProjectDto
+import com.info.info_v1_backend.domain.project.business.controller.dto.request.ProjectStatusEditRequest
 import com.info.info_v1_backend.domain.project.business.controller.dto.request.RegisteredProjectCreateRequest
 import com.info.info_v1_backend.domain.project.business.controller.dto.request.RegisteredProjectEditRequest
 import com.info.info_v1_backend.domain.project.business.controller.dto.response.*
@@ -14,7 +15,6 @@ import com.info.info_v1_backend.domain.project.data.repository.CreationRepositor
 import com.info.info_v1_backend.domain.project.data.repository.ProjectRepository
 import com.info.info_v1_backend.domain.project.exception.NotHaveAccessProjectException
 import com.info.info_v1_backend.domain.project.exception.ProjectNotFoundException
-import com.info.info_v1_backend.domain.project.exception.ProjectStatusWaitingException
 import com.info.info_v1_backend.global.error.common.ForbiddenException
 import com.info.info_v1_backend.global.util.user.CurrentUtil
 import io.undertow.util.BadRequestException
@@ -76,7 +76,7 @@ class RegisteredProjectServiceImpl(
         val p = registeredProjectRepository.findByIdOrNull(id)
             ?: throw ProjectNotFoundException("$id :: not found")
         if (p.status == ProjectStatus.WAITING) {
-            throw ProjectStatusWaitingException("$id :: status waiting")
+            verifyAuth()
         }
         p.editRegisteredProject(
             EditRegisteredProjectDto(
@@ -111,7 +111,7 @@ class RegisteredProjectServiceImpl(
     }
 
     override fun writeRegisteredProject(request: RegisteredProjectCreateRequest) {
-        verifyUser(request.studentIdList)
+        verifyAuth(request.studentIdList)
         val c = request.studentIdList
             .map { creationRepository.save(
                 Creation(
@@ -142,7 +142,7 @@ class RegisteredProjectServiceImpl(
     }
 
     override fun editRegisteredProject(request: RegisteredProjectEditRequest) {
-        verifyUser(request.studentIdList)
+        verifyAuth(request.studentIdList)
 
         val p = registeredProjectRepository.findByIdOrNull(request.projectId)
             ?: throw ProjectNotFoundException("${request.projectId} :: not found")
@@ -177,28 +177,56 @@ class RegisteredProjectServiceImpl(
         )
     }
 
-    private fun verifyUser(studentIdList: List<Long>) {
+    override fun getWaitingMinimumProject() {
+        verifyAuth()
+        val list = registeredProjectRepository.findAll(Sort.by(Sort.Direction.ASC, "createAt"))
+            .filter { it.status == ProjectStatus.WAITING }
+            .map {
+                    WaitingMinimumProjectResponse(
+                        id = it.id?: throw BadRequestException("$it :: id가 null입니다"),
+                        name = it.name
+                    )
+            }
+            .toMutableList()
+        WaitingMinimumListProjectResponse(list)
+    }
+
+    override fun updateStatus(request: ProjectStatusEditRequest) {
+        verifyAuth()
+        val p = registeredProjectRepository.findByIdOrNull(request.projectId)
+            ?: throw ProjectNotFoundException("${request.projectId} :: not found")
+        p.editRegisteredProject(
+            EditRegisteredProjectDto(
+                id = null,
+                name = null,
+                shortContent = null,
+                haveSeenCount = null,
+                status = if(request.status) ProjectStatus.APPROVE else ProjectStatus.REJECT,
+                purpose = null,
+                theoreticalBackground = null,
+                processList = null,
+                result = null,
+                conclusion = null,
+                referenceList = null,
+                creationList = null,
+                codeLinkList = null,
+                tagList = null
+            )
+        )
+    }
+
+    private fun verifyAuth(studentIdList: List<Long>) {
         if(studentIdList.stream()
                 .anyMatch { currentUtil.getCurrentUser() == userRepository.findById(it) }){
             throw NotHaveAccessProjectException("작성자가 프로젝트에 참여하지 않음")
         }
     }
 
-    override fun getWaitingMinimumProject() {
+    private fun verifyAuth(){
         if(!currentUtil.getCurrentUser().roleList
-            .stream()
-            .anyMatch { it == Role.TEACHER }){
+                .stream()
+                .anyMatch { it == Role.TEACHER }){
             throw ForbiddenException("${currentUtil.getCurrentUser()} :: 권한 오류")
         }
-        val list = registeredProjectRepository.findAll(Sort.by(Sort.Direction.ASC, "createAt"))
-            .filter { it.status == ProjectStatus.WAITING }
-            .map {
-                    WaitingMinimumProjectResponse(
-                        id = it.id?: throw BadRequestException("$it :: id가 null입니다"),
-                        name = it.name,
-                    )
-            }
-            .toMutableList()
-        WaitingMinimumListProjectResponse(list)
     }
 }

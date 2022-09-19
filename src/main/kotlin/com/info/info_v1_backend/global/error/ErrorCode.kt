@@ -16,7 +16,6 @@ enum class ErrorCode(
     EMAIL_ERROR("Email 전송 과정 중 에러가 발생했습니다.", HttpStatus.BAD_GATEWAY),
 
     //403
-    PROJECT_STATUS_WAITING("Still Waiting For Approval", HttpStatus.FORBIDDEN),
     NOT_HAVE_ACCESS_TO_THE_PROJECT("Not Have Access To The project", HttpStatus.FORBIDDEN),
     FORBIDDEN("권한이 없습니다", HttpStatus.FORBIDDEN),
 
