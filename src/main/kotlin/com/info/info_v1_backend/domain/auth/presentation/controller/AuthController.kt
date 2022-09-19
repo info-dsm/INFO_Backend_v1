@@ -27,10 +27,17 @@ class AuthController(
     private val emailService: EmailService,
     private val current: CurrentUtil,
 ) {
-    @PostMapping("/email")
-    fun sendEmail(
+    @PostMapping("/schoolEmail")
+    fun sendSchoolEmail(
         @RequestParam
         @Pattern(regexp = "[a-zA-Z0-9+\\_.]+@dsm\\.hs\\.kr\$")
+        email: String
+    ){
+        emailService.sendCodeToEmail(email)
+    }
+    @PostMapping("/companyEmail")
+    fun sendCompanyEmail(
+        @RequestParam
         email: String
     ){
         emailService.sendCodeToEmail(email)
