@@ -14,5 +14,6 @@ data class MaximumProjectResponse(
     val projectStatus: ProjectStatus,
     val shortContent: String,
     val haveSeenCount: Long,
+    val studentIdList: MutableList<Long?>,
     val githubLinkList: MutableList<String>?
 )

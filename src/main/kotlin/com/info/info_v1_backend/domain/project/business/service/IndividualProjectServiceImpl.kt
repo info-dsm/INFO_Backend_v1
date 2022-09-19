@@ -15,6 +15,7 @@ import com.info.info_v1_backend.domain.project.data.repository.CreationRepositor
 import com.info.info_v1_backend.domain.project.data.repository.ProjectRepository
 import com.info.info_v1_backend.domain.project.exception.NotHaveAccessProjectException
 import com.info.info_v1_backend.domain.project.exception.ProjectNotFoundException
+import com.info.info_v1_backend.global.error.common.InternalServerErrorException
 import com.info.info_v1_backend.global.util.user.CurrentUtil
 import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
@@ -37,6 +38,8 @@ class IndividualProjectServiceImpl(
             .filter { it.status == ProjectStatus.INDIVIDUAL }
             .map{
                 MinimumProjectResponse(
+                projectId = it.id
+                    ?: throw InternalError("$it :: null일 수 없는 프로젝트 아이디"),
                 name = it.name,
                 haveSeenCount = it.haveSeenCount,
                 createAt = it.createdDate,
@@ -57,6 +60,8 @@ class IndividualProjectServiceImpl(
             .filter { it.status == ProjectStatus.INDIVIDUAL }
             .map{
                 MinimumProjectResponse(
+                    projectId = it.id
+                        ?: throw InternalServerErrorException("$it :: null일 수 없는 프로젝트 아이디"),
                     name = it.name,
                     haveSeenCount = it.haveSeenCount,
                     createAt = it.createdDate,
@@ -84,6 +89,9 @@ class IndividualProjectServiceImpl(
                 tagList = null,
                 status = null
             ))
+        val s = p.creationList
+            .map { it.student.id }
+            .toMutableList()
         return MaximumProjectResponse(
             name = p.name,
             imageLink = p.imageLinkList,
@@ -94,7 +102,8 @@ class IndividualProjectServiceImpl(
             projectStatus = ProjectStatus.INDIVIDUAL,
             shortContent = p.shortContent,
             haveSeenCount = p.haveSeenCount,
-            githubLinkList = p.codeLinkList
+            githubLinkList = p.codeLinkList,
+            studentIdList = s
         )
     }
 

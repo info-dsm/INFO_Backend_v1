@@ -16,6 +16,7 @@ import com.info.info_v1_backend.domain.project.data.repository.ProjectRepository
 import com.info.info_v1_backend.domain.project.exception.NotHaveAccessProjectException
 import com.info.info_v1_backend.domain.project.exception.ProjectNotFoundException
 import com.info.info_v1_backend.global.error.common.ForbiddenException
+import com.info.info_v1_backend.global.error.common.InternalServerErrorException
 import com.info.info_v1_backend.global.util.user.CurrentUtil
 import io.undertow.util.BadRequestException
 import org.springframework.data.domain.Sort
@@ -39,15 +40,17 @@ class RegisteredProjectServiceImpl(
             .filter { it.status == ProjectStatus.APPROVE }
             .map{
                 MinimumProjectResponse(
-                name = it.name,
-                haveSeenCount = it.haveSeenCount,
-                createAt = it.createdDate,
-                updateAt = it.updateDate,
-                createdBy = it.createdBy,
-                updatedBy = it.updatedBy,
-                shortContent = it.shortContent,
-                githubLinkList = it.codeLinkList
-            )
+                    projectId = it.id
+                        ?: throw InternalServerErrorException("$it :: null일 수 없는 프로젝트 아이디"),
+                    name = it.name,
+                    haveSeenCount = it.haveSeenCount,
+                    createAt = it.createdDate,
+                    updateAt = it.updateDate,
+                    createdBy = it.createdBy,
+                    updatedBy = it.updatedBy,
+                    shortContent = it.shortContent,
+                    githubLinkList = it.codeLinkList
+                )
             }.collect(Collectors.toList()))
     }
 
@@ -59,15 +62,17 @@ class RegisteredProjectServiceImpl(
             .filter { it.status != ProjectStatus.APPROVE }
             .map{
                 MinimumProjectResponse(
-                name = it.name,
-                haveSeenCount = it.haveSeenCount,
-                createAt = it.createdDate,
-                updateAt = it.updateDate,
-                createdBy = it.createdBy,
-                updatedBy = it.updatedBy,
-                shortContent = it.shortContent,
-                githubLinkList = it.codeLinkList
-            )
+                    projectId = it.id
+                        ?: throw InternalServerErrorException("$it :: null일 수 없는 프로젝트 아이디"),
+                    name = it.name,
+                    haveSeenCount = it.haveSeenCount,
+                    createAt = it.createdDate,
+                    updateAt = it.updateDate,
+                    createdBy = it.createdBy,
+                    updatedBy = it.updatedBy,
+                    shortContent = it.shortContent,
+                    githubLinkList = it.codeLinkList
+                )
             }.collect(Collectors.toList()))
     }
 
@@ -94,8 +99,11 @@ class RegisteredProjectServiceImpl(
                 creationList = null,
                 codeLinkList = null,
                 tagList = null
+            )
         )
-        )
+        val s = p.creationList
+            .map{ it.student.id }
+            .toMutableList()
         return MaximumProjectResponse(
             name = p.name,
             imageLink = p.imageLinkList,
@@ -106,7 +114,8 @@ class RegisteredProjectServiceImpl(
             projectStatus = p.status,
             shortContent = p.shortContent,
             haveSeenCount = p.haveSeenCount,
-            githubLinkList = p.codeLinkList
+            githubLinkList = p.codeLinkList,
+            studentIdList = s
         )
     }
 
@@ -133,7 +142,8 @@ class RegisteredProjectServiceImpl(
             referenceList = request.referenceList,
             tagList = request.tagList,
             creationList = c
-        ))
+            )
+        )
         c.map {
             it.id?.let {it1 -> creationRepository.findByIdOrNull(it1)
                 ?.editCreation(project = p)
