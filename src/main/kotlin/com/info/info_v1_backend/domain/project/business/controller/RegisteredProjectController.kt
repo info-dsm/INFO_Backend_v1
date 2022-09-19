@@ -1,5 +1,6 @@
 package com.info.info_v1_backend.domain.project.business.controller
 
+import com.info.info_v1_backend.domain.project.business.controller.dto.request.ProjectStatusEditRequest
 import com.info.info_v1_backend.domain.project.business.controller.dto.request.RegisteredProjectCreateRequest
 import com.info.info_v1_backend.domain.project.business.controller.dto.request.RegisteredProjectEditRequest
 import com.info.info_v1_backend.domain.project.business.controller.dto.response.MaximumProjectResponse
@@ -41,5 +42,10 @@ class RegisteredProjectController(private val registeredProjectService: Register
     @GetMapping("/waiting")
     fun getWaitingMinimumProject(){
         registeredProjectService.getWaitingMinimumProject()
+    }
+
+    @PatchMapping("/status")
+    fun updateStatus(@RequestBody request: ProjectStatusEditRequest){
+        registeredProjectService.updateStatus(request)
     }
 }

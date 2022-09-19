@@ -1,5 +1,6 @@
 package com.info.info_v1_backend.domain.project.business.service
 
+import com.info.info_v1_backend.domain.project.business.controller.dto.request.ProjectStatusEditRequest
 import com.info.info_v1_backend.domain.project.business.controller.dto.request.RegisteredProjectCreateRequest
 import com.info.info_v1_backend.domain.project.business.controller.dto.request.RegisteredProjectEditRequest
 import com.info.info_v1_backend.domain.project.business.controller.dto.response.MaximumProjectResponse
@@ -18,5 +19,7 @@ interface RegisteredProjectService {
     fun editRegisteredProject(request: RegisteredProjectEditRequest)
 
     fun getWaitingMinimumProject()
+
+    fun updateStatus(request: ProjectStatusEditRequest)
 
 }
