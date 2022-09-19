@@ -1,6 +1,5 @@
 package com.info.info_v1_backend.domain.auth.presentation.dto.request
 
-import com.info.info_v1_backend.domain.auth.data.entity.type.Role
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
@@ -22,7 +21,6 @@ data class StudentSignUpRequest(
     @field:NotNull
     @field:Size(min = 2, max = 4, message="2 ~ 4글자")
     val name: String,
-    val userType: Role,
 
     @field:NotNull
     val githubLink: String

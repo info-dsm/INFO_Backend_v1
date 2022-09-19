@@ -22,5 +22,4 @@ data class TeacherSingUpRequest(
     @field:NotNull
     @field:Size(min = 2, max = 4, message="2 ~ 4글자")
     val name: String,
-    val userType: Role,
 )
