@@ -5,7 +5,6 @@ import com.info.info_v1_backend.domain.auth.presentation.dto.request.EditMyInfo
 import com.info.info_v1_backend.domain.auth.presentation.dto.response.MinimumStudentList
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
 import com.info.info_v1_backend.domain.project.data.entity.Creation
-import com.info.info_v1_backend.domain.team.data.entity.Affiliation
 import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
 import javax.persistence.*
@@ -38,10 +37,7 @@ class Student(
 
     @OneToMany(mappedBy = "student", cascade = [CascadeType.REMOVE])
     var creationList: MutableList<Creation>? = creationList
-
-    @OneToMany(cascade = [CascadeType.REMOVE])
-    var affiliation: MutableList<Affiliation> = ArrayList()
-
+    
     @ManyToOne
     var company: Company? = null
 

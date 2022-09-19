@@ -42,7 +42,6 @@ class AuthServiceImpl(
                     creationList = null
             )
             userRepository.save(user)
-            return
         } else throw CheckEmailCodeException(req.emailCheckCode)
     }
 
@@ -57,7 +56,6 @@ class AuthServiceImpl(
                         encPw
                 )
                 userRepository.save(user)
-                return
             } else throw CheckTeacherCodeException(req.teacherCheckCode)
         } else throw CheckEmailCodeException(req.emailCheckCode)
     }
@@ -179,7 +177,7 @@ class AuthServiceImpl(
     }
 
     override fun getStudentList(): MinimumStudentList {
-        val list =  studentRepository.findAllByStartingWith().map {
+        val list =  studentRepository.findAll().map {
             it.toMinimumStudent()
         }
         return MinimumStudentList(list)

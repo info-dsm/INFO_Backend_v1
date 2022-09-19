@@ -20,7 +20,7 @@ class CommentServiceImpl(
     private val currentUtil: CurrentUtil
 ): CommentService {
 
-    override fun writeComment(request: WriteCommentRequest, companyId: Long) {
+    override fun writeComment(request: WriteCommentRequest, companyId: String) {
         val current = currentUtil.getCurrentUser()
         if (current is Student) {
             val company = companyRepository.findByIdAndStudentListContains(companyId, current).orElse(null)

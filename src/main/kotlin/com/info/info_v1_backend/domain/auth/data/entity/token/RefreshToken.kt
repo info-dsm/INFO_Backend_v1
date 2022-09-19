@@ -1,8 +1,11 @@
 package com.info.info_v1_backend.domain.auth.data.entity.token
 
 import org.springframework.data.annotation.Id
+import org.springframework.data.redis.core.RedisHash
 import org.springframework.data.redis.core.TimeToLive
 
+
+@RedisHash
 class RefreshToken(
     id: String,
     token: String

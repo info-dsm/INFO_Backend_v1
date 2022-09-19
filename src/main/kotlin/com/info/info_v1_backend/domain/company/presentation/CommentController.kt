@@ -25,7 +25,7 @@ class CommentController(
     @ResponseStatus(HttpStatus.CREATED)
     fun writeComment(
         @RequestBody request: WriteCommentRequest,
-        @RequestParam(required = true) companyId: Long
+        @RequestParam(required = true) companyId: String
     ) {
         commentService.writeComment(request, companyId)
     }

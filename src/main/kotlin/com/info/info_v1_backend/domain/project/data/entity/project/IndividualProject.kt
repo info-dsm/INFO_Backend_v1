@@ -2,7 +2,6 @@ package com.info.info_v1_backend.domain.project.data.entity.project
 
 import com.info.info_v1_backend.domain.project.data.entity.Creation
 import com.info.info_v1_backend.domain.project.data.entity.type.ProjectStatus
-import com.info.info_v1_backend.domain.team.data.entity.Team
 import javax.persistence.DiscriminatorValue
 import javax.persistence.Entity
 import javax.persistence.Inheritance
@@ -16,14 +15,12 @@ class IndividualProject(
     name: String,
     shortContent: String,
     creationList: MutableList<Creation>,
-    developTeam: Team,
     codeLinkList: MutableList<String>,
     tagList: MutableList<String>
 ): Project(
     name,
     shortContent,
     creationList,
-    developTeam,
     codeLinkList,
     tagList,
     ProjectStatus.APPROVE

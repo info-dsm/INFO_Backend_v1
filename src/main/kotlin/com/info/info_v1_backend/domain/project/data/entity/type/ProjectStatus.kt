@@ -5,6 +5,6 @@ enum class ProjectStatus(
 ) {
     APPROVE("수락"),
     REJECT("거절"),
-    WAITING("대기")
+    WAITING("대기"),
 
 }

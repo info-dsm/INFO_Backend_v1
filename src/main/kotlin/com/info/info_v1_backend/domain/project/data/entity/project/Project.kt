@@ -3,8 +3,8 @@ package com.info.info_v1_backend.domain.project.data.entity.project
 import com.info.info_v1_backend.domain.auth.presentation.dto.response.ProjectList
 import com.info.info_v1_backend.domain.project.data.entity.Creation
 import com.info.info_v1_backend.domain.project.data.entity.type.ProjectStatus
-import com.info.info_v1_backend.domain.team.data.entity.Team
 import com.info.info_v1_backend.global.base.entity.BaseAuthorEntity
+import com.info.info_v1_backend.global.image.entity.File
 import javax.persistence.CascadeType
 import javax.persistence.Column
 import javax.persistence.DiscriminatorColumn
@@ -13,8 +13,6 @@ import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
-import javax.persistence.JoinColumn
-import javax.persistence.ManyToOne
 import javax.persistence.OneToMany
 
 @Entity
@@ -23,7 +21,6 @@ sealed class Project(
     name: String,
     shortContent: String,
     creationList: MutableList<Creation>,
-    developTeam: Team,
     codeLinkList: MutableList<String>,
     tagList: MutableList<String>,
     projectStatus: ProjectStatus
@@ -42,13 +39,12 @@ sealed class Project(
     var shortContent: String = shortContent
         protected set
 
-    @OneToMany(mappedBy = "project")
-    var creationList: MutableList<Creation> = creationList
+    @Column(name = "have_seen_count", nullable = false)
+    var haveSeenCount: Long = 0
         protected set
 
-    @ManyToOne(cascade = [CascadeType.REMOVE])
-    @JoinColumn(name = "team_id")
-    var developTeam: Team = developTeam
+    @OneToMany(mappedBy = "project")
+    var creationList: MutableList<Creation> = creationList
         protected set
 
     @ElementCollection
@@ -63,6 +59,10 @@ sealed class Project(
     var status: ProjectStatus = projectStatus
         protected set
 
+    @OneToMany(mappedBy = "project", cascade = [CascadeType.REMOVE])
+    var photoList: MutableList<File> = ArrayList()
+        protected set
+
     fun toProjectList(): ProjectList{
         return ProjectList(
                 this.name,
@@ -70,5 +70,6 @@ sealed class Project(
                 this.status,
         )
     }
+
 
 }
