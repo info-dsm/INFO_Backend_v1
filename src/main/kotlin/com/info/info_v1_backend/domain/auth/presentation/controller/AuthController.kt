@@ -43,11 +43,6 @@ class AuthController(
         emailService.sendCodeToEmail(email)
     }
 
-    @PostMapping("/passwordCode")
-    fun sendPasswordCode(){
-        emailService.sendCodeToEmail(current.getCurrentUser().email)
-    }
-
     @PostMapping("/studentSignUp")
     fun studentSignUp(
         @RequestBody @Valid
@@ -80,6 +75,11 @@ class AuthController(
     ){
         authService.editPassword(request)
     }
+    @PostMapping("/passwordCode")
+    fun sendPasswordCode(){
+        emailService.sendCodeToEmail(current.getCurrentUser().email)
+    }
+
     @PostMapping("/reissue")
     fun reissue(
         @RequestBody
@@ -115,7 +115,7 @@ class AuthController(
         return authService.getUserInfo(name)
     }
 
-    @PostMapping("/getStudentList")
+    @GetMapping("/getStudentList")
     fun getStudentList(): MinimumStudentList{
         return authService.getStudentList()
     }
