@@ -20,12 +20,14 @@ allOpen {
     annotation("javax.persistence.Entity")
     annotation("org.springframework.data.redis.core.RedisHash")
     annotation("org.springframework.data.mongodb.core.mapping.Document")
+    annotation("javax.persistence.Embeddable")
 }
 
 noArg {
     annotation("javax.persistence.Entity")
     annotation("org.springframework.data.redis.core.RedisHash")
     annotation("org.springframework.data.mongodb.core.mapping.Document")
+    annotation("javax.persistence.Embeddable")
 }
 
 repositories {
