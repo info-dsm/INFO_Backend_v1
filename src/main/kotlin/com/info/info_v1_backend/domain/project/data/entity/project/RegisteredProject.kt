@@ -1,5 +1,6 @@
 package com.info.info_v1_backend.domain.project.data.entity.project
 
+import com.info.info_v1_backend.domain.project.business.controller.dto.data.ProcessDto
 import com.info.info_v1_backend.domain.project.business.controller.dto.request.EditRegisteredProjectDto
 import com.info.info_v1_backend.domain.project.data.entity.Creation
 import com.info.info_v1_backend.domain.project.data.entity.type.ProjectStatus
@@ -14,7 +15,7 @@ class RegisteredProject(
     shortContent: String,
     purpose: String,
     theoreticalBackground: MutableList<String>,
-    processList: MutableList<String>,
+    processList: MutableList<ProcessDto>,
     result: String,
     conclusion: String,
     referenceList: MutableList<String>,

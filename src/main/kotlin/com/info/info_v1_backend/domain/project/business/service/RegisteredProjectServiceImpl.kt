@@ -3,6 +3,8 @@ package com.info.info_v1_backend.domain.project.business.service
 import com.info.info_v1_backend.domain.auth.data.entity.type.Role
 import com.info.info_v1_backend.domain.auth.data.repository.user.StudentRepository
 import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
+import com.info.info_v1_backend.domain.project.business.controller.dto.data.GithubLinkDto
+import com.info.info_v1_backend.domain.project.business.controller.dto.data.StudentIdDto
 import com.info.info_v1_backend.domain.project.business.controller.dto.request.EditRegisteredProjectDto
 import com.info.info_v1_backend.domain.project.business.controller.dto.request.ProjectStatusEditRequest
 import com.info.info_v1_backend.domain.project.business.controller.dto.request.RegisteredProjectCreateRequest
@@ -125,7 +127,7 @@ class RegisteredProjectServiceImpl(
             .map { creationRepository.save(
                 Creation(
                 project = null,
-                student = userRepository.findByIdOrNull(it)
+                student = userRepository.findByIdOrNull(it.studentId)
                     ?: throw UserNotFoundException("$it :: not found")
             ))}.toList().toMutableList()
 
@@ -134,13 +136,21 @@ class RegisteredProjectServiceImpl(
             name = request.name,
             shortContent = request.shortContent,
             purpose = request.purpose,
-            theoreticalBackground = request.theoreticalBackground,
-            codeLinkList = request.githubLinkList,
+            theoreticalBackground = request.theoreticalBackground
+                .map { it.theoreticalBackground }
+                .toMutableList(),
+            codeLinkList = request.githubLinkList
+                .map { it.GithubLink }
+                .toMutableList(),
             processList = request.processList,
             result = request.result,
             conclusion = request.conclusion,
-            referenceList = request.referenceList,
-            tagList = request.tagList,
+            referenceList = request.referenceList
+                .map { it.reference }
+                .toMutableList(),
+            tagList = request.tagList
+                .map { it.tag }
+                .toMutableList(),
             creationList = c
             )
         )
@@ -164,7 +174,7 @@ class RegisteredProjectServiceImpl(
             .map { creationRepository.save(
                 Creation(
                     project = p,
-                    student = userRepository.findById(it).orElse(null)
+                    student = userRepository.findById(it.studentId).orElse(null)
                 ) ) }.toList().toMutableList()
 
         p.editRegisteredProject(
@@ -225,9 +235,9 @@ class RegisteredProjectServiceImpl(
         )
     }
 
-    private fun verifyAuth(studentIdList: List<Long>) {
+    private fun verifyAuth(studentIdList: MutableList<StudentIdDto>) {
         if(studentIdList.stream()
-                .anyMatch { currentUtil.getCurrentUser() == userRepository.findById(it) }){
+                .anyMatch { currentUtil.getCurrentUser() == userRepository.findById(it.studentId) }){
             throw NotHaveAccessProjectException("작성자가 프로젝트에 참여하지 않음")
         }
     }
