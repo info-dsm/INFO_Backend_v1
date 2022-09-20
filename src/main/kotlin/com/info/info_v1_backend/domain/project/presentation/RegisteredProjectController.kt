@@ -49,13 +49,9 @@ class RegisteredProjectController(
         registeredProjectService.editRegisteredProject(request)
     }
 
-    @PostMapping("/image/{project-id}")
-    @ResponseStatus(HttpStatus.CREATED)
-    fun uploadImage(
-        @RequestPart image: MultipartFile,
-        @PathVariable("project-id") projectId: Long
-    ) {
-        registeredProjectService.uploadImage(image, projectId)
+    @PostMapping("/status")
+    fun updateStatus(@RequestBody request: ProjectStatusEditRequest){
+        registeredProjectService.updateStatus(request)
     }
 
     @GetMapping("/waiting")
@@ -68,9 +64,13 @@ class RegisteredProjectController(
         registeredProjectService.deleteProject(projectId)
     }
 
-    @PostMapping("/status")
-    fun updateStatus(@RequestBody request: ProjectStatusEditRequest){
-        registeredProjectService.updateStatus(request)
+    @PostMapping("/image/{project-id}")
+    @ResponseStatus(HttpStatus.CREATED)
+    fun uploadImage(
+        @RequestPart image: MultipartFile,
+        @PathVariable("project-id") projectId: Long
+    ) {
+        registeredProjectService.uploadImage(image, projectId)
     }
 
     @DeleteMapping("/image/{image-id}")
