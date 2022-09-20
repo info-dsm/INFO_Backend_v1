@@ -1,6 +1,6 @@
 package com.info.info_v1_backend.domain.project.data.entity.project
 
-import com.info.info_v1_backend.domain.project.business.controller.dto.request.EditIndividualProjectDto
+import com.info.info_v1_backend.domain.project.business.dto.request.EditIndividualProjectDto
 import com.info.info_v1_backend.domain.project.data.entity.Creation
 import com.info.info_v1_backend.domain.project.data.entity.type.ProjectStatus
 import javax.persistence.DiscriminatorValue
@@ -16,7 +16,7 @@ class IndividualProject(
     name: String,
     shortContent: String,
     creationList: MutableList<Creation>,
-    codeLinkList: MutableList<String>,
+    codeLinkList: MutableList<String>?,
     tagList: MutableList<String>
 ): Project(
     name,
@@ -30,8 +30,8 @@ class IndividualProject(
         request.id?. let {
             this.id = it
         }
-        request.imageLinkList?.let {
-            this.imageLinkList =it
+        request.photoList?.let {
+            this.photoList = it
         }
         request.name?. let {
             this.name = it

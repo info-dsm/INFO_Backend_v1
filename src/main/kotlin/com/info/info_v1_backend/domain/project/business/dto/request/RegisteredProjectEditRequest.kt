@@ -1,9 +1,9 @@
-package com.info.info_v1_backend.domain.project.business.controller.dto.request
+package com.info.info_v1_backend.domain.project.business.dto.request
 
-data class RegisteredProjectCreateRequest(
-    val imageLinkList: MutableList<String>?,
-    val name: String,
-    val shortContent: String,
+data class RegisteredProjectEditRequest(
+    val projectId: Long,
+    val name: String?,
+    val shortContent: String?,
     val purpose: String,
     val theoreticalBackground: MutableList<String>,
     val processList: MutableList<String>,

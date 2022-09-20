@@ -1,15 +1,13 @@
 package com.info.info_v1_backend.domain.project.business.dto.response
 
-import java.time.LocalDateTime
+import com.info.info_v1_backend.domain.project.business.dto.common.StudentIdDto
+import com.info.info_v1_backend.infra.amazon.s3.dto.ImageDto
 
 data class MinimumProjectResponse(
+    val photoList: MutableList<ImageDto>?,
     val projectId: Long,
-    val name: String,
-    val createAt: LocalDateTime?,
-    val updateAt: LocalDateTime?,
-    val createdBy: Long?,
-    val updatedBy: Long?,
-    val shortContent: String,
-    val haveSeenCount: Long,
-    val githubLinkList: MutableList<String>
+    val githubLinkList: MutableList<String>?,
+    val shortContent : String,
+    val studentId: MutableList<StudentIdDto>,
+    val haveSeenCount: Long
 )
