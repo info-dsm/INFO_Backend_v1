@@ -46,6 +46,8 @@ enum class ErrorCode(
     IS_NOT_CONTACTOR_OR_TEACHER("Is Not Contactor Or Teacher", HttpStatus.NOT_FOUND),
     FILE_NOT_FOUND("File not Found", HttpStatus.NOT_FOUND),
 
+    //500
+    INTERNAL_SERVER_ERROR("internal server error", HttpStatus.INTERNAL_SERVER_ERROR),
 
     //502
     S3_ERROR("S3 작업 과정 중 에러가 발생했습니다.", HttpStatus.BAD_GATEWAY),

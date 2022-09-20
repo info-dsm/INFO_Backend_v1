@@ -12,7 +12,7 @@ import javax.persistence.*
 sealed class Project(
     name: String,
     shortContent: String,
-    creationList: MutableList<Creation>,
+    creationList: MutableList<Creation>?,
     codeLinkList: MutableList<String>,
     tagList: MutableList<String>,
     projectStatus: ProjectStatus
@@ -36,7 +36,7 @@ sealed class Project(
         protected set
 
     @OneToMany(mappedBy = "project")
-    var creationList: MutableList<Creation> = creationList
+    var creationList: MutableList<Creation>? = creationList
         protected set
 
     @ElementCollection

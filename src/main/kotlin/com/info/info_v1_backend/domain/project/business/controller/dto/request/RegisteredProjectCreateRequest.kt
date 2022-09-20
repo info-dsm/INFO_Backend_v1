@@ -1,7 +1,10 @@
 package com.info.info_v1_backend.domain.project.business.controller.dto.request
 
+import com.info.info_v1_backend.domain.project.business.controller.dto.data.ImageRequestDto
+import com.info.info_v1_backend.domain.project.business.controller.dto.data.StudentIdDto
+
 data class RegisteredProjectCreateRequest(
-    val imageLinkList: MutableList<String>?,
+    val imageLinkList: MutableList<ImageRequestDto>?,
     val name: String,
     val shortContent: String,
     val purpose: String,
@@ -10,7 +13,7 @@ data class RegisteredProjectCreateRequest(
     val result: String,
     val conclusion: String,
     val referenceList: MutableList<String>,
-    val githubLinkList: MutableList<String>,
-    val studentIdList: List<Long>,
+    val studentList: MutableList<StudentIdDto>,
+    val codeLinkList: MutableList<String>,
     val tagList: MutableList<String>
 )

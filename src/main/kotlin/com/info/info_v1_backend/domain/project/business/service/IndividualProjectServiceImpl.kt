@@ -6,7 +6,6 @@ import com.info.info_v1_backend.domain.project.business.controller.dto.request.E
 import com.info.info_v1_backend.domain.project.business.controller.dto.request.IndividualProjectCreateRequest
 import com.info.info_v1_backend.domain.project.business.controller.dto.request.IndividualProjectEditRequest
 import com.info.info_v1_backend.domain.project.business.controller.dto.response.MaximumProjectResponse
-import com.info.info_v1_backend.domain.project.business.controller.dto.response.MinimumProjectListResponse
 import com.info.info_v1_backend.domain.project.business.controller.dto.response.MinimumProjectResponse
 import com.info.info_v1_backend.domain.project.data.entity.Creation
 import com.info.info_v1_backend.domain.project.data.entity.project.IndividualProject
@@ -15,7 +14,10 @@ import com.info.info_v1_backend.domain.project.data.repository.CreationRepositor
 import com.info.info_v1_backend.domain.project.data.repository.IndividualProjectRepository
 import com.info.info_v1_backend.domain.project.exception.NotHaveAccessProjectException
 import com.info.info_v1_backend.domain.project.exception.ProjectNotFoundException
+import com.info.info_v1_backend.global.error.common.InternalServerErrorException
 import com.info.info_v1_backend.global.util.user.CurrentUtil
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -29,46 +31,56 @@ class IndividualProjectServiceImpl(
     private val creationRepository: CreationRepository
     ): IndividualProjectService{
 
-    override fun getMinimumLatestOrderProjectList   (): MinimumProjectListResponse {
+    override fun getMinimumLatestOrderProjectList(idx: Int, size: Int): Page<MinimumProjectResponse>{
         //security config에서 url로 authentication필요
-        return MinimumProjectListResponse(individualRepository.findAll(
-            Sort.by(Sort.Direction.DESC, "createdAt"))
-            .stream()
-            .filter { it.status == ProjectStatus.APPROVE }
+        return individualRepository.findAll(
+            PageRequest.of(
+                idx,
+                size,
+                Sort.by(Sort.Direction.DESC, "createAt")))
             .map{
                 MinimumProjectResponse(
-                    it.id!!,
-                    it.name,
-                    it.createdAt,
-                    it.updatedAt,
-                    it.createdBy,
-                    it.updatedBy,
-                    it.shortContent,
-                    it.haveSeenCount,
-                    it.codeLinkList,
+                    projectId = it.id
+                        ?: throw InternalServerErrorException("$it :: null일 수 없는 프로젝트 아이디"),
+                    name = it.name,
+                    haveSeenCount = it.haveSeenCount,
+                    createAt = it.createdDate,
+                    updateAt = it.updateDate,
+                    createdBy = it.createdBy,
+                    updatedBy = it.updatedBy,
+                    shortContent = it.shortContent,
+                    githubLinkList = it.codeLinkList,
+                    imageLinkList = it.imageLinkList?.map {it1 ->
+                        it1.toImageDto()
+                    }?.toMutableList()
                 )
-            }.collect(Collectors.toList()))
+            }
     }
 
-    override fun getMinimumNumberOfViewsProjectList(): MinimumProjectListResponse {
+    override fun getMinimumNumberOfViewsProjectList(idx: Int, size: Int): Page<MinimumProjectResponse>{
         //security config에서 url로 authentication필요
-        return MinimumProjectListResponse(individualRepository.findAll(
-            Sort.by(Sort.Direction.DESC, "haveSeenCount"))
-            .stream()
-            .filter { it.status == ProjectStatus.APPROVE }
+        return individualRepository.findAll(
+            PageRequest.of(
+                idx,
+                size,
+                Sort.by(Sort.Direction.DESC, "haveSeenCount")))
             .map{
                 MinimumProjectResponse(
-                    it.id!!,
-                    it.name,
-                    it.createdAt,
-                    it.updatedAt,
-                    it.createdBy,
-                    it.updatedBy,
-                    it.shortContent,
-                    it.haveSeenCount,
-                    it.codeLinkList,
+                    projectId = it.id
+                        ?: throw InternalServerErrorException("$it :: null일 수 없는 프로젝트 아이디"),
+                    name = it.name,
+                    haveSeenCount = it.haveSeenCount,
+                    createAt = it.createdDate,
+                    updateAt = it.updateDate,
+                    createdBy = it.createdBy,
+                    updatedBy = it.updatedBy,
+                    shortContent = it.shortContent,
+                    githubLinkList = it.codeLinkList,
+                    imageLinkList = it.imageLinkList?.map {it1 ->
+                        it1.toImageDto()
+                    }?.toMutableList()
                 )
-            }.collect(Collectors.toList()))
+            }
     }
 
     override fun getMaximumProject(id: Long): MaximumProjectResponse {
@@ -86,19 +98,23 @@ class IndividualProjectServiceImpl(
                 tagList = null,
                 status = null
             ))
+        val s = p.creationList
+            ?.map { it.student.id }
+            ?.toMutableList()
         return MaximumProjectResponse(
-            p.photoList.map { 
+            name = p.name,
+            imageLink = p.imageLinkList?.map {
                 it.toImageDto()
-            },
-            p.name,
-            p.createdAt,
-            p.updatedAt,
-            p.createdBy,
-            p.updatedBy,
-            p.status,
-            p.shortContent,
-            p.haveSeenCount,
-            p.codeLinkList
+            }?.toMutableList(),
+            createBy = p.createdBy,
+            updateBy = p.updatedBy,
+            createAt = p.createdDate,
+            updateAt = p.updateDate,
+            projectStatus = ProjectStatus.INDIVIDUAL,
+            shortContent = p.shortContent,
+            haveSeenCount = p.haveSeenCount,
+            githubLinkList = p.codeLinkList,
+            studentIdList = s ?: throw InternalServerErrorException("${p.id} :: 올바르지 않은 프로젝트 입니다")
         )
     }
 
@@ -132,7 +148,7 @@ class IndividualProjectServiceImpl(
         val p = individualRepository.findByIdOrNull(request.projectId)
             ?: throw ProjectNotFoundException("${request.projectId} :: not found")
         p.creationList
-            .map { it.id?.let { it1 -> creationRepository.deleteById(it1) } }
+            ?.map { it.id?.let { it1 -> creationRepository.deleteById(it1) } }
         val c = request.studentIdList
             .map { creationRepository.save(
                 Creation(
