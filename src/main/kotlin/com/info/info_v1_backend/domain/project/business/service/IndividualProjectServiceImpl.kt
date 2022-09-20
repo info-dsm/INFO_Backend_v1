@@ -17,6 +17,7 @@ import com.info.info_v1_backend.domain.project.exception.NotHaveAccessProjectExc
 import com.info.info_v1_backend.domain.project.exception.ProjectNotFoundException
 import com.info.info_v1_backend.global.error.common.FileNotFoundException
 import com.info.info_v1_backend.global.error.common.ForbiddenException
+import com.info.info_v1_backend.global.error.common.InternalServerErrorException
 import com.info.info_v1_backend.global.image.entity.File
 import com.info.info_v1_backend.global.image.entity.type.FileType
 import com.info.info_v1_backend.global.image.repository.FileRepository
@@ -85,18 +86,7 @@ class IndividualProjectServiceImpl(
         //security config에서 url로 authentication필요
         val p = individualRepository.findByIdOrNull(id)
             ?: throw ProjectNotFoundException("$id :: not found")
-        p.editIndividualProject(
-            EditIndividualProjectDto(
-                id = null,
-                name = null,
-                shortContent = null,
-                haveSeenCount = p.haveSeenCount + 1,
-                creationList = null,
-                codeLinkList = null,
-                tagList = null,
-                status = null,
-                photoList = null
-            ))
+        p.eddHaveSeenCount()
         return MaximumProjectResponse(
             imagLinkList = p.photoList?.map {
                 it.toImageDto()
@@ -109,7 +99,11 @@ class IndividualProjectServiceImpl(
             updateBy = p.updatedBy,
             shortContent = p.shortContent,
             codeLinkList = p.codeLinkList,
-            haveSeenCount = p.haveSeenCount
+            haveSeenCount = p.haveSeenCount,
+            studentIdList = p.creationList?.map {
+                StudentIdDto(it.student.id
+                    ?: throw InternalServerErrorException("올바르지 않은 프로젝트"))
+            }?.toMutableList()
         )
     }
 

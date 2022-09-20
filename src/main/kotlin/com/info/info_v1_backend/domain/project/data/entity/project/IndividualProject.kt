@@ -59,4 +59,8 @@ class IndividualProject(
     fun addImage(file: File) {
         this.photoList?.add(file)
     }
+
+    fun eddHaveSeenCount(){
+        this.haveSeenCount++
+    }
 }

@@ -21,6 +21,7 @@ import com.info.info_v1_backend.domain.project.exception.NotHaveAccessProjectExc
 import com.info.info_v1_backend.domain.project.exception.ProjectNotFoundException
 import com.info.info_v1_backend.global.error.common.FileNotFoundException
 import com.info.info_v1_backend.global.error.common.ForbiddenException
+import com.info.info_v1_backend.global.error.common.InternalServerErrorException
 import com.info.info_v1_backend.global.image.entity.File
 import com.info.info_v1_backend.global.image.entity.type.FileType
 import com.info.info_v1_backend.global.image.repository.FileRepository
@@ -89,24 +90,7 @@ class RegisteredProjectServiceImpl(
         if (p.status == ProjectStatus.WAITING) {
             verifyAuth()
         }
-        p.editRegisteredProject(
-            EditRegisteredProjectDto(
-                id = null,
-                name = null,
-                shortContent = null,
-                haveSeenCount = p.haveSeenCount + 1,
-                status = null,
-                purpose = null,
-                theoreticalBackground = null,
-                processList = null,
-                result = null,
-                conclusion = null,
-                referenceList = null,
-                creationList = null,
-                codeLinkList = null,
-                tagList = null,
-                photoList = null
-            ))
+        p.eddHaveSeenCount()
         return MaximumProjectResponse(
             imagLinkList = p.photoList?.map {
                 it.toImageDto()
@@ -119,7 +103,11 @@ class RegisteredProjectServiceImpl(
             status = p.status,
             shortContent = p.shortContent,
             haveSeenCount = p.haveSeenCount,
-            codeLinkList = p.codeLinkList
+            codeLinkList = p.codeLinkList,
+            studentIdList = p.creationList?.map {
+                StudentIdDto(it.student.id
+                    ?: throw InternalServerErrorException("올바르지 않은 프로젝트"))
+            }?.toMutableList()
         )
     }
 
