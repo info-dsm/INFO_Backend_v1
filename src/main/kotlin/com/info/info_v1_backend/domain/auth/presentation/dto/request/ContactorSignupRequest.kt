@@ -1,9 +1,9 @@
 package com.info.info_v1_backend.domain.auth.presentation.dto.request
 
 import javax.validation.constraints.Email
-import javax.validation.constraints.Size
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
+import javax.validation.constraints.Size
 
 data class ContactorSignupRequest(
     @field:Size(max = 4, min = 1)
@@ -16,6 +16,7 @@ data class ContactorSignupRequest(
         message = "전화번호는 반드시 02 or 0xx-xxxx-xxxx 조합이여야합니다."
     )
     val phoneNum: String,
+    @field:NotNull
     @field:Email(message = "이메일 형식이 아닙니다.")
     val email: String,
     @field:Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d~!@#\$%^&*()+|=]{8,30}\$")

@@ -1,6 +1,6 @@
  package com.info.info_v1_backend.domain.project.data.entity.project
 
-import com.info.info_v1_backend.domain.project.business.controller.dto.request.EditRegisteredProjectDto
+import com.info.info_v1_backend.domain.project.business.dto.request.EditRegisteredProjectDto
 import com.info.info_v1_backend.domain.project.data.entity.Creation
 import com.info.info_v1_backend.domain.project.data.entity.type.ProjectStatus
 import javax.persistence.*
