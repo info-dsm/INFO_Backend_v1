@@ -76,7 +76,7 @@ class AuthServiceImpl(
                                 encPw
                         )
                 )
-            }
+            } else throw CheckContactorCodeException(req.contactorCheckCode)
 
         }
     }
