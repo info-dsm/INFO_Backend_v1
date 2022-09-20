@@ -1,21 +1,27 @@
 package com.info.info_v1_backend.domain.auth.data.entity.user
 
 import com.info.info_v1_backend.domain.auth.data.entity.type.Role
+import com.info.info_v1_backend.domain.auth.presentation.dto.request.EditMyInfo
+import com.info.info_v1_backend.domain.auth.presentation.dto.response.MinimumStudentList
+import com.info.info_v1_backend.domain.company.data.entity.company.Company
 import com.info.info_v1_backend.domain.project.data.entity.Creation
-import com.info.info_v1_backend.domain.team.data.Affiliation
+import com.info.info_v1_backend.domain.team.data.entity.Affiliation
+import org.hibernate.annotations.OnDelete
+import org.hibernate.annotations.OnDeleteAction
 import javax.persistence.*
 
 
 @Entity
 @DiscriminatorValue("student")
-@Inheritance(strategy = InheritanceType.JOINED)
+@OnDelete(action = OnDeleteAction.CASCADE)
 class Student(
     studentKey: String,
     name: String,
     email: String,
     password: String,
     githubLink: String,
-    creationList: MutableList<Creation>?
+    isHired: Boolean = false,
+    creationList: MutableList<Creation>?,
 ): User(
     name,
     email,
@@ -27,12 +33,37 @@ class Student(
     @Column(name = "github_link", nullable = false)
     var githubLink: String = githubLink
 
+    @Column(name =  "is_hired", nullable = false)
+    var isHired: Boolean = isHired
+
     @OneToMany(mappedBy = "student", cascade = [CascadeType.REMOVE])
     var creationList: MutableList<Creation>? = creationList
 
     @OneToMany(cascade = [CascadeType.REMOVE])
     var affiliation: MutableList<Affiliation> = ArrayList()
 
+    @ManyToOne
+    var company: Company? = null
+
+    fun editMyInfo(request: EditMyInfo){
+        request.name?. let{
+            this.name = it
+        }
+        request.isHired?.let {
+            this.isHired = it
+        }
+        request.githubLink?.let{
+            this.githubLink
+        }
+    }
+
+    fun toMinimumStudent(): MinimumStudentList.MinimumStudent{
+        return MinimumStudentList.MinimumStudent(
+                this.name,
+                this.studentKey,
+                this.id!!
+        )
+    }
 
 
 }
