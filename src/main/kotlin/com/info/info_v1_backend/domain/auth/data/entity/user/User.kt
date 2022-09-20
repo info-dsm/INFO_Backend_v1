@@ -18,6 +18,7 @@ import javax.persistence.*
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "user_type")
 abstract class User(
+    id: Long?,
     name: String,
     email: String,
     password: String,
@@ -26,7 +27,7 @@ abstract class User(
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null
+    val id: Long? = id
 
     var name: String = name
         protected set

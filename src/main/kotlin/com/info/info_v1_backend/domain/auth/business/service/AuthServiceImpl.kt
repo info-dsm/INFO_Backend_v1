@@ -1,7 +1,6 @@
 package com.info.info_v1_backend.domain.auth.business.service
 
 import com.info.info_v1_backend.domain.auth.data.entity.token.RefreshToken
-import com.info.info_v1_backend.domain.auth.data.entity.user.Contactor
 import com.info.info_v1_backend.domain.auth.data.entity.user.Student
 import com.info.info_v1_backend.domain.auth.data.entity.user.Teacher
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
