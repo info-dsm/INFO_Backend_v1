@@ -4,7 +4,11 @@ import com.info.info_v1_backend.domain.company.business.dto.request.notice.EditN
 import com.info.info_v1_backend.domain.company.business.dto.response.notice.MaximumNoticeResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.notice.MinimumNoticeResponse
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
+import com.info.info_v1_backend.domain.company.data.entity.notice.certificate.Certificate
 import com.info.info_v1_backend.domain.company.data.entity.notice.embeddable.*
+import com.info.info_v1_backend.domain.company.data.entity.notice.language.LanguageUsage
+import com.info.info_v1_backend.domain.company.data.entity.notice.recruitment.RecruitmentBusiness
+import com.info.info_v1_backend.domain.company.data.entity.notice.technology.Technology
 import com.info.info_v1_backend.domain.company.data.entity.type.WorkTime
 import com.info.info_v1_backend.global.base.entity.BaseAuthorEntity
 import org.hibernate.annotations.SQLDelete
@@ -28,19 +32,22 @@ import javax.persistence.OneToOne
 @SQLDelete(sql = "UPDATE shop SET notice_is_delete = true WHERE id = ?")
 @Where(clause = "notice_is_delete = false")
 class Notice(
+    recruitmentBusinessList: List<RecruitmentBusiness>,
+    languageUsageList: List<LanguageUsage>,
+    technologyList: List<Technology>,
+    needCertificateList: List<Certificate>,
+    gradeCutLine: Int?,
     company: Company,
-    businessInformation: String,
-    certificateList: MutableList<String>,
-    cutLine: Int?,
-    personalRemark: String,
-    commuteTime: CommuteTime,
-    workTime: WorkTime,
+    workHour: Int,
+    pay: Pay,
+    
+
     screeningProcedure: ScreeningProcedure,
     alternativeMilitaryPlan: Boolean,
     mealSupport: MealSupport,
     welfare: Welfare,
     needDocuments: String?,
-    deadLine: LocalDate?,
+
     isAlwaysOpen: Boolean,
     interviewHopeMonth: LocalDate?,
     workHopeMonth: LocalDate?
@@ -84,7 +91,7 @@ class Notice(
         protected set
 
     @OneToOne
-    var pay: Pay? = null
+    var pay: Pay = pay
         protected set
 
     @Embedded

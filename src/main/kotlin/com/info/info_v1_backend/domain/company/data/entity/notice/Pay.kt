@@ -12,8 +12,8 @@ import javax.persistence.OneToOne
 
 @Entity
 class Pay(
-    fieldTrainingPay: Long,
-    employmentPay: EmploymentPay,
+    fieldTrainingPayPerMonth: Long,
+    fullTimeEmploymentPay: EmploymentPay,
     notice: Notice
 ) {
 
@@ -21,27 +21,12 @@ class Pay(
     val id: Long? = null
 
     @Column(name = "field_training_pay", nullable = false)
-    var fieldTrainingPay: Long = fieldTrainingPay
+    var fieldTrainingPayPerMonth: Long = fieldTrainingPayPerMonth
 
     @Embedded
-    var employmentPay: EmploymentPay = employmentPay
+    var fullTimeEmploymentPay: EmploymentPay = fullTimeEmploymentPay
 
     @OneToOne @MapsId
     var notice: Notice = notice
 
-    fun editPay(r: PayRequest) {
-        this.fieldTrainingPay = r.fieldTrainingPay
-        this.employmentPay = EmploymentPay(
-            r.employmentPay.yearPay,
-            r.employmentPay.monthPay,
-            r.employmentPay.bonus
-        )
-    }
-
-    fun toPayRequest(): PayRequest {
-        return PayRequest(
-            this.fieldTrainingPay,
-            this.employmentPay.toEmploymentPay(),
-        )
-    }
 }

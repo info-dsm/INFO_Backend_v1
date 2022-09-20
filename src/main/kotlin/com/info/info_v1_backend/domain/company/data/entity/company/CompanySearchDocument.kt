@@ -19,7 +19,7 @@ class CompanySearchDocument(
     var companyName: String = companyName
         protected set
 
-
+    @Field(name = "company_id")
     val companyId: String = companyId
 
     @TextScore

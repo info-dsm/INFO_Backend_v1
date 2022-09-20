@@ -37,3 +37,7 @@ out/
 .vscode/
 
 .DS_Store
+
+hs_err_pid2181.log
+
+*.log
