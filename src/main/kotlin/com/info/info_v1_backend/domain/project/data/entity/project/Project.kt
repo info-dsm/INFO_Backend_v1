@@ -12,8 +12,8 @@ import javax.persistence.*
 sealed class Project(
     name: String,
     shortContent: String,
-    creationList: MutableList<Creation>?,
-    codeLinkList: MutableList<String>,
+    creationList: MutableList<Creation>,
+    codeLinkList: MutableList<String>?,
     tagList: MutableList<String>,
     projectStatus: ProjectStatus
 ): BaseAuthorEntity() {
@@ -40,7 +40,7 @@ sealed class Project(
         protected set
 
     @ElementCollection
-    var codeLinkList: MutableList<String> = codeLinkList
+    var codeLinkList: MutableList<String>? = codeLinkList
         protected set
 
     @ElementCollection
@@ -52,13 +52,15 @@ sealed class Project(
         protected set
 
     @OneToMany(mappedBy = "project", cascade = [CascadeType.REMOVE])
-    var photoList: MutableList<File> = ArrayList()
+    var photoList: MutableList<File>? = ArrayList()
         protected set
 
     fun toProjectList(): ProjectList{
         return ProjectList(
                 this.name,
-                this.codeLinkList,
+                this.codeLinkList?.map {
+                    it
+                }?.toList(),
                 this.status,
         )
     }
