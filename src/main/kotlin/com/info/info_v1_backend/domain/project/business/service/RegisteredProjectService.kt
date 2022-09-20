@@ -4,13 +4,14 @@ import com.info.info_v1_backend.domain.project.business.controller.dto.request.P
 import com.info.info_v1_backend.domain.project.business.controller.dto.request.RegisteredProjectCreateRequest
 import com.info.info_v1_backend.domain.project.business.controller.dto.request.RegisteredProjectEditRequest
 import com.info.info_v1_backend.domain.project.business.controller.dto.response.MaximumProjectResponse
-import com.info.info_v1_backend.domain.project.business.controller.dto.response.MinimumProjectListResponse
+import com.info.info_v1_backend.domain.project.business.controller.dto.response.MinimumProjectResponse
+import org.springframework.data.domain.Page
 
 interface RegisteredProjectService {
 
-    fun getMinimumLatestOrderProjectList(): MinimumProjectListResponse
+    fun getMinimumLatestOrderProjectList(idx: Int, size: Int): Page<MinimumProjectResponse>
 
-    fun getMinimumNumberOfViewsProjectList(): MinimumProjectListResponse
+    fun getMinimumNumberOfViewsProjectList(idx: Int, size: Int): Page<MinimumProjectResponse>
 
     fun getMaximumProject(id: Long): MaximumProjectResponse
 

@@ -36,7 +36,7 @@ sealed class Project(
         protected set
 
     @OneToMany(mappedBy = "project")
-    var creationList: MutableList<Creation> = creationList
+    var creationList: MutableList<Creation>? = creationList
         protected set
 
     @ElementCollection

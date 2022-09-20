@@ -1,6 +1,7 @@
 package com.info.info_v1_backend.domain.project.business.controller.dto.request
 
-import com.info.info_v1_backend.domain.project.business.controller.dto.data.*
+import com.info.info_v1_backend.domain.project.business.controller.dto.data.ImageRequestDto
+import com.info.info_v1_backend.domain.project.business.controller.dto.data.StudentIdDto
 
 data class RegisteredProjectCreateRequest(
     val imageLinkList: MutableList<ImageRequestDto>?,
