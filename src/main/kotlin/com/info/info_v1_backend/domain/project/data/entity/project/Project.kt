@@ -52,7 +52,7 @@ sealed class Project(
         protected set
 
     @OneToMany(mappedBy = "project", cascade = [CascadeType.REMOVE])
-    var imageLinkList: MutableList<File>? = null
+    var photoList: MutableList<File> = ArrayList()
         protected set
 
     fun toProjectList(): ProjectList{

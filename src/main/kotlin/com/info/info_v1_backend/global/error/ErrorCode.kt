@@ -43,6 +43,7 @@ enum class ErrorCode(
     CONTACTOR_NOT_FOUND("Contactor Not Found", HttpStatus.NOT_FOUND),
     CONTACTOR_MUST_LEAVE_LEAST_AT_ONE_ON_COMPANY("Contactor Must leave least at one on company", HttpStatus.BAD_REQUEST),
     IS_NOT_CONTACTOR_OR_TEACHER("Is Not Contactor Or Teacher", HttpStatus.NOT_FOUND),
+    FILE_NOT_FOUND("File not Found", HttpStatus.NOT_FOUND),
 
     //500
     INTERNAL_SERVER_ERROR("internal server error", HttpStatus.INTERNAL_SERVER_ERROR),

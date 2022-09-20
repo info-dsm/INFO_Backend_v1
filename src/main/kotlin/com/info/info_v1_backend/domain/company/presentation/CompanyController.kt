@@ -39,7 +39,7 @@ class CompanyController(
     @ResponseStatus(HttpStatus.OK)
     fun editCompany(
         @RequestBody request: EditCompanyRequest,
-        @RequestParam(required = true) id: Long
+        @RequestParam(required = true) id: String
     ) {
         companyService.editCompany(request, id)
     }
@@ -54,7 +54,7 @@ class CompanyController(
 
     @GetMapping
     fun getMaximumCompany(
-        @RequestParam(required = true) id: Long
+        @RequestParam(required = true) id: String
     ): MaximumCompanyResponse {
         return companyService.getMaximumCompany(id)
     }

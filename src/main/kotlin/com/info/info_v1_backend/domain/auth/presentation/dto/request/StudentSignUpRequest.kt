@@ -1,16 +1,15 @@
 package com.info.info_v1_backend.domain.auth.presentation.dto.request
 
-import com.info.info_v1_backend.domain.auth.data.entity.type.Role
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
 
 data class StudentSignUpRequest(
 
-    @field:Pattern(regexp = "^[123][1-5][012]\\d\$")
+    @field:Pattern(regexp = "^[123][1-5][012]\\d\$", message = "올바른 학번이 아닙니다.")
     val studentKey: String,
 
-    @field:Pattern(regexp = "[a-zA-Z0-9+\\_.]+@dsm\\.hs\\.kr\$")
+    @field:Pattern(regexp = "[a-zA-Z0-9+\\_.]+@dsm\\.hs\\.kr\$", message = "올바른 이메일 형식이 아닙니다.")
     val email: String,
 
     @field:Size(min = 4, max = 4)
@@ -22,7 +21,6 @@ data class StudentSignUpRequest(
     @field:NotNull
     @field:Size(min = 2, max = 4, message="2 ~ 4글자")
     val name: String,
-    val userType: Role,
 
     @field:NotNull
     val githubLink: String

@@ -16,15 +16,16 @@ group = "com.info"
 version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
-
 allOpen {
     annotation("javax.persistence.Entity")
     annotation("org.springframework.data.redis.core.RedisHash")
+    annotation("org.springframework.data.mongodb.core.mapping.Document")
 }
 
 noArg {
     annotation("javax.persistence.Entity")
     annotation("org.springframework.data.redis.core.RedisHash")
+    annotation("org.springframework.data.mongodb.core.mapping.Document")
 }
 
 repositories {

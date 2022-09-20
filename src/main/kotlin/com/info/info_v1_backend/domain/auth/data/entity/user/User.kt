@@ -63,6 +63,7 @@ abstract class User(
     override fun getUsername(): String {
         return this.id.toString()
     }
+
     override fun isAccountNonLocked(): Boolean {
         return this.roleList.contains(Role.BLOCK)
     }
@@ -83,7 +84,7 @@ abstract class User(
         this.password = password
     }
     fun changeEmail(email: String){
-        email?.let {
+        email.let {
             this.email = it
         }
     }

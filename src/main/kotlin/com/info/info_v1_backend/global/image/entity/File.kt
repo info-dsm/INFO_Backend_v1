@@ -1,5 +1,6 @@
 package com.info.info_v1_backend.global.image.entity
 
+import com.info.info_v1_backend.domain.company.data.entity.company.Company
 import com.info.info_v1_backend.domain.project.data.entity.project.Project
 import com.info.info_v1_backend.global.base.entity.BaseAuthorEntity
 import com.info.info_v1_backend.global.image.entity.type.FileType
@@ -10,7 +11,9 @@ import javax.persistence.*
 class File(
     fileUrl: String,
     fileType: FileType,
-    extension: String
+    extension: String,
+    project: Project?,
+    company: Company?
 
 ): BaseAuthorEntity() {
 
@@ -30,9 +33,14 @@ class File(
 
     @ManyToOne
     @JoinColumn(name = "project_id")
-    var projectId: Project? = null
+    var project: Project? = project
         protected set
-        
+
+    @ManyToOne
+    @JoinColumn(name = "company_id")
+    var company: Company? = company
+        protected set
+
     fun toImageDto(): ImageDto {
         return ImageDto(
             this.fileUrl,

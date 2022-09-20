@@ -24,7 +24,7 @@ class IndividualProject(
     creationList,
     codeLinkList,
     tagList,
-    ProjectStatus.INDIVIDUAL
+    ProjectStatus.APPROVE
 ) {
     fun editIndividualProject(request: EditIndividualProjectDto){
         request.id?. let {

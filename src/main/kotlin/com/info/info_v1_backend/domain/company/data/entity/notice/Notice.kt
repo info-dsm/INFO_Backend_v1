@@ -47,11 +47,13 @@ class Notice(
 
 ): BaseAuthorEntity() {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(
+        strategy = GenerationType.IDENTITY,
+    )
     val id: Long? = null
 
     @ManyToOne(cascade = [CascadeType.REMOVE])
-    @JoinColumn(name = "id", nullable = false)
+    @JoinColumn(name = "company_id", nullable = false)
     val company: Company = company
 
     @OneToMany(mappedBy = "notice")

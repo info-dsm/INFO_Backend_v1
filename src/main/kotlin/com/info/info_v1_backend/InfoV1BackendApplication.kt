@@ -14,7 +14,7 @@ import org.springframework.scheduling.annotation.EnableScheduling
     exclude = [BatchAutoConfiguration::class, JmxAutoConfiguration::class],
 )
 @EnableScheduling
-@EnableBatchProcessing
+//@EnableBatchProcessing
 @ConfigurationPropertiesScan
 @EnableJpaAuditing
 class InfoV1BackendApplication

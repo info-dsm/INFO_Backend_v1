@@ -11,7 +11,7 @@ import com.info.info_v1_backend.domain.project.data.entity.Creation
 import com.info.info_v1_backend.domain.project.data.entity.project.IndividualProject
 import com.info.info_v1_backend.domain.project.data.entity.type.ProjectStatus
 import com.info.info_v1_backend.domain.project.data.repository.CreationRepository
-import com.info.info_v1_backend.domain.project.data.repository.ProjectRepository
+import com.info.info_v1_backend.domain.project.data.repository.IndividualProjectRepository
 import com.info.info_v1_backend.domain.project.exception.NotHaveAccessProjectException
 import com.info.info_v1_backend.domain.project.exception.ProjectNotFoundException
 import com.info.info_v1_backend.global.error.common.InternalServerErrorException
