@@ -6,10 +6,10 @@ import javax.validation.constraints.Size
 
 data class StudentSignUpRequest(
 
-    @field:Pattern(regexp = "^[123][1-5][012]\\d\$")
+    @field:Pattern(regexp = "^[123][1-5][012]\\d\$", message = "올바른 학번이 아닙니다.")
     val studentKey: String,
 
-    @field:Pattern(regexp = "[a-zA-Z0-9+\\_.]+@dsm\\.hs\\.kr\$")
+    @field:Pattern(regexp = "[a-zA-Z0-9+\\_.]+@dsm\\.hs\\.kr\$", message = "올바른 이메일 형식이 아닙니다.")
     val email: String,
 
     @field:Size(min = 4, max = 4)

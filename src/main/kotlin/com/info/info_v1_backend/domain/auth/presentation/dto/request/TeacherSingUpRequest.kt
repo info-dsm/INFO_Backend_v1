@@ -1,13 +1,12 @@
 package com.info.info_v1_backend.domain.auth.presentation.dto.request
 
-import com.info.info_v1_backend.domain.auth.data.entity.type.Role
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
 
 data class TeacherSingUpRequest(
 
-    @field:Pattern(regexp = "[a-zA-Z\\d+_.]+@dsm\\.hs\\.kr\$")
+    @field:Pattern(regexp = "[a-zA-Z\\d+_.]+@dsm\\.hs\\.kr\$", message = "올바른 이메일 형식이 아닙니다.")
     val email: String,
 
     @field:Size(min = 4, max = 4)
