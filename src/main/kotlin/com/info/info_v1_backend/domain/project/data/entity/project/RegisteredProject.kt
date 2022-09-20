@@ -1,4 +1,4 @@
-package com.info.info_v1_backend.domain.project.data.entity.project
+ package com.info.info_v1_backend.domain.project.data.entity.project
 
 import com.info.info_v1_backend.domain.project.business.controller.dto.data.ProcessDto
 import com.info.info_v1_backend.domain.project.business.controller.dto.request.EditRegisteredProjectDto
@@ -15,11 +15,11 @@ class RegisteredProject(
     shortContent: String,
     purpose: String,
     theoreticalBackground: MutableList<String>,
-    processList: MutableList<ProcessDto>,
+    processList: MutableList<String>,
     result: String,
     conclusion: String,
     referenceList: MutableList<String>,
-    creationList: MutableList<Creation>,
+    creationList: MutableList<Creation>?,
     codeLinkList: MutableList<String>,
     tagList: MutableList<String>
 ): Project(

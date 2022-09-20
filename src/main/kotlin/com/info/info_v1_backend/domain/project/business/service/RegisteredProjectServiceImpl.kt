@@ -122,43 +122,33 @@ class RegisteredProjectServiceImpl(
     }
 
     override fun writeRegisteredProject(request: RegisteredProjectCreateRequest) {
-        verifyAuth(request.studentIdList)
-        val c = request.studentIdList
-            .map { creationRepository.save(
-                Creation(
-                project = null,
-                student = userRepository.findByIdOrNull(it.studentId)
-                    ?: throw UserNotFoundException("$it :: not found")
-            ))}.toList().toMutableList()
-
-        val p = registeredProjectRepository.save(
-            RegisteredProject(
-            name = request.name,
-            shortContent = request.shortContent,
-            purpose = request.purpose,
-            theoreticalBackground = request.theoreticalBackground
-                .map { it.theoreticalBackground }
-                .toMutableList(),
-            codeLinkList = request.githubLinkList
-                .map { it.GithubLink }
-                .toMutableList(),
-            processList = request.processList,
-            result = request.result,
-            conclusion = request.conclusion,
-            referenceList = request.referenceList
-                .map { it.reference }
-                .toMutableList(),
-            tagList = request.tagList
-                .map { it.tag }
-                .toMutableList(),
-            creationList = c
-            )
+        verifyAuth(request.studentList)
+        val project = RegisteredProject(
+            request.name,
+            request.shortContent,
+            request.purpose,
+            request.theoreticalBackground,
+            request.processList,
+            request.result,
+            request.conclusion,
+            request.referenceList,
+            null,
+            request.codeLinkList,
+            request.tagList
         )
-        c.map {
-            it.id?.let {it1 -> creationRepository.findByIdOrNull(it1)
-                ?.editCreation(project = p)
-            }
-        }
+
+        val p =  registeredProjectRepository.save(project)
+
+
+        val creation = request.studentList.map {
+            creationRepository.save(
+                Creation(
+                    p,
+                    userRepository.findById(it.studentId).orElse(null)
+                        ?: throw UserNotFoundException("$it :: not found")
+                ))}.toList().toMutableList()
+
+        registeredProjectRepository.findByIdOrNull(p.id)
     }
 
     override fun editRegisteredProject(request: RegisteredProjectEditRequest) {

@@ -12,7 +12,7 @@ import javax.persistence.*
 sealed class Project(
     name: String,
     shortContent: String,
-    creationList: MutableList<Creation>,
+    creationList: MutableList<Creation>?,
     codeLinkList: MutableList<String>,
     tagList: MutableList<String>,
     projectStatus: ProjectStatus

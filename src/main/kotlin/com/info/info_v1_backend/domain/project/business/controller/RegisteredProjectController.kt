@@ -12,10 +12,23 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/api/info/v1/project/registered")
 class RegisteredProjectController(private val registeredProjectService: RegisteredProjectService) {
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    fun writeRegisteredProject(
+        @RequestBody
+        request: RegisteredProjectCreateRequest
+    ){
+        registeredProjectService.writeRegisteredProject(request)
+    }
+
+    @PatchMapping
+    fun editRegisteredProject(@RequestBody request: RegisteredProjectEditRequest){
+        registeredProjectService.editRegisteredProject(request)
+    }
 
     @GetMapping("/minimum/latest-order}")
     fun getMinimumLatestOrderProjectList(): MinimumProjectListResponse {
-        return registeredProjectService.getMinimumLatestOrderProjectList();
+        return registeredProjectService.getMinimumLatestOrderProjectList()
     }
 
     @GetMapping("/minimum/number-of-views-order")
@@ -26,17 +39,6 @@ class RegisteredProjectController(private val registeredProjectService: Register
     @GetMapping("/maximum/{project-id}")
     fun getMaximumProject(@PathVariable("project-id") id: Long): MaximumProjectResponse {
         return registeredProjectService.getMaximumProject(id)
-    }
-
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    fun writeRegisteredProject(@RequestBody request: RegisteredProjectCreateRequest){
-        registeredProjectService.writeRegisteredProject(request)
-    }
-
-    @PatchMapping
-    fun editRegisteredProject(@RequestBody request: RegisteredProjectEditRequest){
-        registeredProjectService.editRegisteredProject(request)
     }
 
     @GetMapping("/waiting")
