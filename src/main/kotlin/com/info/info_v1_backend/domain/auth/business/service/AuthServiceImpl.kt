@@ -74,7 +74,7 @@ class AuthServiceImpl(
                                 encPw
                         )
                 )
-            }
+            } else throw CheckContactorCodeException(req.contactorCheckCode)
 
         }
     }
@@ -137,7 +137,7 @@ class AuthServiceImpl(
                         user.githubLink,
                         user.isHired,
                         user.creationList?.map {
-                            it.project.toProjectList()
+                            it.project!!.toProjectList()
                         },
                         user.company?.toMinimumCompanyResponse()
                 )
@@ -159,7 +159,6 @@ class AuthServiceImpl(
                         user.company?.toMinimumCompanyResponse()
                 )
             }
-
             else -> {
                 throw UserNotFoundException(user.email)
             }
@@ -177,7 +176,7 @@ class AuthServiceImpl(
     }
 
     override fun getStudentList(): MinimumStudentList {
-        val list =  studentRepository.findAllByStartingWith().map {
+        val list =  studentRepository.findAll().map {
             it.toMinimumStudent()
         }
         return MinimumStudentList(list)

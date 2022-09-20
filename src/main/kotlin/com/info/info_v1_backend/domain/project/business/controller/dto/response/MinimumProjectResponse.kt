@@ -1,9 +1,8 @@
-package com.info.info_v1_backend.domain.project.business.dto.response
+package com.info.info_v1_backend.domain.project.business.controller.dto.response
 
 import java.time.LocalDateTime
 
 data class MinimumProjectResponse(
-    val projectId: Long,
     val name: String,
     val createAt: LocalDateTime?,
     val updateAt: LocalDateTime?,

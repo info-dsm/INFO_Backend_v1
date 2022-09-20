@@ -5,8 +5,6 @@ import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
 import javax.persistence.DiscriminatorValue
 import javax.persistence.Entity
-import javax.persistence.Inheritance
-import javax.persistence.InheritanceType
 
 
 @Entity

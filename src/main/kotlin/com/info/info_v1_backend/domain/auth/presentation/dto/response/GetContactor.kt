@@ -8,4 +8,4 @@ data class GetContactor(
         val position: String,
         val personalPhone: String,
         val company: MinimumCompanyResponse?
-        ):GetUserInfo
+        ): GetUserInfo()

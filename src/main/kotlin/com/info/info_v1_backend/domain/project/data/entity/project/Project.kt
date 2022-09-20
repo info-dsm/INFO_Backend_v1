@@ -5,22 +5,14 @@ import com.info.info_v1_backend.domain.project.data.entity.Creation
 import com.info.info_v1_backend.domain.project.data.entity.type.ProjectStatus
 import com.info.info_v1_backend.global.base.entity.BaseAuthorEntity
 import com.info.info_v1_backend.global.image.entity.File
-import javax.persistence.CascadeType
-import javax.persistence.Column
-import javax.persistence.DiscriminatorColumn
-import javax.persistence.ElementCollection
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
-import javax.persistence.OneToMany
+import javax.persistence.*
 
 @Entity
 @DiscriminatorColumn(name = "project_type")
 sealed class Project(
     name: String,
     shortContent: String,
-    creationList: MutableList<Creation>,
+    creationList: MutableList<Creation>?,
     codeLinkList: MutableList<String>,
     tagList: MutableList<String>,
     projectStatus: ProjectStatus
@@ -29,7 +21,7 @@ sealed class Project(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "project_id", nullable = false)
-    val id: Long? = null
+    var id: Long? = null
 
     @Column(name = "project_name", nullable = false)
     var name: String = name
@@ -44,7 +36,7 @@ sealed class Project(
         protected set
 
     @OneToMany(mappedBy = "project")
-    var creationList: MutableList<Creation> = creationList
+    var creationList: MutableList<Creation>? = creationList
         protected set
 
     @ElementCollection
@@ -70,6 +62,5 @@ sealed class Project(
                 this.status,
         )
     }
-
 
 }

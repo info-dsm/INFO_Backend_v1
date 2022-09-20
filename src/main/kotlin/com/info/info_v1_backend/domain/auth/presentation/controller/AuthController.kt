@@ -27,18 +27,20 @@ class AuthController(
     private val emailService: EmailService,
     private val current: CurrentUtil,
 ) {
-    @PostMapping("/email")
-    fun sendEmail(
+    @PostMapping("/schoolEmail")
+    fun sendSchoolEmail(
         @RequestParam
         @Pattern(regexp = "[a-zA-Z0-9+\\_.]+@dsm\\.hs\\.kr\$")
         email: String
     ){
         emailService.sendCodeToEmail(email)
     }
-
-    @PostMapping("/passwordCode")
-    fun sendPasswordCode(){
-        emailService.sendCodeToEmail(current.getCurrentUser().email)
+    @PostMapping("/companyEmail")
+    fun sendCompanyEmail(
+        @RequestParam
+        email: String
+    ){
+        emailService.sendCodeToEmail(email)
     }
 
     @PostMapping("/studentSignUp")
@@ -57,6 +59,15 @@ class AuthController(
         authService.teacherSignUp(request)
     }
 
+    @PostMapping("/contactorSignUp")
+    fun contactorSignUp(
+        @RequestBody @Valid
+        request: ContactorSignupRequest
+    ){
+        authService.contactorSignup(request)
+    }
+
+
     @PostMapping("/changePassword")
     fun password(
         @RequestBody
@@ -64,6 +75,11 @@ class AuthController(
     ){
         authService.editPassword(request)
     }
+    @PostMapping("/passwordCode")
+    fun sendPasswordCode(){
+        emailService.sendCodeToEmail(current.getCurrentUser().email)
+    }
+
     @PostMapping("/reissue")
     fun reissue(
         @RequestBody
@@ -99,7 +115,7 @@ class AuthController(
         return authService.getUserInfo(name)
     }
 
-    @PostMapping("/getStudentList")
+    @GetMapping("/getStudentList")
     fun getStudentList(): MinimumStudentList{
         return authService.getStudentList()
     }

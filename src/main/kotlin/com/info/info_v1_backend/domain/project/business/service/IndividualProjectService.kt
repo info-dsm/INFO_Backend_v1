@@ -1,17 +1,21 @@
 package com.info.info_v1_backend.domain.project.business.service
 
-import com.info.info_v1_backend.domain.project.business.dto.request.IndividualProjectRequest
-import com.info.info_v1_backend.domain.project.business.dto.response.MaximumProjectResponse
-import com.info.info_v1_backend.domain.project.business.dto.response.MinimumProjectListResponse
+import com.info.info_v1_backend.domain.project.business.controller.dto.request.IndividualProjectCreateRequest
+import com.info.info_v1_backend.domain.project.business.controller.dto.request.IndividualProjectEditRequest
+import com.info.info_v1_backend.domain.project.business.controller.dto.response.MaximumProjectResponse
+import com.info.info_v1_backend.domain.project.business.controller.dto.response.MinimumProjectResponse
+import org.springframework.data.domain.Page
 
 interface IndividualProjectService {
 
-    fun getMinimumLatestOrderProjectList(): MinimumProjectListResponse
+    fun getMinimumLatestOrderProjectList(idx: Int, size: Int): Page<MinimumProjectResponse>
 
-    fun getMinimumNumberOfViewsProjectList(): MinimumProjectListResponse
+    fun getMinimumNumberOfViewsProjectList(idx: Int, size: Int): Page<MinimumProjectResponse>
 
     fun getMaximumProject(id: Long): MaximumProjectResponse
 
-    fun writeIndividualProject(request: IndividualProjectRequest)
+    fun writeIndividualProject(request: IndividualProjectCreateRequest)
+
+    fun editIndividualProject(request: IndividualProjectEditRequest)
 
 }

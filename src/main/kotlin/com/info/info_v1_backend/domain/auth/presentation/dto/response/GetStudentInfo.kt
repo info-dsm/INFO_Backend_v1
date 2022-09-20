@@ -10,4 +10,4 @@ data class GetStudentInfo(
         val isHired: Boolean?,
         val project: List<ProjectList>?,
         val company: MinimumCompanyResponse?
-) :GetUserInfo
+) : GetUserInfo()

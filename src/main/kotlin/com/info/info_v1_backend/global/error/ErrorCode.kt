@@ -16,8 +16,8 @@ enum class ErrorCode(
     EMAIL_ERROR("Email 전송 과정 중 에러가 발생했습니다.", HttpStatus.BAD_GATEWAY),
 
     //403
-    PROJECT_STATUS_WAITING("Still Waiting For Approval", HttpStatus.FORBIDDEN),
     NOT_HAVE_ACCESS_TO_THE_PROJECT("Not Have Access To The project", HttpStatus.FORBIDDEN),
+    FORBIDDEN("권한이 없습니다", HttpStatus.FORBIDDEN),
 
     //404
     HEADER_NOT_FOUND("Header Not Found", HttpStatus.NOT_FOUND),
@@ -29,6 +29,7 @@ enum class ErrorCode(
     NEWS_NOT_FOUND("News Not Found", HttpStatus.NOT_FOUND),
     PROJECT_NOT_FOUND("Project Not Found", HttpStatus.NOT_FOUND),
     CHECK_TEACHER_CODE_ERROR("Error Occurred while Checking Teacher Code", HttpStatus.NOT_FOUND),
+    CHECK_CONTACTOR_CODE_ERROR("Error Occurred while Checking Contactor Code", HttpStatus.NOT_FOUND),
     INVALID_COMPANY_CHECK_CODE("Invalid Company Check Code", HttpStatus.BAD_REQUEST),
     NOT_CONTACTOR("You are Not Contactor", HttpStatus.FORBIDDEN),
     COMPANY_NOT_FOUND("Company Not Found", HttpStatus.NOT_FOUND),
@@ -45,6 +46,8 @@ enum class ErrorCode(
     IS_NOT_CONTACTOR_OR_TEACHER("Is Not Contactor Or Teacher", HttpStatus.NOT_FOUND),
     FILE_NOT_FOUND("File not Found", HttpStatus.NOT_FOUND),
 
+    //500
+    INTERNAL_SERVER_ERROR("internal server error", HttpStatus.INTERNAL_SERVER_ERROR),
 
     //502
     S3_ERROR("S3 작업 과정 중 에러가 발생했습니다.", HttpStatus.BAD_GATEWAY),
