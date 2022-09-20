@@ -29,6 +29,7 @@ enum class ErrorCode(
     NEWS_NOT_FOUND("News Not Found", HttpStatus.NOT_FOUND),
     PROJECT_NOT_FOUND("Project Not Found", HttpStatus.NOT_FOUND),
     CHECK_TEACHER_CODE_ERROR("Error Occurred while Checking Teacher Code", HttpStatus.NOT_FOUND),
+    CHECK_CONTACTOR_CODE_ERROR("Error Occurred while Checking Contactor Code", HttpStatus.NOT_FOUND),
     INVALID_COMPANY_CHECK_CODE("Invalid Company Check Code", HttpStatus.BAD_REQUEST),
     NOT_CONTACTOR("You are Not Contactor", HttpStatus.FORBIDDEN),
     COMPANY_NOT_FOUND("Company Not Found", HttpStatus.NOT_FOUND),
