@@ -3,7 +3,6 @@ package com.info.info_v1_backend.domain.project.business.service
 import com.info.info_v1_backend.domain.auth.data.entity.type.Role
 import com.info.info_v1_backend.domain.auth.data.repository.user.StudentRepository
 import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
-import com.info.info_v1_backend.domain.project.business.controller.dto.data.GithubLinkDto
 import com.info.info_v1_backend.domain.project.business.controller.dto.data.StudentIdDto
 import com.info.info_v1_backend.domain.project.business.controller.dto.request.EditRegisteredProjectDto
 import com.info.info_v1_backend.domain.project.business.controller.dto.request.ProjectStatusEditRequest
@@ -21,6 +20,8 @@ import com.info.info_v1_backend.global.error.common.ForbiddenException
 import com.info.info_v1_backend.global.error.common.InternalServerErrorException
 import com.info.info_v1_backend.global.util.user.CurrentUtil
 import io.undertow.util.BadRequestException
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -34,13 +35,16 @@ class RegisteredProjectServiceImpl(
     private val creationRepository: CreationRepository
     ): RegisteredProjectService {
 
-    override fun getMinimumLatestOrderProjectList(): MinimumProjectListResponse {
+    override fun getMinimumLatestOrderProjectList(idx: Int, size: Int): Page<MinimumProjectResponse>{
         //security config에서 url로 authentication필요
-        return MinimumProjectListResponse(registeredProjectRepository.findAll(Sort
-            .by(Sort.Direction.DESC, "createdAt"))
-            .stream()
-            .filter { it.status == ProjectStatus.APPROVE }
+        return registeredProjectRepository.findAllByProjectStatus(ProjectStatus.APPROVE,
+            PageRequest.of(
+                idx,
+                size,
+                Sort.by(Sort.Direction.DESC, "createAt"))
+        )
             .map{
+                    it: RegisteredProject ->
                 MinimumProjectResponse(
                     projectId = it.id
                         ?: throw InternalServerErrorException("$it :: null일 수 없는 프로젝트 아이디"),
@@ -51,18 +55,24 @@ class RegisteredProjectServiceImpl(
                     createdBy = it.createdBy,
                     updatedBy = it.updatedBy,
                     shortContent = it.shortContent,
-                    githubLinkList = it.codeLinkList
+                    githubLinkList = it.codeLinkList,
+                    imageLinkList = it.imageLinkList?.map {it1 ->
+                        it1.toImageDto()
+                    }?.toMutableList()
                 )
-            }.collect(Collectors.toList()))
+            }
     }
 
-    override fun getMinimumNumberOfViewsProjectList(): MinimumProjectListResponse {
+    override fun getMinimumNumberOfViewsProjectList(idx: Int, size: Int): Page<MinimumProjectResponse> {
         //security config에서 url로 authentication필요
-        return MinimumProjectListResponse(registeredProjectRepository.findAll(Sort
-            .by(Sort.Direction.DESC, "haveSeenCount"))
-            .stream()
-            .filter { it.status != ProjectStatus.APPROVE }
+        return registeredProjectRepository.findAllByProjectStatus(ProjectStatus.APPROVE,
+            PageRequest.of(
+                idx,
+                size,
+                Sort.by(Sort.Direction.DESC, "haveSeenCount"))
+            )
             .map{
+                it: RegisteredProject ->
                 MinimumProjectResponse(
                     projectId = it.id
                         ?: throw InternalServerErrorException("$it :: null일 수 없는 프로젝트 아이디"),
@@ -73,9 +83,13 @@ class RegisteredProjectServiceImpl(
                     createdBy = it.createdBy,
                     updatedBy = it.updatedBy,
                     shortContent = it.shortContent,
-                    githubLinkList = it.codeLinkList
+                    githubLinkList = it.codeLinkList,
+                    imageLinkList = it.imageLinkList?.map {it1 ->
+                        it1.toImageDto()
+                    }?.toMutableList()
                 )
-            }.collect(Collectors.toList()))
+            }
+
     }
 
     override fun getMaximumProject(id: Long): MaximumProjectResponse {
@@ -104,11 +118,13 @@ class RegisteredProjectServiceImpl(
             )
         )
         val s = p.creationList
-            .map{ it.student.id }
-            .toMutableList()
+            ?.map{ it.student.id }
+            ?.toMutableList()
         return MaximumProjectResponse(
             name = p.name,
-            imageLink = p.imageLinkList,
+            imageLink = p.imageLinkList?.map {
+                it.toImageDto()
+            }?.toMutableList(),
             createBy = p.createdBy,
             updateBy = p.updatedBy,
             createAt = p.createdDate,
@@ -117,13 +133,14 @@ class RegisteredProjectServiceImpl(
             shortContent = p.shortContent,
             haveSeenCount = p.haveSeenCount,
             githubLinkList = p.codeLinkList,
-            studentIdList = s
+            studentIdList = s ?: throw InternalServerErrorException("${p.id} :: 정상적이지 않은 프로젝트 입니다")
         )
     }
 
     override fun writeRegisteredProject(request: RegisteredProjectCreateRequest) {
         verifyAuth(request.studentList)
-        val project = RegisteredProject(
+
+        val project = registeredProjectRepository.save(RegisteredProject(
             request.name,
             request.shortContent,
             request.purpose,
@@ -135,20 +152,29 @@ class RegisteredProjectServiceImpl(
             null,
             request.codeLinkList,
             request.tagList
-        )
-
-        val p =  registeredProjectRepository.save(project)
-
-
-        val creation = request.studentList.map {
-            creationRepository.save(
-                Creation(
-                    p,
-                    userRepository.findById(it.studentId).orElse(null)
-                        ?: throw UserNotFoundException("$it :: not found")
-                ))}.toList().toMutableList()
-
-        registeredProjectRepository.findByIdOrNull(p.id)
+        ))
+        project.editRegisteredProject(EditRegisteredProjectDto(
+            id = null,
+            name = null,
+            shortContent = null,
+            haveSeenCount = null,
+            status = null,
+            purpose = null,
+            theoreticalBackground = null,
+            processList = null,
+            result = null,
+            conclusion = null,
+            referenceList = null,
+            creationList = request.studentList.map {
+                creationRepository.save(
+                    Creation(
+                        project,
+                        userRepository.findById(it.studentId).orElse(null)
+                            ?: throw UserNotFoundException("$it :: not found")
+                    ))}.toList().toMutableList(),
+            codeLinkList = null,
+            tagList = null
+        ))
     }
 
     override fun editRegisteredProject(request: RegisteredProjectEditRequest) {
@@ -158,7 +184,7 @@ class RegisteredProjectServiceImpl(
             ?: throw ProjectNotFoundException("${request.projectId} :: not found")
 
         p.creationList
-            .map { it.id?.let { it1 -> creationRepository.deleteById(it1) } }
+            ?.map { it.id?.let { it1 -> creationRepository.deleteById(it1) } }
 
         val c = request.studentIdList
             .map { creationRepository.save(
