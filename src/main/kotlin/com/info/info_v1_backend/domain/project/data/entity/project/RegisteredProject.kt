@@ -19,7 +19,7 @@ class RegisteredProject(
     conclusion: String,
     referenceList: MutableList<String>,
     creationList: MutableList<Creation>?,
-    codeLinkList: MutableList<String>,
+    codeLinkList: MutableList<String>?,
     tagList: MutableList<String>
 ): Project(
     name,

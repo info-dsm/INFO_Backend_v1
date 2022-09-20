@@ -27,5 +27,6 @@ interface RegisteredProjectService {
     fun uploadImage(image: MultipartFile, projectId: Long)
 
     fun deleteProject(projectId: Long)
+
     fun deleteImage(imageId: Long)
 }

@@ -3,6 +3,7 @@ package com.info.info_v1_backend.domain.project.business.service
 import com.info.info_v1_backend.domain.auth.data.entity.type.Role
 import com.info.info_v1_backend.domain.auth.data.repository.user.StudentRepository
 import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
+import com.info.info_v1_backend.domain.project.business.dto.common.StudentIdDto
 import com.info.info_v1_backend.domain.project.business.dto.request.EditRegisteredProjectDto
 import com.info.info_v1_backend.domain.project.business.dto.request.ProjectStatusEditRequest
 import com.info.info_v1_backend.domain.project.business.dto.request.RegisteredProjectCreateRequest
@@ -41,7 +42,7 @@ class RegisteredProjectServiceImpl(
     private val creationRepository: CreationRepository,
     private val s3Util: S3Util,
     private val fileRepository: FileRepository
-    ): RegisteredProjectService {
+): RegisteredProjectService {
     override fun getMinimumNumberOfViewsProjectList(idx: Int, size: Int): Page<MinimumProjectResponse> {
         return registeredProjectRepository.findAllByProjectStatus(
             ProjectStatus.APPROVE,
@@ -105,7 +106,7 @@ class RegisteredProjectServiceImpl(
                 codeLinkList = null,
                 tagList = null,
                 photoList = null
-        ))
+            ))
         return MaximumProjectResponse(
             imagLinkList = p.photoList?.map {
                 it.toImageDto()
@@ -123,43 +124,34 @@ class RegisteredProjectServiceImpl(
     }
 
     override fun writeRegisteredProject(request: RegisteredProjectCreateRequest) {
-        verifyAuth(request.studentList)
+        verifyAuth(request.studentIdList)
+        val c = request.studentIdList
+            .map { creationRepository.save(
+                Creation(
+                    project = null,
+                    student = userRepository.findByIdOrNull(it.studentId)
+                        ?: throw UserNotFoundException("$it :: not found")
+                ))}.toList().toMutableList()
 
-        val project = registeredProjectRepository.save(RegisteredProject(
-            request.name,
-            request.shortContent,
-            request.purpose,
-            request.theoreticalBackground,
-            request.processList,
-            request.result,
-            request.conclusion,
-            request.referenceList,
-            null,
-            request.codeLinkList,
-            request.tagList
-        ))
-        project.editRegisteredProject(EditRegisteredProjectDto(
-            id = null,
-            name = null,
-            shortContent = null,
-            haveSeenCount = null,
-            status = null,
-            purpose = null,
-            theoreticalBackground = null,
-            processList = null,
-            result = null,
-            conclusion = null,
-            referenceList = null,
-            creationList = request.studentList.map {
-                creationRepository.save(
-                    Creation(
-                        project,
-                        userRepository.findById(it.studentId).orElse(null)
-                            ?: throw UserNotFoundException("$it :: not found")
-                    ))}.toList().toMutableList(),
-            codeLinkList = null,
-            tagList = null
-        ))
+        val p = registeredProjectRepository.save(
+            RegisteredProject(
+                name = request.name,
+                shortContent = request.shortContent,
+                purpose = request.purpose,
+                theoreticalBackground = request.theoreticalBackground,
+                codeLinkList = request.githubLinkList,
+                processList = request.processList,
+                result = request.result,
+                conclusion = request.conclusion,
+                referenceList = request.referenceList,
+                tagList = request.tagList,
+                creationList = c
+            ))
+        c.map {
+            it.id?.let {it1 -> creationRepository.findByIdOrNull(it1)
+                ?.editCreation(project = p)
+            }
+        }
     }
 
     override fun editRegisteredProject(request: RegisteredProjectEditRequest) {
@@ -204,10 +196,10 @@ class RegisteredProjectServiceImpl(
         val list = registeredProjectRepository.findAll(Sort.by(Sort.Direction.ASC, "createAt"))
             .filter { it.status == ProjectStatus.WAITING }
             .map {
-                    WaitingMinimumProjectResponse(
-                        id = it.id?: throw BadRequestException("$it :: id가 null입니다"),
-                        name = it.name
-                    )
+                WaitingMinimumProjectResponse(
+                    id = it.id?: throw BadRequestException("$it :: id가 null입니다"),
+                    name = it.name
+                )
             }
             .toMutableList()
         WaitingMinimumListProjectResponse(list)
@@ -256,8 +248,8 @@ class RegisteredProjectServiceImpl(
     override fun uploadImage(image: MultipartFile, projectId: Long) {
         val project = registeredProjectRepository.findByIdOrNull(projectId)
             ?: throw ProjectNotFoundException("$projectId :: 없는 프로젝트 입니다")
-        if (project.creationList.stream()
-                .anyMatch { it.student == currentUtil.getCurrentUser() }
+        if (project.creationList?.stream()
+                ?.anyMatch { it.student == currentUtil.getCurrentUser() } == true
         ) {
             val url = s3Util.uploadFile(image, "project", projectId.toString())
             val fileName = image.originalFilename!!
@@ -325,8 +317,9 @@ class RegisteredProjectServiceImpl(
     override fun deleteProject(projectId: Long) {
         val p = registeredProjectRepository.findByIdOrNull(projectId)
             ?: throw ProjectNotFoundException("$projectId :: 없는 프로젝트 입니다")
-        if(p.creationList.stream()
-            .anyMatch { it.student == currentUtil.getCurrentUser() }){
+        if(p.creationList?.stream()
+                ?.anyMatch { it.student == currentUtil.getCurrentUser() } == true
+        ){
             throw ForbiddenException("$projectId :: 프로젝트에 접근 권한이 없습니다")
         }
         registeredProjectRepository.deleteById(projectId)

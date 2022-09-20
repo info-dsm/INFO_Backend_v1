@@ -38,7 +38,7 @@ class IndividualProjectServiceImpl(
     private val creationRepository: CreationRepository,
     private val s3Util: S3Util,
     private val fileRepository: FileRepository
-    ): IndividualProjectService{
+): IndividualProjectService{
 
     override fun getMinimumLatestOrderProjectList(idx: Int, size: Int): Page<MinimumProjectResponse> {
         //security config에서 url로 authentication필요
@@ -97,9 +97,6 @@ class IndividualProjectServiceImpl(
                 status = null,
                 photoList = null
             ))
-        val s = p.creationList
-            ?.map { it.student.id }
-            ?.toMutableList()
         return MaximumProjectResponse(
             imagLinkList = p.photoList?.map {
                 it.toImageDto()
@@ -136,7 +133,7 @@ class IndividualProjectServiceImpl(
 
         c.map {
             it.id?.let {it1 -> creationRepository.findByIdOrNull(it1)
-                    ?.editCreation(project = p)
+                ?.editCreation(project = p)
             }
         }
     }
@@ -171,8 +168,9 @@ class IndividualProjectServiceImpl(
     override fun deleteProject(projectId: Long) {
         val p = individualRepository.findByIdOrNull(projectId)
             ?: throw ProjectNotFoundException("$projectId :: 없는 프로젝트 입니다")
-        if(p.creationList.stream()
-                .anyMatch { it.student == currentUtil.getCurrentUser() }){
+        if(p.creationList?.stream()
+                ?.anyMatch { it.student == currentUtil.getCurrentUser() } == true
+        ){
             throw ForbiddenException("$projectId :: 프로젝트에 접근 권한이 없습니다")
         }
         individualRepository.deleteById(projectId)
@@ -188,8 +186,8 @@ class IndividualProjectServiceImpl(
     override fun uploadImage(image: MultipartFile, projectId: Long) {
         val project = individualRepository.findByIdOrNull(projectId)
             ?: throw ProjectNotFoundException("$projectId :: 없는 프로젝트 입니다")
-        if (project.creationList.stream()
-                .anyMatch { it.student == currentUtil.getCurrentUser() }
+        if (project.creationList?.stream()
+                ?.anyMatch { it.student == currentUtil.getCurrentUser() } == true
         ) {
             val url = s3Util.uploadFile(image, "project", projectId.toString())
             val fileName = image.originalFilename!!
