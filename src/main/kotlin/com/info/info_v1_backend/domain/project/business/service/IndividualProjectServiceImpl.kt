@@ -202,39 +202,7 @@ class IndividualProjectServiceImpl(
                     company = null
                 )
             )
-            if (project.photoList == null) {
-                val list: MutableList<File> = ArrayList()
-                list.add(f)
-                project.editIndividualProject(
-                    EditIndividualProjectDto(
-                        id = null,
-                        photoList = list,
-                        name = null,
-                        shortContent = null,
-                        haveSeenCount = null,
-                        creationList = null,
-                        codeLinkList = null,
-                        tagList = null,
-                        status = null,
-                    )
-                )
-            } else {
-                val list = project.photoList
-                list!!.add(f)
-                project.editIndividualProject(
-                    EditIndividualProjectDto(
-                        id = null,
-                        photoList = list,
-                        name = null,
-                        shortContent = null,
-                        haveSeenCount = null,
-                        creationList = null,
-                        codeLinkList = null,
-                        tagList = null,
-                        status = null,
-                    )
-                )
-            }
+            project.addImage(f)
         } else {
             throw ForbiddenException("$projectId :: 프로젝트에 대한 권한이 없습니다")
         }

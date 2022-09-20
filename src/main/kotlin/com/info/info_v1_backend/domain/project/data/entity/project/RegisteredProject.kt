@@ -3,6 +3,7 @@
 import com.info.info_v1_backend.domain.project.business.dto.request.EditRegisteredProjectDto
 import com.info.info_v1_backend.domain.project.data.entity.Creation
 import com.info.info_v1_backend.domain.project.data.entity.type.ProjectStatus
+import com.info.info_v1_backend.global.image.entity.File
 import javax.persistence.*
 
 
@@ -97,4 +98,7 @@ class RegisteredProject(
         }
     }
 
+    fun addImage(file: File) {
+        this.photoList?.add(file)
+    }
 }
