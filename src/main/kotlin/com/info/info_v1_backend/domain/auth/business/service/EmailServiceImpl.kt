@@ -5,6 +5,7 @@ import com.info.info_v1_backend.domain.auth.data.entity.user.User
 import com.info.info_v1_backend.domain.auth.data.repository.token.CheckEmailCodeRepository
 import com.info.info_v1_backend.domain.auth.data.repository.user.UserRepository
 import com.info.info_v1_backend.domain.auth.exception.UserAlreadyExists
+import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
 import com.info.info_v1_backend.infra.mail.MailUtil
 import org.apache.commons.lang3.RandomStringUtils
 import org.springframework.stereotype.Service
@@ -28,6 +29,17 @@ class EmailServiceImpl(
         val random = RandomStringUtils.randomNumeric(CODE_LENGTH)
         val emailCheckCode = CheckEmailCode(email, random)
         checkEmailCodeRepository.save(emailCheckCode)
+        val map = HashMap<String, String>()
+        map["code"] = random
+        mailSender.sendHtmlMail(email, AUTH_MAIL_TITLE, "mail.html", map)
+    }
+
+    override fun sendPasswordCodeToEmail(email: String) {
+        userRepository.findByEmail(email).orElse(null)?: throw UserNotFoundException(email)
+
+        val random = RandomStringUtils.randomNumeric(CODE_LENGTH)
+        val passwordCheckCode = CheckEmailCode(email, random)
+        checkEmailCodeRepository.save(passwordCheckCode)
         val map = HashMap<String, String>()
         map["code"] = random
         mailSender.sendHtmlMail(email, AUTH_MAIL_TITLE, "mail.html", map)

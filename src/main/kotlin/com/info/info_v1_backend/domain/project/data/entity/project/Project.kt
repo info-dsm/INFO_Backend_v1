@@ -66,7 +66,7 @@ sealed class Project(
     fun toProjectList(): ProjectList{
         return ProjectList(
                 this.name,
-                this.codeLinkList,
+                this.id.toString(),
                 this.status,
         )
     }

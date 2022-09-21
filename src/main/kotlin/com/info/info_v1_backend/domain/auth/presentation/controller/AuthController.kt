@@ -30,7 +30,7 @@ class AuthController(
     @PostMapping("/email")
     fun sendEmail(
         @RequestParam
-        @Pattern(regexp = "[a-zA-Z0-9+\\_.]+@dsm\\.hs\\.kr\$")
+        @Pattern(regexp = "[a-zA-Z0-9+\\_.]+@dsm\\.hs\\.kr\$", message = "이메일 형식이 맞지 않습니다.")
         email: String
     ){
         emailService.sendCodeToEmail(email)
@@ -64,6 +64,11 @@ class AuthController(
     ){
         authService.editPassword(request)
     }
+    @PostMapping("/passwordCode")
+    fun sendPasswordCode(){
+        emailService.sendPasswordCodeToEmail(current.getCurrentUser().email)
+    }
+
     @PostMapping("/reissue")
     fun reissue(
         @RequestBody
