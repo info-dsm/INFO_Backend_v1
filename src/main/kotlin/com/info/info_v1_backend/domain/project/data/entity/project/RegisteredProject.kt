@@ -105,4 +105,8 @@ class RegisteredProject(
     fun eddHaveSeenCount(){
         this.haveSeenCount++
     }
+
+    fun changeStatus(status: ProjectStatus){
+        this.status = status
+    }
 }

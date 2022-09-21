@@ -29,7 +29,6 @@ import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
-import java.util.stream.Collectors
 
 @Service
 class IndividualProjectServiceImpl(
@@ -109,18 +108,17 @@ class IndividualProjectServiceImpl(
 
     override fun writeIndividualProject(request: IndividualProjectCreateRequest) {
         verifyUser(request.studentIdList)
-        val c = request.studentIdList.stream()
+        val c = request.studentIdList
             .map { creationRepository.save(Creation(
                 project = null,
                 student = userRepository.findByIdOrNull(it.studentId)
                     ?: throw UserNotFoundException("$it :: not found")
-            ))}
-            .collect(Collectors.toList())
+            ))}.toMutableList()
 
         val p = individualRepository.save(IndividualProject(
             name = request.name,
             shortContent = request.shortContent,
-            codeLinkList = request.githubLinkList,
+            codeLinkList = request.codeLinkList,
             tagList = request.tagList,
             creationList = c,
         ))
@@ -142,7 +140,8 @@ class IndividualProjectServiceImpl(
             .map { creationRepository.save(
                 Creation(
                     project = p,
-                    student = userRepository.findById(it.studentId).orElse(null)
+                    student = userRepository.findById(it.studentId)
+                        .orElse(null)
                 ) ) }.toList()
         p.editIndividualProject(
             EditIndividualProjectDto(
@@ -151,7 +150,7 @@ class IndividualProjectServiceImpl(
                 shortContent = request.shortContent,
                 haveSeenCount = p.haveSeenCount,
                 creationList = c,
-                codeLinkList = request.githubLinkList,
+                codeLinkList = request.codeLinkList,
                 tagList = request.tagList,
                 status = null,
                 photoList = null
@@ -173,7 +172,7 @@ class IndividualProjectServiceImpl(
     private fun verifyUser(studentIdList: MutableList<StudentIdDto>) {
         if(studentIdList.stream()
                 .anyMatch { currentUtil.getCurrentUser() == userRepository.findById(it.studentId) }){
-            throw NotHaveAccessProjectException("작성자가 프로젝트에 참여하지 않음")
+            throw NotHaveAccessProjectException("유저가 프로젝트에 참여하지 않음")
         }
     }
 

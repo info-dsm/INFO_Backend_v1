@@ -197,24 +197,9 @@ class RegisteredProjectServiceImpl(
         verifyAuth()
         val p = registeredProjectRepository.findByIdOrNull(request.projectId)
             ?: throw ProjectNotFoundException("${request.projectId} :: not found")
-        p.editRegisteredProject(
-            EditRegisteredProjectDto(
-                id = null,
-                name = null,
-                shortContent = null,
-                haveSeenCount = null,
-                status = if(request.status) ProjectStatus.APPROVE else ProjectStatus.REJECT,
-                purpose = null,
-                theoreticalBackground = null,
-                processList = null,
-                result = null,
-                conclusion = null,
-                referenceList = null,
-                creationList = null,
-                codeLinkList = null,
-                tagList = null,
-                photoList = null
-            )
+        p.changeStatus(
+            if(request.status) ProjectStatus.APPROVE
+            else ProjectStatus.REJECT
         )
     }
 
