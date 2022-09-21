@@ -2,7 +2,7 @@ package com.info.info_v1_backend.domain.project.business.dto.request
 
 import com.info.info_v1_backend.domain.project.data.entity.Creation
 import com.info.info_v1_backend.domain.project.data.entity.type.ProjectStatus
-import com.info.info_v1_backend.global.image.entity.File
+import com.info.info_v1_backend.global.file.entity.File
 
 data class EditRegisteredProjectDto(
     val id: Long?,

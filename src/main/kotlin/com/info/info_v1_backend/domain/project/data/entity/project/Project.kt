@@ -4,7 +4,7 @@ import com.info.info_v1_backend.domain.auth.presentation.dto.response.ProjectLis
 import com.info.info_v1_backend.domain.project.data.entity.Creation
 import com.info.info_v1_backend.domain.project.data.entity.type.ProjectStatus
 import com.info.info_v1_backend.global.base.entity.BaseAuthorEntity
-import com.info.info_v1_backend.global.image.entity.File
+import com.info.info_v1_backend.global.file.entity.File
 import javax.persistence.*
 
 @Entity

@@ -1,7 +1,6 @@
 package com.info.info_v1_backend.domain.company.data.entity.company.embeddable
 
-import com.info.info_v1_backend.global.image.entity.File
-import javax.persistence.Column
+import com.info.info_v1_backend.global.file.entity.File
 import javax.persistence.Embeddable
 import javax.persistence.OneToMany
 import javax.persistence.OneToOne

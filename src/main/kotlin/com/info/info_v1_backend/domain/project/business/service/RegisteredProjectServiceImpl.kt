@@ -20,9 +20,9 @@ import com.info.info_v1_backend.domain.project.exception.NotHaveAccessProjectExc
 import com.info.info_v1_backend.domain.project.exception.ProjectNotFoundException
 import com.info.info_v1_backend.global.error.common.FileNotFoundException
 import com.info.info_v1_backend.global.error.common.ForbiddenException
-import com.info.info_v1_backend.global.image.entity.File
-import com.info.info_v1_backend.global.image.entity.type.FileType
-import com.info.info_v1_backend.global.image.repository.FileRepository
+import com.info.info_v1_backend.global.file.entity.File
+import com.info.info_v1_backend.global.file.entity.type.FileType
+import com.info.info_v1_backend.global.file.repository.FileRepository
 import com.info.info_v1_backend.global.util.user.CurrentUtil
 import com.info.info_v1_backend.infra.amazon.s3.S3Util
 import io.undertow.util.BadRequestException

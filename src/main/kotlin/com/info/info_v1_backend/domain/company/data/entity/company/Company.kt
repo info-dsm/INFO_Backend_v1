@@ -3,19 +3,12 @@ package com.info.info_v1_backend.domain.company.data.entity.company
 import com.info.info_v1_backend.domain.auth.data.entity.type.Role
 import com.info.info_v1_backend.domain.auth.data.entity.user.Student
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
-import com.info.info_v1_backend.domain.company.business.dto.request.company.CompanyContactRequest
-import com.info.info_v1_backend.domain.company.business.dto.request.company.CompanyInformationRequest
 import com.info.info_v1_backend.domain.company.business.dto.request.company.CompanyNameRequest
-import com.info.info_v1_backend.domain.company.business.dto.request.company.EditCompanyRequest
-import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyResponse
-import com.info.info_v1_backend.domain.company.business.dto.response.company.MinimumCompanyResponse
 import com.info.info_v1_backend.domain.company.data.entity.comment.Comment
 import com.info.info_v1_backend.domain.company.data.entity.company.embeddable.CompanyContact
 import com.info.info_v1_backend.domain.company.data.entity.company.embeddable.CompanyInformation
 import com.info.info_v1_backend.domain.company.data.entity.company.embeddable.CompanyIntroduction
 import com.info.info_v1_backend.domain.company.data.entity.notice.Notice
-import com.info.info_v1_backend.global.image.entity.File
-import java.time.Year
 import javax.persistence.*
 
 
@@ -26,6 +19,7 @@ class Company(
     companyInformation: CompanyInformation,
     companyContact: CompanyContact,
     companyIntroduction: CompanyIntroduction,
+    isLeading: Boolean
 ): User(
     companyName.companyNumber,
     companyName.companyName,
@@ -56,6 +50,10 @@ class Company(
         mappedBy = "company"
     )
     var commentList: MutableList<Comment> = ArrayList()
+
+    @Column(name = "company_is_leading", nullable = false)
+    var isLeading: Boolean = isLeading
+        protected set
 
 
     @OneToMany(mappedBy = "company")

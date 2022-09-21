@@ -1,19 +1,15 @@
 package com.info.info_v1_backend.domain.company.data.entity.notice
 
-import com.info.info_v1_backend.domain.company.business.dto.request.notice.EditNoticeRequest
-import com.info.info_v1_backend.domain.company.business.dto.response.notice.MaximumNoticeResponse
-import com.info.info_v1_backend.domain.company.business.dto.response.notice.MinimumNoticeResponse
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
 import com.info.info_v1_backend.domain.company.data.entity.notice.certificate.Certificate
 import com.info.info_v1_backend.domain.company.data.entity.notice.embeddable.*
 import com.info.info_v1_backend.domain.company.data.entity.notice.language.LanguageUsage
 import com.info.info_v1_backend.domain.company.data.entity.notice.recruitment.RecruitmentBusiness
 import com.info.info_v1_backend.domain.company.data.entity.notice.technology.Technology
-import com.info.info_v1_backend.domain.company.data.entity.type.WorkTime
 import com.info.info_v1_backend.global.base.entity.BaseAuthorEntity
+import com.info.info_v1_backend.global.file.entity.File
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Where
-import java.time.LocalDate
 import javax.persistence.CascadeType
 import javax.persistence.Column
 import javax.persistence.ElementCollection
@@ -40,17 +36,27 @@ class Notice(
     company: Company,
     workHour: Int,
     pay: Pay,
-    
 
-    screeningProcedure: ScreeningProcedure,
-    alternativeMilitaryPlan: Boolean,
     mealSupport: MealSupport,
     welfare: Welfare,
-    needDocuments: String?,
+    alternativeMilitaryPlan: Boolean,
 
-    isAlwaysOpen: Boolean,
-    interviewHopeMonth: LocalDate?,
-    workHopeMonth: LocalDate?
+
+    recruitmentPeriod: RecruitmentPeriod,
+
+    screeningProcessList: List<ScreeningProcess>,
+
+    resumeForm: File,
+
+    otherFeatures: String?,
+    workPlace: WorkPlace,
+    isPersonalContact: Boolean,
+
+//    screeningProcedure: ScreeningProcedure,
+
+
+    //기재되지 않은 사항
+    needDocuments: String?,
 
 ): BaseAuthorEntity() {
     @Id
@@ -64,42 +70,20 @@ class Notice(
     val company: Company = company
 
     @OneToMany(mappedBy = "notice")
-    var targetMajorList: MutableList<TargetMajor> = ArrayList()
-        protected set
-    @Column(name = "business_information", length = 255)
-    var businessInformation: String = businessInformation
+    var recruitmentBusinessList: MutableList<RecruitmentBusiness> = ArrayList()
         protected set
 
-    @ElementCollection
-    var certificateList: MutableList<String> = certificateList
+
+    @Column(name = "grade_cut_line", nullable = true)
+    var gradeCutLine: Int? = gradeCutLine
         protected set
 
-    @Column(name = "cut_line", nullable = false)
-    var cutLine: Int? = cutLine
-        protected set
-
-    @Column(name = "work_remark", nullable = false)
-    var personalRemark: String = personalRemark
-        protected set
-
-    @Embedded
-    var commuteTime: CommuteTime = commuteTime
-        protected set
-
-    @Column(name = "work_time", nullable = false)
-    var workTime: WorkTime = workTime
+    @Column(name = "work_hour", nullable = false)
+    var workHour: Int = workHour
         protected set
 
     @OneToOne
     var pay: Pay = pay
-        protected set
-
-    @Embedded
-    var screeningProcedure: ScreeningProcedure = screeningProcedure
-        protected set
-
-    @Column(name = "alternative_military_plan", nullable = false)
-    var alternativeMilitaryPlan: Boolean = alternativeMilitaryPlan
         protected set
 
     @Embedded
@@ -110,24 +94,37 @@ class Notice(
     var welfare: Welfare = welfare
         protected set
 
-    @Column(name = "need_documents", nullable = true)
-    var needDocuments: String? = needDocuments
+    @Column(name = "alternative_military_plan", nullable = false)
+    var alternativeMilitaryPlan: Boolean = alternativeMilitaryPlan
         protected set
 
-    @Column(name = "dead_line", nullable = true)
-    var deadLine: LocalDate? = deadLine
+    @Embedded
+    var recruitmentPeriod: RecruitmentPeriod = recruitmentPeriod
         protected set
 
-    @Column(name = "is_always_open", nullable = false)
-    var isAlwaysOpen: Boolean = isAlwaysOpen
+
+    @OneToOne
+    var resumeForm: File = resumeForm
         protected set
 
-    @Column(name = "interview_hope_month", nullable = true)
-    var interviewHopeMonth: LocalDate? = interviewHopeMonth
+    @Column(name = "other_feature", nullable = true)
+    var otherFeatures: String? = otherFeatures
         protected set
 
-    @Column(name = "work_hope_month", nullable = true)
-    var workHopeMonth: LocalDate? = workHopeMonth
+    @Embedded
+    var workPlace: WorkPlace = workPlace
+        protected set
+
+    @Column(name = "is_personal_contact", nullable = false)
+    var isPersonalContact: Boolean = isPersonalContact
+        protected set
+
+    @ElementCollection
+    var needDocuments: MutableList<String> = ArrayList()
+        protected set
+
+    @OneToMany
+    var reportedFileList: MutableList<File> = ArrayList()
         protected set
 
     @Column(name = "notice_is_delete", nullable = false)
@@ -138,120 +135,20 @@ class Notice(
     var isExpired: Boolean = false
         protected set
 
-    var isPayOpen: Boolean = false
-        protected set
-
 
     fun makeExpired() {
         this.isExpired = true
     }
 
-    fun toMinimumNoticeResponse(): MinimumNoticeResponse {
-        return MinimumNoticeResponse(
-            this.id!!,
-            this.company.toMinimumCompanyResponse(),
-            this.targetMajorList.map {
-                it.toTargetMajorRequest()
-            }.toList(),
-            this.businessInformation,
-            this.certificateList,
-            this.cutLine,
-            this.personalRemark
-        )
+
+    init {
+        needDocuments?. let {
+            this.needDocuments.add(it)
+        }
     }
 
-    fun toMaximumNoticeResponse(): MaximumNoticeResponse {
-        return MaximumNoticeResponse(
-            this.id!!,
-            this.company.toMaximumCompanyResponse(),
-            this.targetMajorList.map {
-                it.toTargetMajorRequest()
-            }.toList(),
-            this.deadLine,
-            this.businessInformation,
-            this.certificateList,
-            this.cutLine,
-            this.personalRemark,
-            this.commuteTime.toCommuteTimeRequest(),
-            this.workTime,
-            if (this.isPayOpen) {
-                this.pay?.toPayRequest()
-            } else null,
-            this.screeningProcedure.toScreeningProcedureRequest(),
-            this.alternativeMilitaryPlan,
-            this.mealSupport.toMealSupportRequest(),
-            this.welfare.toWelfareRequest(),
-            this.needDocuments
-        )
-    }
 
-    fun editNotice(r: EditNoticeRequest) {
-        r.businessInformation?.let {
-            this.businessInformation = it
-        }
-        r.certificateList?.let {
-            this.certificateList = it
-        }
-        r.cutLine?.let {
-            this.cutLine = it
-        }
-        r.personalRemark ?.let {
-            this.personalRemark = it
-        }
-        r.commuteTime ?.let {
-            this.commuteTime = CommuteTime(
-                it.startTime,
-                it.endTime
-            )
-        }
-        r.workTime ?.let {
-            this.workTime = it
-        }
-        r.screeningProcedure ?.let {
-            this.screeningProcedure = ScreeningProcedure(
-                it.document,
-                it.technicalInterview,
-                it.physicalCheck,
-                it.assignment,
-                it.executiveInterview,
-                it.elseProcedure
-            )
-        }
-        r.alternativeMilitaryPlan ?.let {
-            this.alternativeMilitaryPlan = it
-        }
-        r.mealSupport ?.let {
-            this.mealSupport = MealSupport(
-                it.mealSupportPay,
-                it.breakfast,
-                it.lunch,
-                it.dinner
-            )
-        }
-        r.welfare ?.let {
-            this.welfare = Welfare(
-                it.dormitorySupport,
-                it.selfDevelopmentPay,
-                it.equipmentSupport,
-                it.elseSupport
-            )
-        }
-        r.needDocuments ?.let {
-            this.needDocuments = it
-        }
-        r.deadLine ?.let {
-            this.deadLine = it
-        }
-        r.isAlwaysOpen ?.let {
-            this.isAlwaysOpen = it
-        }
-        r.interviewHopeMonth ?.let {
-            this.interviewHopeMonth = it
-        }
-        r.workHopeMonth ?.let {
-            this.workHopeMonth = it
-        }
 
-    }
+
 
 }

@@ -18,10 +18,10 @@ import com.info.info_v1_backend.domain.company.data.repository.company.CompanySe
 import com.info.info_v1_backend.domain.company.data.repository.notice.NoticeSearchDocumentRepository
 import com.info.info_v1_backend.domain.company.exception.*
 import com.info.info_v1_backend.global.error.common.NoAuthenticationException
-import com.info.info_v1_backend.global.image.entity.File
-import com.info.info_v1_backend.global.image.entity.type.FileType
-import com.info.info_v1_backend.global.image.exception.FileNotFoundException
-import com.info.info_v1_backend.global.image.repository.FileRepository
+import com.info.info_v1_backend.global.file.entity.File
+import com.info.info_v1_backend.global.file.entity.type.FileType
+import com.info.info_v1_backend.global.file.exception.FileNotFoundException
+import com.info.info_v1_backend.global.file.repository.FileRepository
 import com.info.info_v1_backend.global.util.user.CurrentUtil
 import com.info.info_v1_backend.infra.amazon.s3.S3Util
 import org.springframework.data.domain.Page
