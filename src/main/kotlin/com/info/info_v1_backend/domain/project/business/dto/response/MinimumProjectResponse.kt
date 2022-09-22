@@ -6,8 +6,8 @@ import com.info.info_v1_backend.infra.amazon.s3.dto.ImageDto
 data class MinimumProjectResponse(
     val photoList: MutableList<ImageDto>?,
     val projectId: Long,
-    val githubLinkList: MutableList<String>?,
+    val codeLinkList: MutableList<String>?,
     val shortContent : String,
-    val studentId: MutableList<StudentIdDto>,
+    val studentIdList: MutableList<StudentIdDto>,
     val haveSeenCount: Long
 )
