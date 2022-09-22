@@ -10,7 +10,6 @@ import com.info.info_v1_backend.domain.project.business.dto.response.MaximumProj
 import com.info.info_v1_backend.domain.project.business.dto.response.MinimumProjectResponse
 import com.info.info_v1_backend.domain.project.data.entity.Creation
 import com.info.info_v1_backend.domain.project.data.entity.project.IndividualProject
-import com.info.info_v1_backend.domain.project.data.entity.type.ProjectStatus
 import com.info.info_v1_backend.domain.project.data.repository.CreationRepository
 import com.info.info_v1_backend.domain.project.data.repository.ProjectRepository
 import com.info.info_v1_backend.domain.project.exception.NotHaveAccessProjectException
@@ -42,8 +41,7 @@ class IndividualProjectServiceImpl(
 
     override fun getMinimumLatestOrderProjectList(idx: Int, size: Int): Page<MinimumProjectResponse> {
         //security config에서 url로 authentication필요
-        return individualRepository.findAllByProjectStatus(
-            ProjectStatus.APPROVE,
+        return individualRepository.findAll(
             PageRequest.of(
                 idx,
                 size,
@@ -67,8 +65,7 @@ class IndividualProjectServiceImpl(
 
     override fun getMinimumNumberOfViewsProjectList(idx: Int, size: Int): Page<MinimumProjectResponse> {
         //security config에서 url로 authentication필요
-        return individualRepository.findAllByProjectStatus(
-            ProjectStatus.APPROVE,
+        return individualRepository.findAll(
             PageRequest.of(
                 idx,
                 size,
@@ -127,7 +124,7 @@ class IndividualProjectServiceImpl(
             shortContent = request.shortContent,
             codeLinkList = request.codeLinkList,
             tagList = request.tagList,
-            creationList = c,
+            creationList = c
         ))
 
         c.map {
