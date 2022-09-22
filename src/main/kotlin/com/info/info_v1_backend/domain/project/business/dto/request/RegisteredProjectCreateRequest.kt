@@ -11,7 +11,7 @@ data class RegisteredProjectCreateRequest(
     val result: String,
     val conclusion: String,
     val referenceList: MutableList<String>,
-    val githubLinkList: MutableList<String>,
+    val codeLinkList: MutableList<String>,
     val studentIdList: MutableList<StudentIdDto>,
     val tagList: MutableList<String>
 )

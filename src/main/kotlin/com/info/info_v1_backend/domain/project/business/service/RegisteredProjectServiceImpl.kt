@@ -10,7 +10,6 @@ import com.info.info_v1_backend.domain.project.business.dto.request.RegisteredPr
 import com.info.info_v1_backend.domain.project.business.dto.request.RegisteredProjectEditRequest
 import com.info.info_v1_backend.domain.project.business.dto.response.MaximumProjectResponse
 import com.info.info_v1_backend.domain.project.business.dto.response.MinimumProjectResponse
-import com.info.info_v1_backend.domain.project.business.dto.response.WaitingMinimumListProjectResponse
 import com.info.info_v1_backend.domain.project.business.dto.response.WaitingMinimumProjectResponse
 import com.info.info_v1_backend.domain.project.data.entity.Creation
 import com.info.info_v1_backend.domain.project.data.entity.project.RegisteredProject
@@ -27,7 +26,6 @@ import com.info.info_v1_backend.global.image.entity.type.FileType
 import com.info.info_v1_backend.global.image.repository.FileRepository
 import com.info.info_v1_backend.global.util.user.CurrentUtil
 import com.info.info_v1_backend.infra.amazon.s3.S3Util
-import io.undertow.util.BadRequestException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -53,11 +51,15 @@ class RegisteredProjectServiceImpl(
                 Sort.by(Sort.Direction.DESC, "createdAt")))
             .map {
                 MinimumProjectResponse(
-                    projectId = it.projectId,
-                    photoList = it.photoList,
-                    githubLinkList = it.githubLinkList,
+                    projectId = it.id!!,
+                    photoList = it.photoList?.map {it1->
+                        it1.toImageDto()
+                    }?.toMutableList(),
+                    codeLinkList = it.codeLinkList,
                     shortContent = it.shortContent,
-                    studentId = it.studentId,
+                    studentIdList = it.creationList!!.map {it1 ->
+                        StudentIdDto(it1.student.id!!)
+                    }.toMutableList(),
                     haveSeenCount = it.haveSeenCount
                 )
             }
@@ -72,11 +74,15 @@ class RegisteredProjectServiceImpl(
                 Sort.by(Sort.Direction.DESC, "haveSeenCount")))
             .map {
                 MinimumProjectResponse(
-                    projectId = it.projectId,
-                    photoList = it.photoList,
-                    githubLinkList = it.githubLinkList,
+                    projectId = it.id!!,
+                    photoList = it.photoList?.map {it1 ->
+                        it1.toImageDto()
+                    }?.toMutableList(),
+                    codeLinkList = it.codeLinkList,
                     shortContent = it.shortContent,
-                    studentId = it.studentId,
+                    studentIdList = it.creationList!!.map {it1 ->
+                        StudentIdDto(it1.student.id!!)
+                    }.toMutableList(),
                     haveSeenCount = it.haveSeenCount
                 )
             }
@@ -112,7 +118,6 @@ class RegisteredProjectServiceImpl(
     }
 
     override fun writeRegisteredProject(request: RegisteredProjectCreateRequest) {
-        verifyAuth(request.studentIdList)
         val c = request.studentIdList
             .map { creationRepository.save(
                 Creation(
@@ -127,7 +132,7 @@ class RegisteredProjectServiceImpl(
                 shortContent = request.shortContent,
                 purpose = request.purpose,
                 theoreticalBackground = request.theoreticalBackground,
-                codeLinkList = request.githubLinkList,
+                codeLinkList = request.codeLinkList,
                 processList = request.processList,
                 result = request.result,
                 conclusion = request.conclusion,
@@ -172,25 +177,27 @@ class RegisteredProjectServiceImpl(
                 conclusion = request.conclusion,
                 referenceList = request.referenceList,
                 creationList = c,
-                codeLinkList = request.githubLinkList,
+                codeLinkList = request.codeLinkList,
                 tagList = request.tagList,
                 photoList = null
             )
         )
     }
 
-    override fun getWaitingMinimumProject() {
+    override fun getWaitingMinimumProject(idx:Int, size:Int): Page<WaitingMinimumProjectResponse> {
         verifyAuth()
-        val list = registeredProjectRepository.findAll(Sort.by(Sort.Direction.ASC, "createAt"))
-            .filter { it.status == ProjectStatus.WAITING }
-            .map {
-                WaitingMinimumProjectResponse(
-                    id = it.id?: throw BadRequestException("$it :: id가 null입니다"),
-                    name = it.name
-                )
-            }
-            .toMutableList()
-        WaitingMinimumListProjectResponse(list)
+         return registeredProjectRepository.findAllByProjectStatus(
+                ProjectStatus.WAITING,
+                PageRequest.of(
+                    idx,
+                    size,
+                    Sort.by(Sort.Direction.ASC, "createAt")))
+                .map {
+                    WaitingMinimumProjectResponse(
+                        id = it.id!!,
+                        name = it.name
+                    )
+                }
     }
 
     override fun updateStatus(request: ProjectStatusEditRequest) {

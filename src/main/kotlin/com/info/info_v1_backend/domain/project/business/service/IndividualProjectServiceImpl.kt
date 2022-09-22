@@ -50,11 +50,15 @@ class IndividualProjectServiceImpl(
                 Sort.by(Sort.Direction.DESC, "createdAt")))
             .map {
                 MinimumProjectResponse(
-                    projectId = it.projectId,
-                    photoList = it.photoList,
-                    githubLinkList = it.githubLinkList,
+                    projectId = it.id!!,
+                    photoList = it.photoList?.map{it1 ->
+                        it1.toImageDto()
+                    }?.toMutableList(),
+                    codeLinkList = it.codeLinkList,
                     shortContent = it.shortContent,
-                    studentId = it.studentId,
+                    studentIdList = it.creationList!!.map { it1 ->
+                        StudentIdDto(it1.student.id!!)
+                    }.toMutableList(),
                     haveSeenCount = it.haveSeenCount
                 )
             }
@@ -71,11 +75,15 @@ class IndividualProjectServiceImpl(
                 Sort.by(Sort.Direction.DESC, "haveSeenCount")))
             .map {
                 MinimumProjectResponse(
-                    projectId = it.projectId,
-                    photoList = it.photoList,
-                    githubLinkList = it.githubLinkList,
+                    projectId = it.id!!,
+                    photoList = it.photoList?.map { it1 ->
+                        it1.toImageDto()
+                    }?.toMutableList(),
+                    codeLinkList = it.codeLinkList,
                     shortContent = it.shortContent,
-                    studentId = it.studentId,
+                    studentIdList = it.creationList!!.map { it1 ->
+                        StudentIdDto(it1.student.id!!)
+                    }.toMutableList(),
                     haveSeenCount = it.haveSeenCount
                 )
             }
@@ -107,7 +115,6 @@ class IndividualProjectServiceImpl(
     }
 
     override fun writeIndividualProject(request: IndividualProjectCreateRequest) {
-        verifyUser(request.studentIdList)
         val c = request.studentIdList
             .map { creationRepository.save(Creation(
                 project = null,
