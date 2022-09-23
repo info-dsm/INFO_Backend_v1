@@ -10,16 +10,16 @@ import com.info.info_v1_backend.domain.project.business.dto.response.MaximumProj
 import com.info.info_v1_backend.domain.project.business.dto.response.MinimumProjectResponse
 import com.info.info_v1_backend.domain.project.data.entity.Creation
 import com.info.info_v1_backend.domain.project.data.entity.project.IndividualProject
-import com.info.info_v1_backend.domain.project.data.entity.type.ProjectStatus
 import com.info.info_v1_backend.domain.project.data.repository.CreationRepository
 import com.info.info_v1_backend.domain.project.data.repository.ProjectRepository
 import com.info.info_v1_backend.domain.project.exception.NotHaveAccessProjectException
 import com.info.info_v1_backend.domain.project.exception.ProjectNotFoundException
 import com.info.info_v1_backend.global.error.common.FileNotFoundException
 import com.info.info_v1_backend.global.error.common.ForbiddenException
-import com.info.info_v1_backend.global.file.entity.File
-import com.info.info_v1_backend.global.file.entity.type.FileType
-import com.info.info_v1_backend.global.file.repository.FileRepository
+import com.info.info_v1_backend.global.error.common.InternalServerErrorException
+import com.info.info_v1_backend.global.image.entity.File
+import com.info.info_v1_backend.global.image.entity.type.FileType
+import com.info.info_v1_backend.global.image.repository.FileRepository
 import com.info.info_v1_backend.global.util.user.CurrentUtil
 import com.info.info_v1_backend.infra.amazon.s3.S3Util
 import org.springframework.data.domain.Page
@@ -28,7 +28,6 @@ import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
-import java.util.stream.Collectors
 
 @Service
 class IndividualProjectServiceImpl(
@@ -38,23 +37,26 @@ class IndividualProjectServiceImpl(
     private val creationRepository: CreationRepository,
     private val s3Util: S3Util,
     private val fileRepository: FileRepository
-    ): IndividualProjectService{
+): IndividualProjectService{
 
     override fun getMinimumLatestOrderProjectList(idx: Int, size: Int): Page<MinimumProjectResponse> {
         //security config에서 url로 authentication필요
-        return individualRepository.findAllByProjectStatus(
-            ProjectStatus.APPROVE,
+        return individualRepository.findAll(
             PageRequest.of(
                 idx,
                 size,
                 Sort.by(Sort.Direction.DESC, "createdAt")))
             .map {
                 MinimumProjectResponse(
-                    projectId = it.projectId,
-                    photoList = it.photoList,
-                    githubLinkList = it.githubLinkList,
+                    projectId = it.id!!,
+                    photoList = it.photoList?.map{it1 ->
+                        it1.toImageDto()
+                    }?.toMutableList(),
+                    codeLinkList = it.codeLinkList,
                     shortContent = it.shortContent,
-                    studentId = it.studentId,
+                    studentIdList = it.creationList!!.map { it1 ->
+                        StudentIdDto(it1.student.id!!)
+                    }.toMutableList(),
                     haveSeenCount = it.haveSeenCount
                 )
             }
@@ -63,19 +65,22 @@ class IndividualProjectServiceImpl(
 
     override fun getMinimumNumberOfViewsProjectList(idx: Int, size: Int): Page<MinimumProjectResponse> {
         //security config에서 url로 authentication필요
-        return individualRepository.findAllByProjectStatus(
-            ProjectStatus.APPROVE,
+        return individualRepository.findAll(
             PageRequest.of(
                 idx,
                 size,
                 Sort.by(Sort.Direction.DESC, "haveSeenCount")))
             .map {
                 MinimumProjectResponse(
-                    projectId = it.projectId,
-                    photoList = it.photoList,
-                    githubLinkList = it.githubLinkList,
+                    projectId = it.id!!,
+                    photoList = it.photoList?.map { it1 ->
+                        it1.toImageDto()
+                    }?.toMutableList(),
+                    codeLinkList = it.codeLinkList,
                     shortContent = it.shortContent,
-                    studentId = it.studentId,
+                    studentIdList = it.creationList!!.map { it1 ->
+                        StudentIdDto(it1.student.id!!)
+                    }.toMutableList(),
                     haveSeenCount = it.haveSeenCount
                 )
             }
@@ -85,21 +90,7 @@ class IndividualProjectServiceImpl(
         //security config에서 url로 authentication필요
         val p = individualRepository.findByIdOrNull(id)
             ?: throw ProjectNotFoundException("$id :: not found")
-        p.editIndividualProject(
-            EditIndividualProjectDto(
-                id = null,
-                name = null,
-                shortContent = null,
-                haveSeenCount = p.haveSeenCount + 1,
-                creationList = null,
-                codeLinkList = null,
-                tagList = null,
-                status = null,
-                photoList = null
-            ))
-        val s = p.creationList
-            ?.map { it.student.id }
-            ?.toMutableList()
+        p.eddHaveSeenCount()
         return MaximumProjectResponse(
             imagLinkList = p.photoList?.map {
                 it.toImageDto()
@@ -112,31 +103,33 @@ class IndividualProjectServiceImpl(
             updateBy = p.updatedBy,
             shortContent = p.shortContent,
             codeLinkList = p.codeLinkList,
-            haveSeenCount = p.haveSeenCount
+            haveSeenCount = p.haveSeenCount,
+            studentIdList = p.creationList?.map {
+                StudentIdDto(it.student.id
+                    ?: throw InternalServerErrorException("올바르지 않은 프로젝트"))
+            }?.toMutableList()
         )
     }
 
     override fun writeIndividualProject(request: IndividualProjectCreateRequest) {
-        verifyUser(request.studentIdList)
-        val c = request.studentIdList.stream()
+        val c = request.studentIdList
             .map { creationRepository.save(Creation(
                 project = null,
                 student = userRepository.findByIdOrNull(it.studentId)
                     ?: throw UserNotFoundException("$it :: not found")
-            ))}
-            .collect(Collectors.toList())
+            ))}.toMutableList()
 
         val p = individualRepository.save(IndividualProject(
             name = request.name,
             shortContent = request.shortContent,
-            codeLinkList = request.githubLinkList,
+            codeLinkList = request.codeLinkList,
             tagList = request.tagList,
-            creationList = c,
+            creationList = c
         ))
 
         c.map {
             it.id?.let {it1 -> creationRepository.findByIdOrNull(it1)
-                    ?.editCreation(project = p)
+                ?.editCreation(project = p)
             }
         }
     }
@@ -151,7 +144,8 @@ class IndividualProjectServiceImpl(
             .map { creationRepository.save(
                 Creation(
                     project = p,
-                    student = userRepository.findById(it.studentId).orElse(null)
+                    student = userRepository.findById(it.studentId)
+                        .orElse(null)
                 ) ) }.toList()
         p.editIndividualProject(
             EditIndividualProjectDto(
@@ -160,7 +154,7 @@ class IndividualProjectServiceImpl(
                 shortContent = request.shortContent,
                 haveSeenCount = p.haveSeenCount,
                 creationList = c,
-                codeLinkList = request.githubLinkList,
+                codeLinkList = request.codeLinkList,
                 tagList = request.tagList,
                 status = null,
                 photoList = null
@@ -171,8 +165,9 @@ class IndividualProjectServiceImpl(
     override fun deleteProject(projectId: Long) {
         val p = individualRepository.findByIdOrNull(projectId)
             ?: throw ProjectNotFoundException("$projectId :: 없는 프로젝트 입니다")
-        if(p.creationList.stream()
-                .anyMatch { it.student == currentUtil.getCurrentUser() }){
+        if(p.creationList?.stream()
+                ?.anyMatch { it.student == currentUtil.getCurrentUser() } == true
+        ){
             throw ForbiddenException("$projectId :: 프로젝트에 접근 권한이 없습니다")
         }
         individualRepository.deleteById(projectId)
@@ -181,15 +176,15 @@ class IndividualProjectServiceImpl(
     private fun verifyUser(studentIdList: MutableList<StudentIdDto>) {
         if(studentIdList.stream()
                 .anyMatch { currentUtil.getCurrentUser() == userRepository.findById(it.studentId) }){
-            throw NotHaveAccessProjectException("작성자가 프로젝트에 참여하지 않음")
+            throw NotHaveAccessProjectException("유저가 프로젝트에 참여하지 않음")
         }
     }
 
     override fun uploadImage(image: MultipartFile, projectId: Long) {
         val project = individualRepository.findByIdOrNull(projectId)
             ?: throw ProjectNotFoundException("$projectId :: 없는 프로젝트 입니다")
-        if (project.creationList.stream()
-                .anyMatch { it.student == currentUtil.getCurrentUser() }
+        if (project.creationList?.stream()
+                ?.anyMatch { it.student == currentUtil.getCurrentUser() } == true
         ) {
             val url = s3Util.uploadFile(image, "project", projectId.toString())
             val fileName = image.originalFilename!!
@@ -204,39 +199,7 @@ class IndividualProjectServiceImpl(
                     company = null
                 )
             )
-            if (project.photoList == null) {
-                val list: MutableList<File> = ArrayList()
-                list.add(f)
-                project.editIndividualProject(
-                    EditIndividualProjectDto(
-                        id = null,
-                        photoList = list,
-                        name = null,
-                        shortContent = null,
-                        haveSeenCount = null,
-                        creationList = null,
-                        codeLinkList = null,
-                        tagList = null,
-                        status = null,
-                    )
-                )
-            } else {
-                val list = project.photoList
-                list!!.add(f)
-                project.editIndividualProject(
-                    EditIndividualProjectDto(
-                        id = null,
-                        photoList = list,
-                        name = null,
-                        shortContent = null,
-                        haveSeenCount = null,
-                        creationList = null,
-                        codeLinkList = null,
-                        tagList = null,
-                        status = null,
-                    )
-                )
-            }
+            project.addImage(f)
         } else {
             throw ForbiddenException("$projectId :: 프로젝트에 대한 권한이 없습니다")
         }

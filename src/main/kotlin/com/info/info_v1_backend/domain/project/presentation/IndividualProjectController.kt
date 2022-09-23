@@ -1,6 +1,7 @@
 package com.info.info_v1_backend.domain.project.presentation
 
 import com.info.info_v1_backend.domain.project.business.dto.request.IndividualProjectCreateRequest
+import com.info.info_v1_backend.domain.project.business.dto.request.IndividualProjectEditRequest
 import com.info.info_v1_backend.domain.project.business.dto.response.MaximumProjectResponse
 import com.info.info_v1_backend.domain.project.business.dto.response.MinimumProjectResponse
 import com.info.info_v1_backend.domain.project.business.service.IndividualProjectService
@@ -40,6 +41,11 @@ class IndividualProjectController(
     @ResponseStatus(HttpStatus.CREATED)
     fun writeIndividualProject(@RequestBody request: IndividualProjectCreateRequest){
         individualProjectService.writeIndividualProject(request)
+    }
+
+    @PatchMapping
+    fun editIndividualProject(@RequestBody request: IndividualProjectEditRequest){
+        individualProjectService.editIndividualProject(request)
     }
 
     @DeleteMapping("/{project-id}")

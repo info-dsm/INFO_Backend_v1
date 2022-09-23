@@ -3,6 +3,7 @@ package com.info.info_v1_backend.domain.project.data.entity.project
 import com.info.info_v1_backend.domain.project.business.dto.request.EditIndividualProjectDto
 import com.info.info_v1_backend.domain.project.data.entity.Creation
 import com.info.info_v1_backend.domain.project.data.entity.type.ProjectStatus
+import com.info.info_v1_backend.global.image.entity.File
 import javax.persistence.DiscriminatorValue
 import javax.persistence.Entity
 import javax.persistence.Inheritance
@@ -54,5 +55,12 @@ class IndividualProject(
         request.status?.let {
             this.status = it
         }
+    }
+    fun addImage(file: File) {
+        this.photoList?.add(file)
+    }
+
+    fun eddHaveSeenCount(){
+        this.haveSeenCount++
     }
 }

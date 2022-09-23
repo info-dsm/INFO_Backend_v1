@@ -1,5 +1,7 @@
 package com.info.info_v1_backend.domain.project.business.dto.request
 
+import com.info.info_v1_backend.domain.project.business.dto.common.StudentIdDto
+
 data class RegisteredProjectCreateRequest(
     val name: String,
     val shortContent: String,
@@ -9,7 +11,7 @@ data class RegisteredProjectCreateRequest(
     val result: String,
     val conclusion: String,
     val referenceList: MutableList<String>,
-    val githubLinkList: MutableList<String>,
-    val studentIdList: List<Long>,
+    val codeLinkList: MutableList<String>,
+    val studentIdList: MutableList<StudentIdDto>,
     val tagList: MutableList<String>
 )

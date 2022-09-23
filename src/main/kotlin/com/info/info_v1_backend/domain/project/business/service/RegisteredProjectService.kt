@@ -5,6 +5,7 @@ import com.info.info_v1_backend.domain.project.business.dto.request.RegisteredPr
 import com.info.info_v1_backend.domain.project.business.dto.request.RegisteredProjectEditRequest
 import com.info.info_v1_backend.domain.project.business.dto.response.MaximumProjectResponse
 import com.info.info_v1_backend.domain.project.business.dto.response.MinimumProjectResponse
+import com.info.info_v1_backend.domain.project.business.dto.response.WaitingMinimumProjectResponse
 import org.springframework.data.domain.Page
 import org.springframework.web.multipart.MultipartFile
 
@@ -20,12 +21,13 @@ interface RegisteredProjectService {
 
     fun editRegisteredProject(request: RegisteredProjectEditRequest)
 
-    fun getWaitingMinimumProject()
+    fun getWaitingMinimumProject(idx:Int, size:Int): Page<WaitingMinimumProjectResponse>
 
     fun updateStatus(request: ProjectStatusEditRequest)
 
     fun uploadImage(image: MultipartFile, projectId: Long)
 
     fun deleteProject(projectId: Long)
+
     fun deleteImage(imageId: Long)
 }

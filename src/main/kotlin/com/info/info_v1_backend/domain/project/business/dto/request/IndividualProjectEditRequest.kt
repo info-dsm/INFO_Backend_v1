@@ -6,7 +6,7 @@ data class IndividualProjectEditRequest(
     val projectId: Long,
     val name: String,
     val shortContent: String,
-    val githubLinkList: MutableList<String>,
+    val codeLinkList: MutableList<String>,
     val studentIdList: MutableList<StudentIdDto>,
     val tagList: MutableList<String>
 )

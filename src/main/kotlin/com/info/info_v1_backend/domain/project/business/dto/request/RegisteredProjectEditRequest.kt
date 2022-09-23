@@ -1,6 +1,6 @@
 package com.info.info_v1_backend.domain.project.business.dto.request
 
-import com.info.info_v1_backend.domain.project.business.controller.dto.data.StudentIdDto
+import com.info.info_v1_backend.domain.project.business.dto.common.StudentIdDto
 
 data class RegisteredProjectEditRequest(
     val projectId: Long,
@@ -12,7 +12,7 @@ data class RegisteredProjectEditRequest(
     val result: String,//프로젝트 결과
     val conclusion: String,//결론 및 고찰
     val referenceList: MutableList<String>,//참고 문헌 링크
-    val githubLinkList: MutableList<String>,
+    val codeLinkList: MutableList<String>,
     val studentIdList: MutableList<StudentIdDto>,
     val tagList: MutableList<String>
 )

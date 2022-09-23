@@ -3,13 +3,13 @@ package com.info.info_v1_backend.domain.project.business.service
 import com.info.info_v1_backend.domain.auth.data.entity.type.Role
 import com.info.info_v1_backend.domain.auth.data.repository.user.StudentRepository
 import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
+import com.info.info_v1_backend.domain.project.business.dto.common.StudentIdDto
 import com.info.info_v1_backend.domain.project.business.dto.request.EditRegisteredProjectDto
 import com.info.info_v1_backend.domain.project.business.dto.request.ProjectStatusEditRequest
 import com.info.info_v1_backend.domain.project.business.dto.request.RegisteredProjectCreateRequest
 import com.info.info_v1_backend.domain.project.business.dto.request.RegisteredProjectEditRequest
 import com.info.info_v1_backend.domain.project.business.dto.response.MaximumProjectResponse
 import com.info.info_v1_backend.domain.project.business.dto.response.MinimumProjectResponse
-import com.info.info_v1_backend.domain.project.business.dto.response.WaitingMinimumListProjectResponse
 import com.info.info_v1_backend.domain.project.business.dto.response.WaitingMinimumProjectResponse
 import com.info.info_v1_backend.domain.project.data.entity.Creation
 import com.info.info_v1_backend.domain.project.data.entity.project.RegisteredProject
@@ -20,12 +20,12 @@ import com.info.info_v1_backend.domain.project.exception.NotHaveAccessProjectExc
 import com.info.info_v1_backend.domain.project.exception.ProjectNotFoundException
 import com.info.info_v1_backend.global.error.common.FileNotFoundException
 import com.info.info_v1_backend.global.error.common.ForbiddenException
-import com.info.info_v1_backend.global.file.entity.File
-import com.info.info_v1_backend.global.file.entity.type.FileType
-import com.info.info_v1_backend.global.file.repository.FileRepository
+import com.info.info_v1_backend.global.error.common.InternalServerErrorException
+import com.info.info_v1_backend.global.image.entity.File
+import com.info.info_v1_backend.global.image.entity.type.FileType
+import com.info.info_v1_backend.global.image.repository.FileRepository
 import com.info.info_v1_backend.global.util.user.CurrentUtil
 import com.info.info_v1_backend.infra.amazon.s3.S3Util
-import io.undertow.util.BadRequestException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -41,7 +41,7 @@ class RegisteredProjectServiceImpl(
     private val creationRepository: CreationRepository,
     private val s3Util: S3Util,
     private val fileRepository: FileRepository
-    ): RegisteredProjectService {
+): RegisteredProjectService {
     override fun getMinimumNumberOfViewsProjectList(idx: Int, size: Int): Page<MinimumProjectResponse> {
         return registeredProjectRepository.findAllByProjectStatus(
             ProjectStatus.APPROVE,
@@ -51,11 +51,15 @@ class RegisteredProjectServiceImpl(
                 Sort.by(Sort.Direction.DESC, "createdAt")))
             .map {
                 MinimumProjectResponse(
-                    projectId = it.projectId,
-                    photoList = it.photoList,
-                    githubLinkList = it.githubLinkList,
+                    projectId = it.id!!,
+                    photoList = it.photoList?.map {it1->
+                        it1.toImageDto()
+                    }?.toMutableList(),
+                    codeLinkList = it.codeLinkList,
                     shortContent = it.shortContent,
-                    studentId = it.studentId,
+                    studentIdList = it.creationList!!.map {it1 ->
+                        StudentIdDto(it1.student.id!!)
+                    }.toMutableList(),
                     haveSeenCount = it.haveSeenCount
                 )
             }
@@ -70,11 +74,15 @@ class RegisteredProjectServiceImpl(
                 Sort.by(Sort.Direction.DESC, "haveSeenCount")))
             .map {
                 MinimumProjectResponse(
-                    projectId = it.projectId,
-                    photoList = it.photoList,
-                    githubLinkList = it.githubLinkList,
+                    projectId = it.id!!,
+                    photoList = it.photoList?.map {it1 ->
+                        it1.toImageDto()
+                    }?.toMutableList(),
+                    codeLinkList = it.codeLinkList,
                     shortContent = it.shortContent,
-                    studentId = it.studentId,
+                    studentIdList = it.creationList!!.map {it1 ->
+                        StudentIdDto(it1.student.id!!)
+                    }.toMutableList(),
                     haveSeenCount = it.haveSeenCount
                 )
             }
@@ -88,24 +96,7 @@ class RegisteredProjectServiceImpl(
         if (p.status == ProjectStatus.WAITING) {
             verifyAuth()
         }
-        p.editRegisteredProject(
-            EditRegisteredProjectDto(
-                id = null,
-                name = null,
-                shortContent = null,
-                haveSeenCount = p.haveSeenCount + 1,
-                status = null,
-                purpose = null,
-                theoreticalBackground = null,
-                processList = null,
-                result = null,
-                conclusion = null,
-                referenceList = null,
-                creationList = null,
-                codeLinkList = null,
-                tagList = null,
-                photoList = null
-        ))
+        p.eddHaveSeenCount()
         return MaximumProjectResponse(
             imagLinkList = p.photoList?.map {
                 it.toImageDto()
@@ -118,48 +109,42 @@ class RegisteredProjectServiceImpl(
             status = p.status,
             shortContent = p.shortContent,
             haveSeenCount = p.haveSeenCount,
-            codeLinkList = p.codeLinkList
+            codeLinkList = p.codeLinkList,
+            studentIdList = p.creationList?.map {
+                StudentIdDto(it.student.id
+                    ?: throw InternalServerErrorException("올바르지 않은 프로젝트"))
+            }?.toMutableList()
         )
     }
 
     override fun writeRegisteredProject(request: RegisteredProjectCreateRequest) {
-        verifyAuth(request.studentList)
+        val c = request.studentIdList
+            .map { creationRepository.save(
+                Creation(
+                    project = null,
+                    student = userRepository.findByIdOrNull(it.studentId)
+                        ?: throw UserNotFoundException("$it :: not found")
+                ))}.toList().toMutableList()
 
-        val project = registeredProjectRepository.save(RegisteredProject(
-            request.name,
-            request.shortContent,
-            request.purpose,
-            request.theoreticalBackground,
-            request.processList,
-            request.result,
-            request.conclusion,
-            request.referenceList,
-            null,
-            request.codeLinkList,
-            request.tagList
-        ))
-        project.editRegisteredProject(EditRegisteredProjectDto(
-            id = null,
-            name = null,
-            shortContent = null,
-            haveSeenCount = null,
-            status = null,
-            purpose = null,
-            theoreticalBackground = null,
-            processList = null,
-            result = null,
-            conclusion = null,
-            referenceList = null,
-            creationList = request.studentList.map {
-                creationRepository.save(
-                    Creation(
-                        project,
-                        userRepository.findById(it.studentId).orElse(null)
-                            ?: throw UserNotFoundException("$it :: not found")
-                    ))}.toList().toMutableList(),
-            codeLinkList = null,
-            tagList = null
-        ))
+        val p = registeredProjectRepository.save(
+            RegisteredProject(
+                name = request.name,
+                shortContent = request.shortContent,
+                purpose = request.purpose,
+                theoreticalBackground = request.theoreticalBackground,
+                codeLinkList = request.codeLinkList,
+                processList = request.processList,
+                result = request.result,
+                conclusion = request.conclusion,
+                referenceList = request.referenceList,
+                tagList = request.tagList,
+                creationList = c
+            ))
+        c.map {
+            it.id?.let {it1 -> creationRepository.findByIdOrNull(it1)
+                ?.editCreation(project = p)
+            }
+        }
     }
 
     override fun editRegisteredProject(request: RegisteredProjectEditRequest) {
@@ -192,49 +177,36 @@ class RegisteredProjectServiceImpl(
                 conclusion = request.conclusion,
                 referenceList = request.referenceList,
                 creationList = c,
-                codeLinkList = request.githubLinkList,
+                codeLinkList = request.codeLinkList,
                 tagList = request.tagList,
                 photoList = null
             )
         )
     }
 
-    override fun getWaitingMinimumProject() {
+    override fun getWaitingMinimumProject(idx:Int, size:Int): Page<WaitingMinimumProjectResponse> {
         verifyAuth()
-        val list = registeredProjectRepository.findAll(Sort.by(Sort.Direction.ASC, "createAt"))
-            .filter { it.status == ProjectStatus.WAITING }
-            .map {
+         return registeredProjectRepository.findAllByProjectStatus(
+                ProjectStatus.WAITING,
+                PageRequest.of(
+                    idx,
+                    size,
+                    Sort.by(Sort.Direction.ASC, "createAt")))
+                .map {
                     WaitingMinimumProjectResponse(
-                        id = it.id?: throw BadRequestException("$it :: id가 null입니다"),
+                        id = it.id!!,
                         name = it.name
                     )
-            }
-            .toMutableList()
-        WaitingMinimumListProjectResponse(list)
+                }
     }
 
     override fun updateStatus(request: ProjectStatusEditRequest) {
         verifyAuth()
         val p = registeredProjectRepository.findByIdOrNull(request.projectId)
             ?: throw ProjectNotFoundException("${request.projectId} :: not found")
-        p.editRegisteredProject(
-            EditRegisteredProjectDto(
-                id = null,
-                name = null,
-                shortContent = null,
-                haveSeenCount = null,
-                status = if(request.status) ProjectStatus.APPROVE else ProjectStatus.REJECT,
-                purpose = null,
-                theoreticalBackground = null,
-                processList = null,
-                result = null,
-                conclusion = null,
-                referenceList = null,
-                creationList = null,
-                codeLinkList = null,
-                tagList = null,
-                photoList = null
-            )
+        p.changeStatus(
+            if(request.status) ProjectStatus.APPROVE
+            else ProjectStatus.REJECT
         )
     }
 
@@ -256,8 +228,8 @@ class RegisteredProjectServiceImpl(
     override fun uploadImage(image: MultipartFile, projectId: Long) {
         val project = registeredProjectRepository.findByIdOrNull(projectId)
             ?: throw ProjectNotFoundException("$projectId :: 없는 프로젝트 입니다")
-        if (project.creationList.stream()
-                .anyMatch { it.student == currentUtil.getCurrentUser() }
+        if (project.creationList?.stream()
+                ?.anyMatch { it.student == currentUtil.getCurrentUser() } == true
         ) {
             val url = s3Util.uploadFile(image, "project", projectId.toString())
             val fileName = image.originalFilename!!
@@ -272,51 +244,7 @@ class RegisteredProjectServiceImpl(
                     company = null
                 )
             )
-            if (project.photoList == null) {
-                val list: MutableList<File> = ArrayList()
-                list.add(f)
-                project.editRegisteredProject(
-                    EditRegisteredProjectDto(
-                        id = null,
-                        photoList = list,
-                        name = null,
-                        shortContent = null,
-                        haveSeenCount = null,
-                        creationList = null,
-                        codeLinkList = null,
-                        tagList = null,
-                        status = null,
-                        conclusion = null,
-                        theoreticalBackground = null,
-                        purpose = null,
-                        processList = null,
-                        result = null,
-                        referenceList = null
-                    )
-                )
-            } else {
-                val list = project.photoList
-                list!!.add(f)
-                project.editRegisteredProject(
-                    EditRegisteredProjectDto(
-                        id = null,
-                        photoList = list,
-                        name = null,
-                        shortContent = null,
-                        haveSeenCount = null,
-                        creationList = null,
-                        codeLinkList = null,
-                        tagList = null,
-                        status = null,
-                        conclusion = null,
-                        theoreticalBackground = null,
-                        purpose = null,
-                        processList = null,
-                        result = null,
-                        referenceList = null
-                    )
-                )
-            }
+            project.addImage(f)
         } else {
             throw ForbiddenException("$projectId :: 프로젝트에 대한 권한이 없습니다")
         }
@@ -325,8 +253,9 @@ class RegisteredProjectServiceImpl(
     override fun deleteProject(projectId: Long) {
         val p = registeredProjectRepository.findByIdOrNull(projectId)
             ?: throw ProjectNotFoundException("$projectId :: 없는 프로젝트 입니다")
-        if(p.creationList.stream()
-            .anyMatch { it.student == currentUtil.getCurrentUser() }){
+        if(p.creationList?.stream()
+                ?.anyMatch { it.student == currentUtil.getCurrentUser() } == true
+        ){
             throw ForbiddenException("$projectId :: 프로젝트에 접근 권한이 없습니다")
         }
         registeredProjectRepository.deleteById(projectId)
