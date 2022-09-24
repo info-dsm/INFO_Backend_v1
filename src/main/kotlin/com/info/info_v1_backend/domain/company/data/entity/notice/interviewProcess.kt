@@ -1,7 +1,7 @@
 package com.info.info_v1_backend.domain.company.data.entity.notice
 
-enum class ScreeningProcess(
-    val meaning: String
+enum class interviewProcess(
+    val meaning: String,
 ) {
 
 

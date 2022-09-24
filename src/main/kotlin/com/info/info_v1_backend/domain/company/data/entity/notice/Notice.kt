@@ -10,28 +10,17 @@ import com.info.info_v1_backend.global.base.entity.BaseAuthorEntity
 import com.info.info_v1_backend.global.file.entity.File
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Where
-import javax.persistence.CascadeType
-import javax.persistence.Column
-import javax.persistence.ElementCollection
-import javax.persistence.Embedded
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
-import javax.persistence.JoinColumn
-import javax.persistence.ManyToOne
-import javax.persistence.OneToMany
-import javax.persistence.OneToOne
+import javax.persistence.*
 
 
 @Entity
 @SQLDelete(sql = "UPDATE shop SET notice_is_delete = true WHERE id = ?")
 @Where(clause = "notice_is_delete = false")
 class Notice(
-    recruitmentBusinessList: List<RecruitmentBusiness>,
-    languageUsageList: List<LanguageUsage>,
-    technologyList: List<Technology>,
-    needCertificateList: List<Certificate>,
+    recruitmentBusinessList: MutableList<RecruitmentBusiness>,
+    languageUsageList: Set<LanguageUsage>,
+    technologyList: MutableList<Technology>,
+    needCertificateList: MutableList<Certificate>,
     gradeCutLine: Int?,
     company: Company,
     workHour: Int,
@@ -44,7 +33,7 @@ class Notice(
 
     recruitmentPeriod: RecruitmentPeriod,
 
-    screeningProcessList: List<ScreeningProcess>,
+    interviewProcessList: LinkedHashMap<Int, interviewProcess>,
 
     resumeForm: File,
 
@@ -58,7 +47,7 @@ class Notice(
     //기재되지 않은 사항
     needDocuments: String?,
 
-): BaseAuthorEntity() {
+    ): BaseAuthorEntity() {
     @Id
     @GeneratedValue(
         strategy = GenerationType.IDENTITY,
@@ -70,7 +59,7 @@ class Notice(
     val company: Company = company
 
     @OneToMany(mappedBy = "notice")
-    var recruitmentBusinessList: MutableList<RecruitmentBusiness> = ArrayList()
+    var recruitmentBusinessList: MutableList<RecruitmentBusiness> = recruitmentBusinessList
         protected set
 
 
@@ -131,13 +120,26 @@ class Notice(
     var isDelete: Boolean = false
         protected set
 
-    @Column(name = "notice_is_expired", nullable = false)
-    var isExpired: Boolean = false
+    var isApprove: Boolean = false
+        protected set
+
+    @ElementCollection
+    @CollectionTable(
+        name = "notice_screening_process",
+        joinColumns = [JoinColumn(name = "notice_id")]
+    )
+    @OrderBy(value = "sequence_order ASC")
+    @MapKeyColumn(name = "sequence_order")
+    var interviewProcessList: LinkedHashMap<Int, interviewProcess> = LinkedHashMap()
         protected set
 
 
-    fun makeExpired() {
-        this.isExpired = true
+    fun changeInterviewProcess(key: Int, interviewProcess: interviewProcess) {
+        this.interviewProcessList[key] = interviewProcess
+    }
+
+    fun approveNotice() {
+        this.isApprove = true
     }
 
 

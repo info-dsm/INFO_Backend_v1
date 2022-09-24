@@ -22,6 +22,7 @@ class S3Util(
         val objectMetadata = ObjectMetadata()
         val bytes: ByteArray = IOUtils.toByteArray(file.inputStream)
         objectMetadata.contentLength = bytes.size.toLong()
+        objectMetadata.contentType = "image/${file.name.substring(file.name.lastIndexOf(".") + 1)}"
         val byteArrayInputStream = ByteArrayInputStream(bytes)
 
         val fileName = "${s3Property.bucketName}/${rootPathName}/${middlePathName}/${file.originalFilename}/${UUID.randomUUID()}"

@@ -19,7 +19,8 @@ class Company(
     companyInformation: CompanyInformation,
     companyContact: CompanyContact,
     companyIntroduction: CompanyIntroduction,
-    isLeading: Boolean
+    isLeading: Boolean,
+
 ): User(
     companyName.companyNumber,
     companyName.companyName,
