@@ -6,7 +6,7 @@ import com.info.info_v1_backend.domain.auth.data.repository.user.StudentReposito
 import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.CloseNoticeRequest
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.EditNoticeRequest
-import com.info.info_v1_backend.domain.company.business.dto.request.notice.RegisterNoticeRequest
+import com.info.info_v1_backend.domain.company.business.dto.request.notice.register.RegisterNoticeRequest
 import com.info.info_v1_backend.domain.company.business.dto.response.notice.MaximumNoticeResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.notice.MinimumNoticeResponse
 import com.info.info_v1_backend.domain.company.data.entity.notice.Notice
@@ -57,7 +57,7 @@ class NoticeServiceImpl(
                                 r.commuteTime.startTime,
                                 r.commuteTime.endTime
                             ),
-                            r.workTime,
+                            r.workTimePerDay,
                             ScreeningProcedure(
                                 r.screeningProcedure.document,
                                 r.screeningProcedure.technicalInterview,

@@ -1,4 +1,4 @@
-package com.info.info_v1_backend.domain.company.business.dto.request.notice
+package com.info.info_v1_backend.domain.company.business.dto.request.notice.register
 
 import javax.persistence.Column
 import javax.validation.constraints.Min

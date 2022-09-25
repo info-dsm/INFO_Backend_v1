@@ -2,7 +2,7 @@ package com.info.info_v1_backend.domain.company.business.service
 
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.CloseNoticeRequest
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.EditNoticeRequest
-import com.info.info_v1_backend.domain.company.business.dto.request.notice.RegisterNoticeRequest
+import com.info.info_v1_backend.domain.company.business.dto.request.notice.register.RegisterNoticeRequest
 import com.info.info_v1_backend.domain.company.business.dto.response.notice.MaximumNoticeResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.notice.MinimumNoticeResponse
 import org.springframework.data.domain.Page

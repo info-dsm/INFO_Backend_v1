@@ -1,10 +1,8 @@
 package com.info.info_v1_backend.domain.company.data.entity.notice.embeddable
 
-import com.info.info_v1_backend.domain.company.business.dto.request.notice.TargetMajorRequest
 import com.info.info_v1_backend.domain.company.data.entity.notice.Notice
 import com.info.info_v1_backend.domain.company.data.entity.type.MajorType
 import com.info.info_v1_backend.global.base.entity.BaseTimeEntity
-import javax.persistence.Embeddable
 import javax.persistence.Entity
 import javax.persistence.Id
 import javax.persistence.JoinColumn

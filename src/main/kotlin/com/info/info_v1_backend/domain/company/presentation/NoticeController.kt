@@ -2,7 +2,7 @@ package com.info.info_v1_backend.domain.company.presentation
 
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.CloseNoticeRequest
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.EditNoticeRequest
-import com.info.info_v1_backend.domain.company.business.dto.request.notice.RegisterNoticeRequest
+import com.info.info_v1_backend.domain.company.business.dto.request.notice.register.RegisterNoticeRequest
 import com.info.info_v1_backend.domain.company.business.dto.response.notice.MaximumNoticeResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.notice.MinimumNoticeResponse
 import com.info.info_v1_backend.domain.company.business.service.NoticeService
@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam

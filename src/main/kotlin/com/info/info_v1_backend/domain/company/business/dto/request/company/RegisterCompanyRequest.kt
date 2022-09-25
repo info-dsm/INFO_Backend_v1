@@ -7,10 +7,8 @@ import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
 
 data class RegisterCompanyRequest(
-    @field:Size(max = 30, min = 1)
-    val shortName: String,
     @field:Size(max = 50, min = 1)
-    val fullName: String,
+    val companyName: String,
     @field:Pattern(regexp = "/([0-9]{3})-?([0-9]{2})-?([0-9]{5})/")
     val companyNumber: String,
     @field:Pattern(

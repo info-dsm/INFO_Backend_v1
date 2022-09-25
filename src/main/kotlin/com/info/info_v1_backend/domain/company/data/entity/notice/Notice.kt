@@ -2,50 +2,42 @@ package com.info.info_v1_backend.domain.company.data.entity.notice
 
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
 import com.info.info_v1_backend.domain.company.data.entity.notice.certificate.Certificate
+import com.info.info_v1_backend.domain.company.data.entity.notice.certificate.CertificateUsage
 import com.info.info_v1_backend.domain.company.data.entity.notice.embeddable.*
 import com.info.info_v1_backend.domain.company.data.entity.notice.language.LanguageUsage
 import com.info.info_v1_backend.domain.company.data.entity.notice.recruitment.RecruitmentBusiness
-import com.info.info_v1_backend.domain.company.data.entity.notice.technology.Technology
+import com.info.info_v1_backend.domain.company.data.entity.notice.technology.TechnologyUsage
 import com.info.info_v1_backend.global.base.entity.BaseAuthorEntity
 import com.info.info_v1_backend.global.file.entity.File
 import org.hibernate.annotations.SQLDelete
+import org.hibernate.annotations.SortNatural
 import org.hibernate.annotations.Where
 import javax.persistence.*
 
 
 @Entity
-@SQLDelete(sql = "UPDATE shop SET notice_is_delete = true WHERE id = ?")
+@Table(name = "notice")
+@SQLDelete(sql = "UPDATE `notice` SET notice_is_delete = true WHERE id = ?")
 @Where(clause = "notice_is_delete = false")
 class Notice(
-    recruitmentBusinessList: MutableList<RecruitmentBusiness>,
-    languageUsageList: Set<LanguageUsage>,
-    technologyList: MutableList<Technology>,
-    needCertificateList: MutableList<Certificate>,
-    gradeCutLine: Int?,
     company: Company,
-    workHour: Int,
+//    recruitmentBusinessList: MutableList<RecruitmentBusiness>,
+    workTime: WorkTime,
     pay: Pay,
 
     mealSupport: MealSupport,
     welfare: Welfare,
-    alternativeMilitaryPlan: Boolean,
 
+    noticeOpenPeriod: NoticeOpenPeriod,
 
-    recruitmentPeriod: RecruitmentPeriod,
+    interviewProcessMap: LinkedHashMap<Int, InterviewProcess>,
 
-    interviewProcessList: LinkedHashMap<Int, interviewProcess>,
-
+    needDocuments: String?,
     resumeForm: File,
 
     otherFeatures: String?,
     workPlace: WorkPlace,
     isPersonalContact: Boolean,
-
-//    screeningProcedure: ScreeningProcedure,
-
-
-    //기재되지 않은 사항
-    needDocuments: String?,
 
     ): BaseAuthorEntity() {
     @Id
@@ -58,20 +50,16 @@ class Notice(
     @JoinColumn(name = "company_id", nullable = false)
     val company: Company = company
 
-    @OneToMany(mappedBy = "notice")
-    var recruitmentBusinessList: MutableList<RecruitmentBusiness> = recruitmentBusinessList
+
+    @OneToMany
+    var recruitmentBusinessList: MutableList<RecruitmentBusiness> = ArrayList()
         protected set
 
-
-    @Column(name = "grade_cut_line", nullable = true)
-    var gradeCutLine: Int? = gradeCutLine
+    @Embedded
+    var workTime: WorkTime = workTime
         protected set
 
-    @Column(name = "work_hour", nullable = false)
-    var workHour: Int = workHour
-        protected set
-
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     var pay: Pay = pay
         protected set
 
@@ -83,34 +71,36 @@ class Notice(
     var welfare: Welfare = welfare
         protected set
 
-    @Column(name = "alternative_military_plan", nullable = false)
-    var alternativeMilitaryPlan: Boolean = alternativeMilitaryPlan
-        protected set
-
     @Embedded
-    var recruitmentPeriod: RecruitmentPeriod = recruitmentPeriod
+    var noticeOpenPeriod: NoticeOpenPeriod = noticeOpenPeriod
         protected set
 
 
-    @OneToOne
-    var resumeForm: File = resumeForm
+    @ElementCollection
+    @CollectionTable(
+        name = "notice_screening_process",
+        joinColumns = [JoinColumn(name = "notice_id")]
+    )
+    @SortNatural
+    var interviewProcessList: LinkedHashMap<Int, InterviewProcess> = LinkedHashMap()
         protected set
 
-    @Column(name = "other_feature", nullable = true)
+
+    var needDocuments: String? = needDocuments
+        protected set
+
+    @OneToMany
+    var resumeForm: File? = resumeForm
+        protected set
+
+    @Column(name = "notice_other_features", nullable = true)
     var otherFeatures: String? = otherFeatures
         protected set
 
-    @Embedded
     var workPlace: WorkPlace = workPlace
-        protected set
 
     @Column(name = "is_personal_contact", nullable = false)
     var isPersonalContact: Boolean = isPersonalContact
-        protected set
-
-    @ElementCollection
-    var needDocuments: MutableList<String> = ArrayList()
-        protected set
 
     @OneToMany
     var reportedFileList: MutableList<File> = ArrayList()
@@ -123,18 +113,8 @@ class Notice(
     var isApprove: Boolean = false
         protected set
 
-    @ElementCollection
-    @CollectionTable(
-        name = "notice_screening_process",
-        joinColumns = [JoinColumn(name = "notice_id")]
-    )
-    @OrderBy(value = "sequence_order ASC")
-    @MapKeyColumn(name = "sequence_order")
-    var interviewProcessList: LinkedHashMap<Int, interviewProcess> = LinkedHashMap()
-        protected set
 
-
-    fun changeInterviewProcess(key: Int, interviewProcess: interviewProcess) {
+    fun changeInterviewProcess(key: Int, interviewProcess: InterviewProcess) {
         this.interviewProcessList[key] = interviewProcess
     }
 
@@ -142,12 +122,6 @@ class Notice(
         this.isApprove = true
     }
 
-
-    init {
-        needDocuments?. let {
-            this.needDocuments.add(it)
-        }
-    }
 
 
 

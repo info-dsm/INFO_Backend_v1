@@ -4,10 +4,10 @@ import java.io.Serializable
 
 class LanguageUsageIdClass(
     languageId: String,
-    noticeId: Long
+    recruitmentBusinessId: Long
 ): Serializable {
     val languageId: String = languageId
 
-    val noticeId: Long = noticeId
+    val recruitmentBusinessId: Long = recruitmentBusinessId
 
 }

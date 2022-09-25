@@ -5,7 +5,7 @@ import javax.persistence.Column
 import javax.persistence.Embeddable
 
 @Embeddable
-class RecruitmentPeriod(
+class NoticeOpenPeriod(
     startDate: LocalDate,
     endDate: LocalDate
 ) {

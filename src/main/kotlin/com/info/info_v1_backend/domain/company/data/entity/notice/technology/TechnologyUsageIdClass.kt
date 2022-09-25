@@ -4,9 +4,9 @@ import java.io.Serializable
 
 class TechnologyUsageIdClass(
     technologyId: String,
-    noticeId: Long
+    recruitmentBusinessId: Long
 ): Serializable {
     val technologyId: String = technologyId
 
-    val noticeId: Long = noticeId
+    val recruitmentBusinessId: Long = recruitmentBusinessId
 }

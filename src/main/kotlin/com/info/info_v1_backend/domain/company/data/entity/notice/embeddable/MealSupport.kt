@@ -1,6 +1,6 @@
 package com.info.info_v1_backend.domain.company.data.entity.notice.embeddable
 
-import com.info.info_v1_backend.domain.company.business.dto.request.notice.MealSupportRequest
+import com.info.info_v1_backend.domain.company.business.dto.request.notice.register.MealSupportRequest
 import javax.persistence.Column
 import javax.persistence.Embeddable
 

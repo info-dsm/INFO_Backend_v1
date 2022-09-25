@@ -1,6 +1,6 @@
 package com.info.info_v1_backend.domain.company.data.entity.notice
 
-enum class interviewProcess(
+enum class InterviewProcess(
     val meaning: String,
 ) {
 

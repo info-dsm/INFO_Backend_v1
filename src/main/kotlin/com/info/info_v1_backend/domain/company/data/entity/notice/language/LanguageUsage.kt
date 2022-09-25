@@ -1,6 +1,6 @@
 package com.info.info_v1_backend.domain.company.data.entity.notice.language
 
-import com.info.info_v1_backend.domain.company.data.entity.notice.Notice
+import com.info.info_v1_backend.domain.company.data.entity.notice.recruitment.RecruitmentBusiness
 import com.info.info_v1_backend.global.base.entity.BaseTimeEntity
 import org.springframework.data.domain.Persistable
 import javax.persistence.Entity
@@ -15,7 +15,7 @@ import javax.persistence.Table
 @IdClass(LanguageUsageIdClass::class)
 class LanguageUsage(
     language: Language,
-    notice: Notice
+    recruitmentBusiness: RecruitmentBusiness
 ): BaseTimeEntity(), Persistable<String>, java.io.Serializable {
 
     @Id
@@ -24,9 +24,9 @@ class LanguageUsage(
     val language: Language = language
 
     @Id
-    @ManyToOne()
-    @JoinColumn(name = "notice_id", nullable = false)
-    val notice: Notice = notice
+    @ManyToOne
+    @JoinColumn(name = "recruitment_business_id", nullable = false)
+    val recruitmentBusiness: RecruitmentBusiness = recruitmentBusiness
 
     override fun getId(): String? {
         return this.id

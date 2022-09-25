@@ -1,6 +1,8 @@
 package com.info.info_v1_backend.domain.company.business.dto.request.notice
 
-import com.info.info_v1_backend.domain.company.data.entity.type.WorkTime
+import com.info.info_v1_backend.domain.company.business.dto.request.notice.register.MealSupportRequest
+import com.info.info_v1_backend.domain.company.business.dto.request.notice.register.PayRequest
+import com.info.info_v1_backend.domain.company.business.dto.request.notice.register.WelfareRequest
 import java.time.LocalDate
 import javax.validation.constraints.Size
 
@@ -13,7 +15,7 @@ data class EditNoticeRequest(
     @field:Size(max = 255, message = "personalRemark 최대 길이는 255입니다.")
     var personalRemark: String?,
     var commuteTime: CommuteTimeRequest?,
-    var workTime: WorkTime?,
+    var workTimePerDay: WorkTimePerDay?,
     var screeningProcedure: ScreeningProcedureRequest?,
     var alternativeMilitaryPlan: Boolean?,
     var mealSupport: MealSupportRequest?,
@@ -25,4 +27,4 @@ data class EditNoticeRequest(
     var workHopeMonth: LocalDate?,
     var pay: PayRequest?,
 
-)
+    )

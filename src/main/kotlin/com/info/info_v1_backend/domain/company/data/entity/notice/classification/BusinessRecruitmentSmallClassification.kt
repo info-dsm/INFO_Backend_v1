@@ -5,7 +5,7 @@ import javax.persistence.*
 
 
 @Entity
-class NoticeSmallClassification(
+class BusinessRecruitmentSmallClassification(
     name: String
 ) {
 

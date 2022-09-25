@@ -1,9 +1,10 @@
 package com.info.info_v1_backend.domain.company.business.dto.response.notice
 
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.*
+import com.info.info_v1_backend.domain.company.business.dto.request.notice.register.MealSupportRequest
+import com.info.info_v1_backend.domain.company.business.dto.request.notice.register.PayRequest
+import com.info.info_v1_backend.domain.company.business.dto.request.notice.register.WelfareRequest
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyResponse
-import com.info.info_v1_backend.domain.company.business.dto.response.company.MinimumCompanyResponse
-import com.info.info_v1_backend.domain.company.data.entity.type.WorkTime
 import java.time.LocalDate
 
 data class MaximumNoticeResponse(
@@ -16,7 +17,7 @@ data class MaximumNoticeResponse(
     val cutLine: Int?,
     val personalRemark: String,
     val commuteTime: CommuteTimeRequest,
-    val workTime: WorkTime,
+    val workTimePerDay: WorkTimePerDay,
     val pay: PayRequest?,
     val procedureRequest: ScreeningProcedureRequest,
     val alternativeMilitaryPlan: Boolean,

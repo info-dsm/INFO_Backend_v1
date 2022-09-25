@@ -1,6 +1,5 @@
 package com.info.info_v1_backend.domain.company.business.dto.response.notice
 
-import com.info.info_v1_backend.domain.company.business.dto.request.notice.TargetMajorRequest
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MinimumCompanyResponse
 
 data class MinimumNoticeResponse(
