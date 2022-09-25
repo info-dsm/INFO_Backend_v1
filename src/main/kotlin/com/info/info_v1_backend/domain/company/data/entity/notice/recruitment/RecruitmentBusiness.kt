@@ -2,8 +2,8 @@ package com.info.info_v1_backend.domain.company.data.entity.notice.recruitment
 
 import com.info.info_v1_backend.domain.company.data.entity.notice.Notice
 import com.info.info_v1_backend.domain.company.data.entity.notice.certificate.Certificate
-import com.info.info_v1_backend.domain.company.data.entity.notice.classification.BusinessRecruitmentBigClassification
-import com.info.info_v1_backend.domain.company.data.entity.notice.classification.BusinessRecruitmentSmallClassification
+import com.info.info_v1_backend.domain.company.data.entity.notice.classification.RecruitmentBigClassification
+import com.info.info_v1_backend.domain.company.data.entity.notice.classification.RecruitmentSmallClassification
 import com.info.info_v1_backend.domain.company.data.entity.notice.language.LanguageUsage
 import com.info.info_v1_backend.domain.company.data.entity.notice.technology.TechnologyUsage
 import com.info.info_v1_backend.global.base.entity.BaseTimeEntity
@@ -12,8 +12,8 @@ import javax.persistence.*
 @Entity
 @Table(name = "recruitment")
 class RecruitmentBusiness(
-    bigClassification: BusinessRecruitmentBigClassification,
-    smallClassification: BusinessRecruitmentSmallClassification,
+    bigClassification: RecruitmentBigClassification,
+    smallClassification: RecruitmentSmallClassification,
     numberOfEmplyee: Int,
     notice: Notice,
     detailBusinessDescription: String?,
@@ -31,7 +31,7 @@ class RecruitmentBusiness(
         name = "notice_big_classification",
         nullable = false
     )
-    var bigClassification: BusinessRecruitmentBigClassification = bigClassification
+    var bigClassification: RecruitmentBigClassification = bigClassification
         protected set
 
     @ManyToOne
@@ -39,7 +39,7 @@ class RecruitmentBusiness(
         name = "notice_small_classification",
         nullable = false
     )
-    var smallClassification: BusinessRecruitmentSmallClassification = smallClassification
+    var smallClassification: RecruitmentSmallClassification = smallClassification
         protected set
 
     @ManyToOne

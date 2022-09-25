@@ -1,5 +1,6 @@
 package com.info.info_v1_backend.domain.company.business.dto.request.notice.register
 
+import com.info.info_v1_backend.domain.company.data.entity.notice.embeddable.WorkTime
 import javax.validation.constraints.Max
 import javax.validation.constraints.Min
 
@@ -12,4 +13,14 @@ data class WorkTimeRequest(
     val untilCommuteEndTime: Int,
     val workTimeForWeek: Int
 
-)
+) {
+
+    fun toWorkTime(): WorkTime {
+        return WorkTime(
+            this.untilCommuteStartTime,
+            this.untilCommuteEndTime,
+            this.workTimeForWeek
+        )
+    }
+
+}

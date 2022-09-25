@@ -3,6 +3,7 @@ package com.info.info_v1_backend.domain.auth.data.entity.user
 import com.info.info_v1_backend.domain.auth.data.entity.type.Role
 import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
+import java.util.UUID
 import javax.persistence.DiscriminatorValue
 import javax.persistence.Entity
 

@@ -33,13 +33,13 @@ class Notice(
     interviewProcessMap: LinkedHashMap<Int, InterviewProcess>,
 
     needDocuments: String?,
-    resumeForm: File,
 
     otherFeatures: String?,
     workPlace: WorkPlace,
     isPersonalContact: Boolean,
 
-    ): BaseAuthorEntity() {
+
+): BaseAuthorEntity() {
     @Id
     @GeneratedValue(
         strategy = GenerationType.IDENTITY,
@@ -59,7 +59,7 @@ class Notice(
     var workTime: WorkTime = workTime
         protected set
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @Embedded
     var pay: Pay = pay
         protected set
 
@@ -78,19 +78,21 @@ class Notice(
 
     @ElementCollection
     @CollectionTable(
-        name = "notice_screening_process",
+        name = "interview_process",
         joinColumns = [JoinColumn(name = "notice_id")]
     )
-    @SortNatural
-    var interviewProcessList: LinkedHashMap<Int, InterviewProcess> = LinkedHashMap()
+    @OrderBy(value = "interview_process_sequence asc")
+    @MapKeyColumn(name = "interview_process_sequence")
+    @Column(name = "interview_process_value")
+    var interviewProcessList: LinkedHashMap<Int, InterviewProcess> = interviewProcessMap
         protected set
 
 
     var needDocuments: String? = needDocuments
         protected set
 
-    @OneToMany
-    var resumeForm: File? = resumeForm
+    @OneToMany(mappedBy = "notice")
+    var reporterList: MutableList<Reporter> = ArrayList()
         protected set
 
     @Column(name = "notice_other_features", nullable = true)
@@ -102,9 +104,11 @@ class Notice(
     @Column(name = "is_personal_contact", nullable = false)
     var isPersonalContact: Boolean = isPersonalContact
 
-    @OneToMany
-    var reportedFileList: MutableList<File> = ArrayList()
+
+    @OneToMany(mappedBy = "notice")
+    var attachmentList: MutableList<Attachment> = ArrayList()
         protected set
+
 
     @Column(name = "notice_is_delete", nullable = false)
     var isDelete: Boolean = false
@@ -112,6 +116,10 @@ class Notice(
 
     var isApprove: Boolean = false
         protected set
+
+    fun addAttachment(attachment: Attachment) {
+        this.attachmentList.add(attachment)
+    }
 
 
     fun changeInterviewProcess(key: Int, interviewProcess: InterviewProcess) {

@@ -1,5 +1,6 @@
 package com.info.info_v1_backend.domain.company.business.dto.request.notice.register
 
+import com.info.info_v1_backend.domain.company.data.entity.notice.embeddable.MealSupport
 import javax.persistence.Column
 import javax.validation.constraints.Min
 
@@ -9,4 +10,14 @@ data class MealSupportRequest(
     var breakfast: Boolean,
     var lunch: Boolean,
     var dinner: Boolean
-)
+) {
+    fun toMealSupport(): MealSupport {
+        return MealSupport(
+            this.mealSupportPay,
+            this.breakfast,
+            this.lunch,
+            this.dinner
+        )
+    }
+
+}

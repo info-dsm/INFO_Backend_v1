@@ -1,18 +1,19 @@
 package com.info.info_v1_backend.domain.company.data.entity.notice
 
-import com.info.info_v1_backend.domain.company.data.entity.notice.embeddable.EmploymentPay
 import javax.persistence.Column
+import javax.persistence.Embeddable
 import javax.persistence.Embedded
 import javax.persistence.Entity
 import javax.persistence.Id
 import javax.persistence.MapsId
 import javax.persistence.OneToOne
 
-@Entity
+@Embeddable
 class Pay(
     fieldTrainingPayPerMonth: Long,
-    fullTimeEmploymentPay: EmploymentPay,
-    notice: Notice
+    yearPayStart: Long,
+    yearPayEnd: Long,
+    bonus: Long?
 ) {
 
     @Id
@@ -21,10 +22,14 @@ class Pay(
     @Column(name = "field_training_pay", nullable = false)
     var fieldTrainingPayPerMonth: Long = fieldTrainingPayPerMonth
 
-    @Embedded
-    var fullTimeEmploymentPay: EmploymentPay = fullTimeEmploymentPay
+    @Column(name = "year_pay_start", nullable = false)
+    var yearPayStart: Long = yearPayStart
 
-    @OneToOne @MapsId
-    var notice: Notice = notice
+    @Column(name = "year_pay_end", nullable = false)
+    var yearPayEnd: Long = yearPayEnd
+
+    @Column(name = "bonus", nullable = true)
+    var bonus: Long? = bonus
+
 
 }

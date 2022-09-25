@@ -9,7 +9,7 @@ data class RegisterNoticeRequest(
     val mealSupport: MealSupportRequest,
     val welfare: WelfareRequest,
     val noticeOpenPeriod: NoticeOpenPeriodRequest,
-    val interviewProcessMap: Map<Int, InterviewProcess>,
+    val interviewProcessMap: LinkedHashMap<Int, InterviewProcess>,
     val needDocuments: String?,
     val otherFeatures: String?,
     val workPlace: WorkPlaceRequest,

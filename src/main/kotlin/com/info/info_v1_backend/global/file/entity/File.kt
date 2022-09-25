@@ -1,7 +1,5 @@
 package com.info.info_v1_backend.global.file.entity
 
-import com.info.info_v1_backend.domain.company.data.entity.company.Company
-import com.info.info_v1_backend.domain.project.data.entity.project.Project
 import com.info.info_v1_backend.global.base.entity.BaseAuthorEntity
 import com.info.info_v1_backend.global.file.entity.type.FileType
 import com.info.info_v1_backend.infra.amazon.s3.dto.ImageDto
@@ -10,7 +8,7 @@ import javax.persistence.*
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "file_type")
-class File(
+abstract class File(
     fileUrl: String,
     fileType: FileType,
     extension: String,
@@ -26,7 +24,7 @@ class File(
     var fileType: FileType = fileType
         protected set
 
-    @Column(name = "extension", nullable = false)
+    @Column(name = "file_extension", nullable = false)
     var extention: String = extension
         protected set
 

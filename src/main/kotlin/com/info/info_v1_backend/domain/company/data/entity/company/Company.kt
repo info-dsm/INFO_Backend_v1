@@ -22,12 +22,15 @@ class Company(
     isLeading: Boolean,
 
 ): User(
-    companyName.companyNumber,
     companyName.companyName,
     companyContact.email,
     password,
     Role.COMPANY
 ) {
+
+    @Column(name = "company_number")
+    var companyNumber: String = companyName.companyNumber
+        protected set
 
     @Embedded
     var companyInformation: CompanyInformation = companyInformation

@@ -14,6 +14,7 @@ enum class ErrorCode(
     EXPIRED_TOKEN("token Expired", HttpStatus.BAD_REQUEST),
     INCORRECT_PASSWORD("Incorrect Password", HttpStatus.BAD_REQUEST),
     EMAIL_ERROR("Email 전송 과정 중 에러가 발생했습니다.", HttpStatus.BAD_GATEWAY),
+    INVALID_FILE_EXTENSION("Invalid File Extension", HttpStatus.BAD_REQUEST),
 
     //403
     NOT_HAVE_ACCESS_TO_THE_PROJECT("Not Have Access To The project", HttpStatus.FORBIDDEN),
@@ -44,6 +45,7 @@ enum class ErrorCode(
     CONTACTOR_MUST_LEAVE_LEAST_AT_ONE_ON_COMPANY("Contactor Must leave least at one on company", HttpStatus.BAD_REQUEST),
     IS_NOT_CONTACTOR_OR_TEACHER("Is Not Contactor Or Teacher", HttpStatus.NOT_FOUND),
     FILE_NOT_FOUND("File not Found", HttpStatus.NOT_FOUND),
+
 
     //500
     INTERNAL_SERVER_ERROR("internal server error", HttpStatus.INTERNAL_SERVER_ERROR),

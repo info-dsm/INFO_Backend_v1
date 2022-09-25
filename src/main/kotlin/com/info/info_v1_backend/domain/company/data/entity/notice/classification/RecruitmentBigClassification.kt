@@ -9,7 +9,7 @@ import javax.persistence.OneToMany
 
 
 @Entity
-class BusinessRecruitmentBigClassification(
+class RecruitmentBigClassification(
     name: String
 ): BaseTimeEntity() {
 
