@@ -76,7 +76,7 @@ class CompanyServiceImpl(
                     }
                 }
             }
-        } else throw NotContactorException(user.roleList.toString())
+        } else throw NoAuthenticationException(user.roleList.toString())
     }
 
     override fun getMinimumCompanyList(idx: Int, size: Int): Page<MinimumCompanyResponse> {
