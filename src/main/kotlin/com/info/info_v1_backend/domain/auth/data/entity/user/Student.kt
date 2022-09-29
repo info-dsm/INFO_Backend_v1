@@ -49,15 +49,18 @@ class Student(
         )
     }
 
-    fun toStudentInfoResponse(): StudentInfoResponse{
+    fun toStudentInfoResponse(): StudentInfoResponse {
         return StudentInfoResponse(
             this.name,
             this.email,
             this.studentKey,
             this.hiredStudent.isNotEmpty(),
-            this.hiredStudent.first().company.toMinimumCompanyResponse()
+            this.hiredStudent.filter {
+                !it.isFire
+            }.first().let {
+                it.company.toMinimumCompanyResponse()
+            }
         )
-
     }
 
 

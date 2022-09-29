@@ -61,9 +61,18 @@ class HiredStudent(
     var fieldTraining: FieldTraining? = fieldTraining
         protected set
 
+    @Column(name = "is_fire", nullable = false)
+    var isFire: Boolean = false
+        protected set
+
     @Column(name = "hired_student_is_delete", nullable = false)
     var isDelete: Boolean = false
         protected set
+
+
+    fun makeFire() {
+        this.isFire = true
+    }
 
     override fun getId(): String? {
         return this.id

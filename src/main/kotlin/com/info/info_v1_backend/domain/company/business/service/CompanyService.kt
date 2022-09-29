@@ -13,7 +13,7 @@ interface CompanyService {
     fun editCompany(user: User, request: EditCompanyRequest)
     fun getMinimumCompanyList(idx: Int, size: Int): Page<MinimumCompanyResponse>
     fun getMaximumCompany(id: Long): MaximumCompanyResponse
-    fun getMaximumCompanyByUserId(user: User, id: Long): List<MaximumCompanyResponse>
+    fun getEntireMaximumCompanyByUserId(user: User, id: Long): List<MaximumCompanyResponse>
     fun searchCompany(query: String): List<MinimumCompanyResponse>
 
     //photo

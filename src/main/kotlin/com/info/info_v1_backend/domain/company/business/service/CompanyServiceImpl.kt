@@ -91,8 +91,7 @@ class CompanyServiceImpl(
 
     }
 
-    override fun getMaximumCompanyByUserId(user: User, id: Long): List<MaximumCompanyResponse> {
-
+    override fun getEntireMaximumCompanyByUserId(user: User, id: Long): List<MaximumCompanyResponse> {
         if (user is Student) {
             if (user.id != id) throw NoAuthenticationException(user.roleList.toString())
             val result: MutableList<MaximumCompanyResponse> = ArrayList()
@@ -126,7 +125,7 @@ class CompanyServiceImpl(
         val minimumCompanyResponseList: MutableList<MinimumCompanyResponse> = ArrayList()
         companySearchDocumentList.map {
             companySearchDocument: CompanySearchDocument ->
-            companyRepository.findById(companySearchDocument.companyId.toLong()).orElse(null)?. let{
+            companyRepository.findById(companySearchDocument.companyId).orElse(null)?. let{
                 company:Company ->
                 minimumCompanyResponseList.add(
                     company.toMinimumCompanyResponse()
@@ -264,19 +263,18 @@ class CompanyServiceImpl(
 
     override fun fireStudent(user: User, studentId: Long, companyId: Long?) {
         if (user is Company) {
-            hiredStudentRepository.delete(
-                hiredStudentRepository.findByStudentAndCompany(
-                    studentRepository.findByIdOrNull(studentId)?: throw UserNotFoundException(studentId.toString()),
+        (hiredStudentRepository.findByStudentAndCompany(
+                studentRepository.findByIdOrNull(studentId)?: throw UserNotFoundException(studentId.toString()),
                     user
                 ).orElse(null)?: throw HiredStudentNotFound(studentId.toString())
-            )
+                ).makeFire()
         } else if (user is Teacher) {
-            hiredStudentRepository.delete(
-                hiredStudentRepository.findByStudentAndCompany(
-                    studentRepository.findByIdOrNull(studentId)?: throw UserNotFoundException(studentId.toString()),
-                    companyRepository.findByIdOrNull(companyId)?: throw CompanyNotFoundException(companyId.toString())
-                ).orElse(null)?: throw HiredStudentNotFound(studentId.toString())
-            )
+            (hiredStudentRepository.findByStudentAndCompany(
+                studentRepository.findByIdOrNull(studentId)?: throw UserNotFoundException(studentId.toString()),
+                companyRepository.findByIdOrNull(companyId)?: throw CompanyNotFoundException(companyId.toString())
+            ).orElse(null)?: throw HiredStudentNotFound(studentId.toString())
+            ).makeFire()
+
         } else throw NoAuthenticationException(user.roleList.toString())
     }
 

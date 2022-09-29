@@ -62,7 +62,7 @@ class CompanyController(
         @AuthenticationPrincipal user: User?,
         @RequestParam(required = true) id: Long
     ): List<MaximumCompanyResponse> {
-        return companyService.getMaximumCompanyByUserId(user?: throw TokenNotFoundException(), id)
+        return companyService.getEntireMaximumCompanyByUserId(user?: throw TokenNotFoundException(), id)
     }
 
     @GetMapping("/search")

@@ -110,8 +110,10 @@ class Company(
             this.companyInformation.annualSales,
             this.isLeading,
             this.isAssociated,
-            Year.of(this.noticeList.last().createdAt?.year?:LocalDate.now().year),
-            this.hiredStudentList.map {
+            Year.of(this.noticeList.last().createdAt?.year ?: LocalDate.now().year),
+            this.hiredStudentList.filter {
+                !it.isFire
+            }.map {
                 it.toHiredStudentResponse()
             },
             this.commentList.map {
@@ -138,10 +140,14 @@ class Company(
             this.noticeList.map {
                 it.toMinimumNoticeResponse()
             },
-            this.hiredStudentList.map {
+            this.hiredStudentList.filter {
+                !it.isFire
+            }.map {
                 it.toHiredStudentResponse()
             },
-            this.fieldTrainingList.map {
+            this.fieldTrainingList.filter {
+                it.endDate.isAfter(LocalDate.now())
+            }.map {
                 it.toFieldTrainingResponse()
             },
             this.isAssociated
