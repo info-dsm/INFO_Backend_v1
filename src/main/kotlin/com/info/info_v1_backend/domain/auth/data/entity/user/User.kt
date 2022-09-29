@@ -1,7 +1,6 @@
 package com.info.info_v1_backend.domain.auth.data.entity.user
 
 import com.info.info_v1_backend.domain.auth.data.entity.type.Role
-import com.info.info_v1_backend.domain.auth.presentation.dto.request.EditPasswordRequest
 import com.info.info_v1_backend.global.base.entity.BaseTimeEntity
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Where
@@ -11,8 +10,8 @@ import org.springframework.security.core.userdetails.UserDetails
 import javax.persistence.*
 
 
-@Where(clause = "is_deleted = false")
-@SQLDelete(sql = "UPDATE user SET is_deleted = true where id = ?")
+@Where(clause = "is_delete = false")
+@SQLDelete(sql = "UPDATE `user` SET user_is_delete = true where id = ?")
 @Entity
 @Table(name = "user")
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -44,7 +43,7 @@ abstract class User(
     var roleList: MutableList<Role> = ArrayList()
         protected set
 
-    @Column(name = "is_deleted")
+    @Column(name = "user_is_delete")
     var isDeleted: Boolean = false
         protected set
 

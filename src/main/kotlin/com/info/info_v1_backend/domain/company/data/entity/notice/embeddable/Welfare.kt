@@ -1,5 +1,7 @@
 package com.info.info_v1_backend.domain.company.data.entity.notice.embeddable
 
+import com.info.info_v1_backend.domain.company.business.dto.request.notice.edit.EditWelfareRequest
+import com.info.info_v1_backend.domain.company.business.dto.request.notice.register.WelfareRequest
 import javax.persistence.Column
 import javax.persistence.Embeddable
 
@@ -18,5 +20,37 @@ class Welfare(
     @Column(name = "else_support", nullable = true, length = 255)
     var elseSupport: String?,
 ) {
+
+    fun toWelfare(): WelfareRequest {
+        return WelfareRequest(
+            this.dormitorySupport,
+            this.selfDevelopmentPay,
+            this.equipmentSupport,
+            this.youthTomorrowChaeumDeduction,
+            this.alternativeMilitaryPlan,
+            this.elseSupport
+        )
+    }
+
+    fun editWelfare(r: EditWelfareRequest) {
+        r.dormitorySupport?.let {
+            this.dormitorySupport = it
+        }
+        r.selfDevelopmentPay?.let {
+            this.selfDevelopmentPay = it
+        }
+        r.equipmentSupport?.let {
+            this.equipmentSupport = it
+        }
+        r.youthTomorrowChaeumDeduction?.let {
+            this.youthTomorrowChaeumDeduction = it
+        }
+        r.alternativeMilitaryPlan?.let {
+            this.alternativeMilitaryPlan = it
+        }
+        r.elseSupport?.let {
+            this.elseSupport = it
+        }
+    }
 
 }

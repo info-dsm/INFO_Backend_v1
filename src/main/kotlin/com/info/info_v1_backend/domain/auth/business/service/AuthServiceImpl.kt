@@ -1,34 +1,48 @@
 package com.info.info_v1_backend.domain.auth.business.service
 
+import com.info.info_v1_backend.domain.auth.business.dto.request.*
 import com.info.info_v1_backend.domain.auth.data.entity.token.RefreshToken
 import com.info.info_v1_backend.domain.auth.data.entity.user.Student
 import com.info.info_v1_backend.domain.auth.data.entity.user.Teacher
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
 import com.info.info_v1_backend.domain.auth.data.repository.token.CheckEmailCodeRepository
 import com.info.info_v1_backend.domain.auth.data.repository.token.RefreshTokenRepository
-import com.info.info_v1_backend.domain.auth.data.repository.user.StudentRepository
 import com.info.info_v1_backend.domain.auth.data.repository.user.UserRepository
 import com.info.info_v1_backend.domain.auth.exception.*
-import com.info.info_v1_backend.domain.auth.presentation.dto.request.*
-import com.info.info_v1_backend.domain.auth.presentation.dto.response.*
+import com.info.info_v1_backend.domain.company.data.entity.company.Company
+import com.info.info_v1_backend.domain.company.data.entity.company.CompanySearchDocument
+import com.info.info_v1_backend.domain.company.data.entity.company.embeddable.CompanyIntroduction
+import com.info.info_v1_backend.domain.company.data.entity.company.file.BusinessRegisteredCertificateFile
+import com.info.info_v1_backend.domain.company.data.entity.company.file.CompanyIntroductionFile
+import com.info.info_v1_backend.domain.company.data.entity.company.file.CompanyLogoFile
+import com.info.info_v1_backend.domain.company.data.entity.company.file.CompanyPhotoFile
+import com.info.info_v1_backend.domain.company.data.repository.company.CompanyRepository
+import com.info.info_v1_backend.domain.company.data.repository.company.CompanySearchDocumentRepository
+import com.info.info_v1_backend.global.file.repository.FileRepository
 import com.info.info_v1_backend.global.security.jwt.TokenProvider
 import com.info.info_v1_backend.global.security.jwt.data.TokenResponse
 import com.info.info_v1_backend.global.security.jwt.exception.ExpiredTokenException
-import com.info.info_v1_backend.global.util.user.CurrentUtil
+import com.info.info_v1_backend.infra.amazon.s3.S3Util
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
+@Transactional
 class AuthServiceImpl(
     private val passwordEncoder: PasswordEncoder,
     private val checkEmailCodeRepository: CheckEmailCodeRepository,
     private val userRepository: UserRepository<User>,
-    private val studentRepository: StudentRepository,
+    private val s3Util: S3Util,
+    private val companySearchDocumentRepository: CompanySearchDocumentRepository,
+    private val businessRegisteredCertificateFileRepository: FileRepository<BusinessRegisteredCertificateFile>,
+    private val companyIntroductionFileRepository: FileRepository<CompanyIntroductionFile>,
+    private val companyPhotoFileRepository: FileRepository<CompanyPhotoFile>,
+    private val companyRepository: CompanyRepository,
     private val tokenProvider: TokenProvider,
     private val refreshTokenRepository: RefreshTokenRepository,
-    private val current: CurrentUtil,
+): AuthService {
 
-    ) : AuthService {
     override fun studentSignUp(req: StudentSignUpRequest) {
         if (checkEmail(req.email, req.emailCheckCode)) {
             val encPw = passwordEncoder.encode(req.password)
@@ -37,7 +51,6 @@ class AuthServiceImpl(
                     req.name,
                     req.email,
                     encPw,
-                    req.githubLink,
                     creationList = null
             )
             userRepository.save(user)
@@ -59,23 +72,64 @@ class AuthServiceImpl(
         } else throw CheckEmailCodeException(req.emailCheckCode)
     }
 
-    override fun contactorSignup(req: ContactorSignupRequest) {
-        if (checkEmail(req.email, req.emailCheckCode)) {
-            if (req.contactorCheckCode == "1111") {
-                val encPw = passwordEncoder.encode(req.password)
+    override fun companySignup(req: CompanySignupRequest, emailCheckCode: String) {
+        if (checkEmail(req.companyContact.email, emailCheckCode)) {
 
-                userRepository.save(
-                        Contactor(
-                                req.name,
-                                req.position,
-                                req.personalPhone,
-                                req.email,
-                                encPw
-                        )
+            val company = companyRepository.save(
+                Company(
+                    passwordEncoder.encode(req.password),
+                    req.companyNameRequest,
+                    req.companyInformation.toCompanyInformation(),
+                    req.companyContact.toCompanyContact(),
+                    CompanyIntroduction(
+                        req.companyIntroduction.introduction
+                    ),
+                    req.isLeading
                 )
-            } else throw CheckContactorCodeException(req.contactorCheckCode)
+            )
+            req.companyIntroduction.businessRegisteredCertificate.let{
+                businessRegisteredCertificateFileRepository.save(
+                    BusinessRegisteredCertificateFile(
+                        s3Util.uploadFile(it, "company", "businessRegisteredCertificate"),
+                        company
+                    )
+                )
+            }
 
-        }
+            req.companyIntroduction.companyIntroductionFile.map {
+                companyIntroductionFileRepository.save(
+                    CompanyIntroductionFile(
+                        s3Util.uploadFile(it, "company", "companyIntroduction"),
+                        company
+                    )
+                )
+            }
+
+            req.companyIntroduction.companyLogo?.let {
+                companyIntroductionFileRepository.save(
+                    CompanyIntroductionFile(
+                        s3Util.uploadFile(it, "company", "companyLogo"),
+                        company
+                    )
+                )
+            }
+
+            req.companyIntroduction.companyPhotoList.map {
+                companyPhotoFileRepository.save(
+                    CompanyPhotoFile(
+                        s3Util.uploadFile(it, "company", "companyPhoto"),
+                        company
+                    )
+                )
+            }
+            companySearchDocumentRepository.save(
+                CompanySearchDocument(
+                    company.name,
+                    company.id!!,
+                )
+            )
+
+        } else throw CheckEmailCodeException(emailCheckCode)
     }
 
     private fun checkEmail(email: String, authCode: String): Boolean {
@@ -97,8 +151,7 @@ class AuthServiceImpl(
         } else throw IncorrectPassword(req.password)
     }
 
-    override fun editPassword(req: EditPasswordRequest) {
-        val user = current.getCurrentUser()
+    override fun changePassword(user: User, req: EditPasswordRequest) {
         if ((checkEmailCodeRepository.findById(user.email).orElse(null)
                         ?: throw CheckEmailCodeException(user.email)).code == req.code) {
             val encPw = passwordEncoder.encode(req.password)
@@ -120,73 +173,13 @@ class AuthServiceImpl(
         return tokenResponse
     }
 
-    override fun deleteMe() {
-        userRepository.delete(current.getCurrentUser())
-    }
 
-    override fun getUserInfo(email: String?): GetUserInfo {
-        val email = email ?: current.getCurrentUser().email
-        val user = userRepository.findByEmail(email).orElse(null) ?: throw UserNotFoundException(email)
-        return when (user) {
-            is Student -> {
-                GetStudentInfo(
-                        user.name,
-                        user.studentKey,
-                        user.email,
-                        user.githubLink,
-                        user.isHired,
-                        user.creationList?.map {
-                            it.project!!.toProjectList()
-                        },
-                        user.company?.toMinimumCompanyResponse()
-                )
-            }
 
-            is Teacher -> {
-                GetTeacherInfo(
-                        user.name,
-                        user.email
-                )
-            }
-
-            is Contactor -> {
-                GetContactor(
-                        user.name,
-                        user.email,
-                        user.position,
-                        user.personalPhone,
-                        user.company?.toMinimumCompanyResponse()
-                )
-            }
-            else -> {
-                throw UserNotFoundException(user.email)
-            }
-        }
-    }
-
-    override fun editMyInfo(request: EditMyInfo) {
-        val current = current.getCurrentUser()
-
-        if (current is Student) {
-            val user = studentRepository.findById(current.id!!.toLong()).orElse(null)
-                    ?: throw UserNotFoundException(current.id.toString())
-            user.editMyInfo(request)
-        } else throw IsNotStudentException(current.roleList.toString())
-    }
-
-    override fun getStudentList(): MinimumStudentList {
-        val list =  studentRepository.findAll().map {
-            it.toMinimumStudent()
-        }
-        return MinimumStudentList(list)
-    }
-
-    override fun changeEmail(request: ChangeEmailRequest) {
-        val current = current.getCurrentUser()
-        if (current !is Student) {
-            if (passwordEncoder.matches(request.password, current.password)) {
-                current.changeEmail(request.email)
+    override fun changeEmail(user: User, request: ChangeEmailRequest) {
+        if (user !is Student) {
+            if (passwordEncoder.matches(request.password, user.password)) {
+                user.changeEmail(request.email)
             } else throw IncorrectPassword(request.password)
-        } else throw IsNotContactorOrTeacher(current.roleList.toString())
+        } else throw IsNotContactorOrTeacher(user.roleList.toString())
     }
 }

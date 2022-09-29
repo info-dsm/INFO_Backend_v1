@@ -18,11 +18,23 @@ class OpenApiConfiguration {
     @Bean
     fun authOpenApi(): GroupedOpenApi {
         return GroupedOpenApi.builder()
-            .group("유저")
+            .group("인증")
             .pathsToMatch("/api/info/v1/auth/**")
             .build()
 
     }
+
+
+    @Bean
+    fun userOpenApi(): GroupedOpenApi {
+        return GroupedOpenApi.builder()
+            .group("유저")
+            .pathsToMatch("/api/info/v1/user/**")
+            .build()
+
+    }
+
+
 
     @Bean
     fun boardOpenApi(): GroupedOpenApi {

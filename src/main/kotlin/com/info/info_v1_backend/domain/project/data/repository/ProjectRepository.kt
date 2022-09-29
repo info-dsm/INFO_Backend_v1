@@ -6,8 +6,8 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 
-interface ProjectRepository<T:Project>: JpaRepository<T, Long> {
+interface ProjectRepository<T: Project>: JpaRepository<T, Long> {
 
-    fun findAllByProjectStatus(status: ProjectStatus, pageable: Pageable): Page<T>
+    fun findAllByStatus(status: ProjectStatus, pageable: Pageable): Page<T>
 
 }

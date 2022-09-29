@@ -1,5 +1,6 @@
 package com.info.info_v1_backend.domain.company.data.entity.company.embeddable
 
+import com.info.info_v1_backend.domain.company.business.dto.request.company.CompanyContactRequest
 import javax.persistence.Column
 import javax.persistence.Embeddable
 
@@ -32,5 +33,14 @@ class CompanyContact(
     var email: String = email
         protected set
 
+    fun toCompanyContactRequest(): CompanyContactRequest {
+        return CompanyContactRequest(
+            this.contactorName,
+            this.contactorRank,
+            this.phoneNumber,
+            this.contactorPhone,
+            this.email,
+        )
+    }
 
 }

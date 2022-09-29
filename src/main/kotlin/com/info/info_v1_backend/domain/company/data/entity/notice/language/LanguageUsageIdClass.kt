@@ -6,8 +6,8 @@ class LanguageUsageIdClass(
     languageId: String,
     recruitmentBusinessId: Long
 ): Serializable {
-    val languageId: String = languageId
+    val language: String = languageId
 
-    val recruitmentBusinessId: Long = recruitmentBusinessId
+    val recruitmentBusiness: Long = recruitmentBusinessId
 
 }

@@ -1,5 +1,6 @@
 package com.info.info_v1_backend.domain.company.data.entity.notice
 
+import com.info.info_v1_backend.domain.company.business.dto.request.notice.edit.EditPayRequest
 import javax.persistence.Column
 import javax.persistence.Embeddable
 import javax.persistence.Embedded
@@ -32,4 +33,20 @@ class Pay(
     var bonus: Long? = bonus
 
 
+    fun editPay(r: EditPayRequest) {
+        r.fieldTrainingPayPerMonth?.let {
+            this.fieldTrainingPayPerMonth = r.fieldTrainingPayPerMonth
+        }
+        r.editFullTimeEmploymentPay?.let {
+            it.bonus?.let {
+                this.bonus = it
+            }
+            it.yearPayStart?.let {
+                this.yearPayStart = it
+            }
+            it.yearPayEnd?.let {
+                this.yearPayEnd =it
+            }
+        }
+    }
 }

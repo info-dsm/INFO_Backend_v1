@@ -5,10 +5,6 @@ import com.info.info_v1_backend.domain.company.business.dto.response.company.Min
 data class MinimumNoticeResponse(
     val noticeId: Long,
     val company: MinimumCompanyResponse,
-    val targetMajorList: List<TargetMajorRequest>,
-    val businessInformation: String,
-    val certificateList: List<String>?,
-    val cutLine: Int?,
-    val personalRemark: String
+    val recruitmentBusinessResponseList: RecruitmentBusinessResponse,
 
 )

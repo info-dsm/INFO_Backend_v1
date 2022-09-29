@@ -29,12 +29,8 @@ class DatabaseConfig(
             .build()
     }
 
-    @PreDestroy
-    fun destroyDefaultDatasource() {
-        destroyDatasource(defaultDatasource())
-    }
-    private fun destroyDatasource(datasource: DataSource) {
-        datasource.connection.close()
-    }
+//    private fun destroyDatasource(datasource: DataSource) {
+//        datasource.connection.close()
+//    }
 
 }

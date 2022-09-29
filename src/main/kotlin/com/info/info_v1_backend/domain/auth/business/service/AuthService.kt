@@ -1,22 +1,21 @@
 package com.info.info_v1_backend.domain.auth.business.service
 
-import com.info.info_v1_backend.domain.auth.presentation.dto.request.*
-import com.info.info_v1_backend.domain.auth.presentation.dto.response.GetUserInfo
-import com.info.info_v1_backend.domain.auth.presentation.dto.response.MinimumStudentList
+import com.info.info_v1_backend.domain.auth.business.dto.request.*
+import com.info.info_v1_backend.domain.auth.data.entity.user.User
 import com.info.info_v1_backend.global.security.jwt.data.TokenResponse
+import org.springframework.stereotype.Service
+
 
 interface AuthService {
     fun studentSignUp(req: StudentSignUpRequest)
     fun teacherSignUp(req: TeacherSingUpRequest)
+    fun companySignup(req: CompanySignupRequest, emailCheckCode: String)
 
-    fun contactorSignup(req: ContactorSignupRequest)
+    fun changePassword(user: User, req: EditPasswordRequest)
+
     fun login(req: LoginRequest): TokenResponse
-    fun editPassword(req: EditPasswordRequest)
     fun reissue(req: ReissueRequest): TokenResponse
-    fun deleteMe()
-    fun getUserInfo(userName: String?):GetUserInfo
-    fun editMyInfo(request: EditMyInfo)
-    fun getStudentList(): MinimumStudentList
-    fun changeEmail(request: ChangeEmailRequest)
+
+    fun changeEmail(user: User, request: ChangeEmailRequest)
 
 }

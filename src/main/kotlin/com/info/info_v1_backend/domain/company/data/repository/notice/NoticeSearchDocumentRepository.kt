@@ -10,7 +10,7 @@ import java.util.Optional
 
 interface NoticeSearchDocumentRepository: MongoRepository<NoticeSearchDocument, ObjectId> {
 
-    fun findAllByCompanyId(companyId: String): List<NoticeSearchDocument>
+    fun findAllByCompanyId(companyId: Long): List<NoticeSearchDocument>
     fun findByNoticeId(noticeId: Long): Optional<NoticeSearchDocument>
     fun findAllBy(criteria: TextCriteria, pageable: Pageable): Page<NoticeSearchDocument>
 }

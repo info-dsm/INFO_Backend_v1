@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.mapping.TextScore
 @Document(collection = "company_search")
 class CompanySearchDocument(
     companyName: String,
-    companyId: String,
+    companyId: Long,
 ) {
     @Id
     val id: ObjectId = ObjectId.get()
@@ -20,7 +20,7 @@ class CompanySearchDocument(
         protected set
 
     @Field(name = "company_id")
-    val companyId: String = companyId
+    val companyId: Long = companyId
 
     @TextScore
     @Field(name = "text_score")

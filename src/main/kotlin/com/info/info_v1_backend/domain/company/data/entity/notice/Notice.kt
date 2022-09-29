@@ -1,16 +1,19 @@
 package com.info.info_v1_backend.domain.company.data.entity.notice
 
+import com.info.info_v1_backend.domain.company.business.dto.request.notice.edit.EditNoticeRequest
+import com.info.info_v1_backend.domain.company.business.dto.response.notice.BigClassificationResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.notice.MaximumNoticeWithoutPayResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.notice.MinimumNoticeResponse
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
-import com.info.info_v1_backend.domain.company.data.entity.notice.certificate.Certificate
-import com.info.info_v1_backend.domain.company.data.entity.notice.certificate.CertificateUsage
+import com.info.info_v1_backend.domain.company.data.entity.notice.applicant.Applicant
 import com.info.info_v1_backend.domain.company.data.entity.notice.embeddable.*
-import com.info.info_v1_backend.domain.company.data.entity.notice.language.LanguageUsage
+import com.info.info_v1_backend.domain.company.data.entity.notice.file.FormAttachment
+import com.info.info_v1_backend.domain.company.data.entity.notice.file.Reporter
+import com.info.info_v1_backend.domain.company.data.entity.notice.interview.InterviewProcess
+import com.info.info_v1_backend.domain.company.data.entity.notice.interview.InterviewProcessUsage
 import com.info.info_v1_backend.domain.company.data.entity.notice.recruitment.RecruitmentBusiness
-import com.info.info_v1_backend.domain.company.data.entity.notice.technology.TechnologyUsage
 import com.info.info_v1_backend.global.base.entity.BaseAuthorEntity
-import com.info.info_v1_backend.global.file.entity.File
 import org.hibernate.annotations.SQLDelete
-import org.hibernate.annotations.SortNatural
 import org.hibernate.annotations.Where
 import javax.persistence.*
 
@@ -30,7 +33,7 @@ class Notice(
 
     noticeOpenPeriod: NoticeOpenPeriod,
 
-    interviewProcessMap: LinkedHashMap<Int, InterviewProcess>,
+    interviewProcessList: List<InterviewProcessUsage>,
 
     needDocuments: String?,
 
@@ -39,7 +42,7 @@ class Notice(
     isPersonalContact: Boolean,
 
 
-): BaseAuthorEntity() {
+    ): BaseAuthorEntity() {
     @Id
     @GeneratedValue(
         strategy = GenerationType.IDENTITY,
@@ -51,8 +54,9 @@ class Notice(
     val company: Company = company
 
 
-    @OneToMany
-    var recruitmentBusinessList: MutableList<RecruitmentBusiness> = ArrayList()
+    @OneToOne
+    @JoinColumn(name = "recruitment_business_id", nullable = false)
+    var recruitmentBusiness: RecruitmentBusiness? = null
         protected set
 
     @Embedded
@@ -77,14 +81,7 @@ class Notice(
 
 
     @ElementCollection
-    @CollectionTable(
-        name = "interview_process",
-        joinColumns = [JoinColumn(name = "notice_id")]
-    )
-    @OrderBy(value = "interview_process_sequence asc")
-    @MapKeyColumn(name = "interview_process_sequence")
-    @Column(name = "interview_process_value")
-    var interviewProcessList: LinkedHashMap<Int, InterviewProcess> = interviewProcessMap
+    var interviewProcessList: MutableList<InterviewProcessUsage> = interviewProcessList as MutableList<InterviewProcessUsage>
         protected set
 
 
@@ -99,6 +96,7 @@ class Notice(
     var otherFeatures: String? = otherFeatures
         protected set
 
+    @Embedded
     var workPlace: WorkPlace = workPlace
 
     @Column(name = "is_personal_contact", nullable = false)
@@ -106,7 +104,7 @@ class Notice(
 
 
     @OneToMany(mappedBy = "notice")
-    var attachmentList: MutableList<Attachment> = ArrayList()
+    var formAttachmentList: MutableList<FormAttachment> = ArrayList()
         protected set
 
 
@@ -114,25 +112,85 @@ class Notice(
     var isDelete: Boolean = false
         protected set
 
+    @Column(name = "notice_is_approve", nullable = false)
     var isApprove: Boolean = false
         protected set
 
-    fun addAttachment(attachment: Attachment) {
-        this.attachmentList.add(attachment)
+    @OneToMany(mappedBy = "notice")
+    var applicantList: MutableList<Applicant> = ArrayList()
+        protected set
+
+
+    fun addAttachment(formAttachment: FormAttachment) {
+        this.formAttachmentList.add(formAttachment)
     }
 
+    fun addRecruitmentBusiness(recruitmentBusiness: RecruitmentBusiness) {
+        this.recruitmentBusiness = recruitmentBusiness
+    }
 
     fun changeInterviewProcess(key: Int, interviewProcess: InterviewProcess) {
-        this.interviewProcessList[key] = interviewProcess
+        this.interviewProcessList.first { it.sequence == key }.changeInterviewProcess(interviewProcess)
     }
 
     fun approveNotice() {
         this.isApprove = true
     }
 
+    fun toMinimumNoticeResponse(): MinimumNoticeResponse {
+        return MinimumNoticeResponse(
+            this.id!!,
+            this.company.toMinimumCompanyResponse(),
+            this.recruitmentBusiness!!.toRecruitmentBusinessResponse()
+        )
+    }
 
+    fun toMaximumNoticeResponse(): MaximumNoticeWithoutPayResponse {
+        return MaximumNoticeWithoutPayResponse(
+            this.id!!,
+            this.company.toMaximumCompanyResponse(),
+            this.recruitmentBusiness!!.toRecruitmentBusinessResponse(),
+            this.workTime.toWorkTimeRequest(),
+            this.mealSupport.toMealSupportRequest(),
+            this.welfare.toWelfare(),
+            this.noticeOpenPeriod.toNoticeOpenPeriod(),
+            this.interviewProcessList.map {
+                it.interviewProcess
+            },
+            this.needDocuments,
+            this.otherFeatures,
+            this.workPlace.toWorkPlaceRequest(),
+            this.formAttachmentList.map {
+                it.toFileResponse()
+            }
+        )
+    }
 
-
-
+    fun editNotice(r: EditNoticeRequest) {
+        r.workTime?.let {
+            this.workTime.editWorkTime(r.workTime)
+        }
+        r.pay?.let {
+            this.pay
+        }
+        r.mealSupport?.let {
+            this.mealSupport.editMealSupport(it)
+        }
+        r.welfare?.let {
+            this.welfare.editWelfare(r.welfare)
+        }
+        r.needDocuments?.let {
+            this.needDocuments = r.needDocuments
+        }
+        r.otherFeatures?.let {
+            this.otherFeatures = r.otherFeatures
+        }
+        r.workPlace?.let {
+            this.workPlace.editWorkPlace(r.workPlace)
+        }
+        r.isPersonalContact?.let {
+            this.isPersonalContact = r.isPersonalContact
+        }
+    }
 
 }

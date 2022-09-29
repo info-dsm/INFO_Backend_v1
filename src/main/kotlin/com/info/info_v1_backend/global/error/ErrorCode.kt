@@ -16,6 +16,9 @@ enum class ErrorCode(
     EMAIL_ERROR("Email 전송 과정 중 에러가 발생했습니다.", HttpStatus.BAD_GATEWAY),
     INVALID_FILE_EXTENSION("Invalid File Extension", HttpStatus.BAD_REQUEST),
 
+    //401
+    TOKEN_NOT_FOUND("Token Not Found", HttpStatus.UNAUTHORIZED),
+
     //403
     NOT_HAVE_ACCESS_TO_THE_PROJECT("Not Have Access To The project", HttpStatus.FORBIDDEN),
     FORBIDDEN("권한이 없습니다", HttpStatus.FORBIDDEN),
@@ -35,7 +38,6 @@ enum class ErrorCode(
     NOT_CONTACTOR("You are Not Contactor", HttpStatus.FORBIDDEN),
     COMPANY_NOT_FOUND("Company Not Found", HttpStatus.NOT_FOUND),
     IS_NOT_CONTACTOR_COMPANY("You are not Contactor Company", HttpStatus.FORBIDDEN),
-    STUDENT_CANNOT_OPEN("Student Cannot Open this", HttpStatus.FORBIDDEN),
     IS_NOT_STUDENT("You are not student", HttpStatus.FORBIDDEN),
     STUDENT_ALREADY_WRITTEN_COMMENT("you have Already Written comment", HttpStatus.BAD_REQUEST),
     COMMENT_NOT_FOUND("Comment Not Found", HttpStatus.NOT_FOUND),
@@ -45,6 +47,7 @@ enum class ErrorCode(
     CONTACTOR_MUST_LEAVE_LEAST_AT_ONE_ON_COMPANY("Contactor Must leave least at one on company", HttpStatus.BAD_REQUEST),
     IS_NOT_CONTACTOR_OR_TEACHER("Is Not Contactor Or Teacher", HttpStatus.NOT_FOUND),
     FILE_NOT_FOUND("File not Found", HttpStatus.NOT_FOUND),
+    HIRED_STUDENT_NOT_FOUND("Hired Student Not Found", HttpStatus.NOT_FOUND),
 
 
     //500

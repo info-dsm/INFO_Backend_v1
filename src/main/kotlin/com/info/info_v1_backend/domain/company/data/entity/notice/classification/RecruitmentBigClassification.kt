@@ -1,5 +1,6 @@
 package com.info.info_v1_backend.domain.company.data.entity.notice.classification
 
+import com.info.info_v1_backend.domain.company.business.dto.response.notice.BigClassificationResponse
 import com.info.info_v1_backend.domain.company.data.entity.notice.recruitment.RecruitmentBusiness
 import com.info.info_v1_backend.global.base.entity.BaseTimeEntity
 import javax.persistence.Column
@@ -21,5 +22,14 @@ class RecruitmentBigClassification(
     var  recruitmentBusinessList: MutableList<RecruitmentBusiness> = ArrayList()
         protected set
 
+    @OneToMany
+    var smallClassificationList: MutableList<RecruitmentSmallClassification>  = ArrayList()
+        protected set
+
+    fun toBigClassificationResponse(): BigClassificationResponse {
+        return BigClassificationResponse(
+            this.name
+        )
+    }
 
 }

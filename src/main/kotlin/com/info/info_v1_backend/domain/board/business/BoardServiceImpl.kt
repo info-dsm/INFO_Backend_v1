@@ -5,7 +5,9 @@ import com.info.info_v1_backend.domain.board.business.dto.EmployBoardDto
 import com.info.info_v1_backend.domain.board.business.dto.IndicationDto
 import com.info.info_v1_backend.domain.board.business.dto.PerClassEmployInfoDto
 import com.info.info_v1_backend.domain.board.business.type.ClassInfo
-import com.info.info_v1_backend.infra.amazon.s3.dto.ImageDto
+import com.info.info_v1_backend.domain.company.data.entity.company.work.hired.HiredStudent
+import com.info.info_v1_backend.global.file.dto.FileResponse
+import com.info.info_v1_backend.global.file.entity.type.FileType
 import org.springframework.stereotype.Service
 
 @Service
@@ -34,26 +36,20 @@ class BoardServiceImpl(
         var employStudentCnt = 0
 
         studentRepository.findAllByStudentKeyStartingWith("3${classInfo.classNum}").map { student ->
-            student.company?.let { company ->
+            student.hiredStudent.map {
+                    hiredStudent: HiredStudent ->
                 indicationDtoList.add(
                     IndicationDto(
-                        company.id!!,
-                        company.shortName,
-                        try {
-
-                            ImageDto(
-                                company.photoList.first().let {
-                                    it.fileUrl
-                                },
-                                company.photoList.first().id!!
-                                )
-                        } catch (e: NoSuchElementException) {
-                            ImageDto(
-                                "NULL",
-                                0
+                        hiredStudent.company.id!!,
+                        hiredStudent.company.name,
+                        (hiredStudent.company.companyIntroduction.companyLogo
+                            ?.toFileResponse())
+                            ?: FileResponse(
+                                0,
+                                "https://cdn.pixabay.com/photo/2017/02/13/01/26/the-question-mark-2061539_960_720.png",
+                                FileType.DOCS,
+                                "png"
                             )
-                        }
-
                     )
                 )
                 employStudentCnt++

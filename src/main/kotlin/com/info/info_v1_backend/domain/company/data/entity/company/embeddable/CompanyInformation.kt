@@ -1,24 +1,37 @@
 package com.info.info_v1_backend.domain.company.data.entity.company.embeddable
 
+import com.info.info_v1_backend.domain.company.business.dto.request.company.CompanyInformationRequest
+import com.info.info_v1_backend.domain.company.data.entity.company.address.AddressInfo
 import java.time.Year
+import javax.persistence.AttributeOverride
+import javax.persistence.AttributeOverrides
 import javax.persistence.Column
 import javax.persistence.Embeddable
+import javax.persistence.Embedded
 
 @Embeddable
-open class CompanyInformation(
-    homeAddress: String,
-    agentAddress: String?,
+class CompanyInformation(
+    homeAddress: AddressInfo,
+    agentAddress: AddressInfo?,
     representative: String,
     establishedAt: Year,
     workerCount: Int,
     annualSales: Long
 ) {
-    @Column(name = "home_address", nullable = false)
-    var homeAddress: String = homeAddress
+    @Embedded
+    @AttributeOverrides(
+        AttributeOverride(name = "full_address", column = Column(name = "home_full_address")),
+        AttributeOverride(name = "address_number", column = Column(name = "home_address_number"))
+    )
+    var homeAddress: AddressInfo = homeAddress
         protected set
 
-    @Column(name = "agent_address", nullable = true)
-    var agentAddress: String? = agentAddress
+    @Embedded
+    @AttributeOverrides(
+        AttributeOverride(name = "full_address", column = Column(name = "agent_full_address")),
+        AttributeOverride(name = "address_number", column = Column(name = "agent_address_number"))
+    )
+    var agentAddress: AddressInfo? = agentAddress
         protected set
 
     @Column(name = "representative", nullable = false)
@@ -36,5 +49,16 @@ open class CompanyInformation(
     @Column(name = "annual_sales", nullable = false)
     var annualSales: Long = annualSales
         protected set
+
+    fun toCompanyInformationRequest(): CompanyInformationRequest {
+        return CompanyInformationRequest(
+            this.homeAddress,
+            this.agentAddress,
+            this.representative,
+            this.establishedAt,
+            this.workerCount,
+            this.annualSales
+        )
+    }
 
 }

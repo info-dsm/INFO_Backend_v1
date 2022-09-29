@@ -8,8 +8,8 @@ class CertificateUsageIdClass(
     noticeId: Long
 ): Serializable {
 
-    val certificateId: String = certificateId
+    val certificate: String = certificateId
 
-    val noticeId: Long = noticeId
+    val notice: Long = noticeId
 
 }

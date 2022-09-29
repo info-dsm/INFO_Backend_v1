@@ -1,6 +1,6 @@
 package com.info.info_v1_backend.domain.project.data.entity.project
 
-import com.info.info_v1_backend.domain.auth.presentation.dto.response.ProjectList
+import com.info.info_v1_backend.domain.auth.business.dto.response.ProjectList
 import com.info.info_v1_backend.domain.project.data.entity.Creation
 import com.info.info_v1_backend.domain.project.data.entity.type.ProjectStatus
 import com.info.info_v1_backend.global.base.entity.BaseAuthorEntity
@@ -51,11 +51,7 @@ sealed class Project(
     var status: ProjectStatus = projectStatus
         protected set
 
-    @OneToMany(mappedBy = "project", cascade = [CascadeType.REMOVE])
-    var photoList: MutableList<File>? = ArrayList()
-        protected set
-
-    fun toProjectList(): ProjectList{
+    fun toProjectList(): ProjectList {
         return ProjectList(
                 this.name,
                 this.codeLinkList?.map {

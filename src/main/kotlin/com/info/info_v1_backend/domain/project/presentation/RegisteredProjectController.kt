@@ -54,10 +54,10 @@ class RegisteredProjectController(
         registeredProjectService.updateStatus(request)
     }
 
-    @GetMapping("/waiting")
-    fun getWaitingMinimumProject(){
-        registeredProjectService.getWaitingMinimumProject()
-    }
+//    @GetMapping("/waiting")
+//    fun getWaitingMinimumProject(){
+//        registeredProjectService.getWaitingMinimumProject()
+//    }
 
     @DeleteMapping("/{project-id}")
     fun deleteProject(@PathVariable("project-id") projectId: Long){

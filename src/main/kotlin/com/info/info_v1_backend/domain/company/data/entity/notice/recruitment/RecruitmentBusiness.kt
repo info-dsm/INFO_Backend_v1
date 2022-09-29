@@ -1,5 +1,7 @@
 package com.info.info_v1_backend.domain.company.data.entity.notice.recruitment
 
+import com.info.info_v1_backend.domain.company.business.dto.request.notice.edit.EditRecruitmentRequest
+import com.info.info_v1_backend.domain.company.business.dto.response.notice.RecruitmentBusinessResponse
 import com.info.info_v1_backend.domain.company.data.entity.notice.Notice
 import com.info.info_v1_backend.domain.company.data.entity.notice.certificate.Certificate
 import com.info.info_v1_backend.domain.company.data.entity.notice.classification.RecruitmentBigClassification
@@ -42,8 +44,8 @@ class RecruitmentBusiness(
     var smallClassification: RecruitmentSmallClassification = smallClassification
         protected set
 
-    @ManyToOne
-    @JoinColumn(name = "notice", nullable = false)
+    @OneToOne
+    @JoinColumn(name = "notice_id", nullable = false)
     val notice: Notice = notice
 
     @Column(
@@ -54,7 +56,7 @@ class RecruitmentBusiness(
         protected set
 
     @OneToMany(mappedBy = "recruitmentBusiness")
-    var languageUsageSet: LinkedHashSet<LanguageUsage> = LinkedHashSet()
+    var languageUsageSet: MutableList<LanguageUsage> = ArrayList()
         protected set
 
     @OneToMany(mappedBy = "recruitmentBusiness")
@@ -73,5 +75,29 @@ class RecruitmentBusiness(
     var gradeCutLine: Int? = gradeCutLine
         protected set
 
+    fun toRecruitmentBusinessResponse(): RecruitmentBusinessResponse {
+        return RecruitmentBusinessResponse(
+            this.bigClassification.toBigClassificationResponse(),
+            this.smallClassification.toSmallClassification(),
+            this.numberOfEmplyee,
+            this.detailBusinessDescription,
+            this.needCertificateList.map {
+                 it.name
+            },
+            this.gradeCutLine
+        )
+    }
+
+    fun editRecruitmentBusiness(r: EditRecruitmentRequest) {
+        r.numberOfEmployee?.let {
+            this.numberOfEmplyee = r.numberOfEmployee
+        }
+        r.detailBusinessDescription?.let {
+            this.detailBusinessDescription = r.detailBusinessDescription
+        }
+        r.gradeCutLine?.let {
+            this.gradeCutLine = r.gradeCutLine
+        }
+    }
 
 }

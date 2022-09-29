@@ -17,9 +17,8 @@ import com.info.info_v1_backend.domain.project.exception.ProjectNotFoundExceptio
 import com.info.info_v1_backend.global.error.common.FileNotFoundException
 import com.info.info_v1_backend.global.error.common.ForbiddenException
 import com.info.info_v1_backend.global.error.common.InternalServerErrorException
-import com.info.info_v1_backend.global.image.entity.File
-import com.info.info_v1_backend.global.image.entity.type.FileType
-import com.info.info_v1_backend.global.image.repository.FileRepository
+import com.info.info_v1_backend.global.file.entity.File
+import com.info.info_v1_backend.global.file.repository.FileRepository
 import com.info.info_v1_backend.global.util.user.CurrentUtil
 import com.info.info_v1_backend.infra.amazon.s3.S3Util
 import org.springframework.data.domain.Page
@@ -36,7 +35,7 @@ class IndividualProjectServiceImpl(
     private val userRepository: StudentRepository,
     private val creationRepository: CreationRepository,
     private val s3Util: S3Util,
-    private val fileRepository: FileRepository
+    private val fileRepository: FileRepository<File>
 ): IndividualProjectService{
 
     override fun getMinimumLatestOrderProjectList(idx: Int, size: Int): Page<MinimumProjectResponse> {
@@ -49,9 +48,6 @@ class IndividualProjectServiceImpl(
             .map {
                 MinimumProjectResponse(
                     projectId = it.id!!,
-                    photoList = it.photoList?.map{it1 ->
-                        it1.toImageDto()
-                    }?.toMutableList(),
                     codeLinkList = it.codeLinkList,
                     shortContent = it.shortContent,
                     studentIdList = it.creationList!!.map { it1 ->
@@ -73,9 +69,6 @@ class IndividualProjectServiceImpl(
             .map {
                 MinimumProjectResponse(
                     projectId = it.id!!,
-                    photoList = it.photoList?.map { it1 ->
-                        it1.toImageDto()
-                    }?.toMutableList(),
                     codeLinkList = it.codeLinkList,
                     shortContent = it.shortContent,
                     studentIdList = it.creationList!!.map { it1 ->
@@ -92,9 +85,6 @@ class IndividualProjectServiceImpl(
             ?: throw ProjectNotFoundException("$id :: not found")
         p.eddHaveSeenCount()
         return MaximumProjectResponse(
-            imagLinkList = p.photoList?.map {
-                it.toImageDto()
-            }?.toMutableList(),
             name = p.name,
             status = p.status,
             createAt = p.createdAt,
@@ -181,39 +171,41 @@ class IndividualProjectServiceImpl(
     }
 
     override fun uploadImage(image: MultipartFile, projectId: Long) {
-        val project = individualRepository.findByIdOrNull(projectId)
-            ?: throw ProjectNotFoundException("$projectId :: 없는 프로젝트 입니다")
-        if (project.creationList?.stream()
-                ?.anyMatch { it.student == currentUtil.getCurrentUser() } == true
-        ) {
-            val url = s3Util.uploadFile(image, "project", projectId.toString())
-            val fileName = image.originalFilename!!
-
-            val ext: String = fileName.substring(fileName.lastIndexOf(".") + 1)
-            val f = fileRepository.save(
-                File(
-                    fileUrl = url,
-                    fileType = FileType.IMAGE,
-                    extension = ext,
-                    project = project,
-                    company = null
-                )
-            )
-            project.addImage(f)
-        } else {
-            throw ForbiddenException("$projectId :: 프로젝트에 대한 권한이 없습니다")
-        }
+//        val project = individualRepository.findByIdOrNull(projectId)
+//            ?: throw ProjectNotFoundException("$projectId :: 없는 프로젝트 입니다")
+//        if (project.creationList?.stream()
+//                ?.anyMatch { it.student == currentUtil.getCurrentUser() } == true
+//        ) {
+//            val url = s3Util.uploadFile(image, "project", projectId.toString())
+//            val fileName = image.originalFilename!!
+//
+//            val ext: String = fileName.substring(fileName.lastIndexOf(".") + 1)
+//            val f = fileRepository.save(
+//                File(
+//                    fileUrl = url,
+//                    fileType = FileType.IMAGE,
+//                    extension = ext,
+//                    project = project,
+//                    company = null
+//                )
+//            )
+//            project.addImage(f)
+//        } else {
+//            throw ForbiddenException("$projectId :: 프로젝트에 대한 권한이 없습니다")
+//        }
+        TODO("GOOD")
     }
 
     override fun deleteImage(imageId: Long) {
-        val i = fileRepository.findByIdOrNull(imageId)
-            ?: throw FileNotFoundException("$imageId :: 없는 파일 입니다")
-        if(i.project?.creationList?.stream()
-                ?.anyMatch { it.student != currentUtil.getCurrentUser() } == true
-        ){
-            throw ForbiddenException("$imageId :: 파일에 대한 권한이 없습니다")
-        }
-        fileRepository.deleteById(imageId)
+//        val i = fileRepository.findByIdOrNull(imageId)
+//            ?: throw FileNotFoundException("$imageId :: 없는 파일 입니다")
+//        if(i.project?.creationList?.stream()
+//                ?.anyMatch { it.student != currentUtil.getCurrentUser() } == true
+//        ){
+//            throw ForbiddenException("$imageId :: 파일에 대한 권한이 없습니다")
+//        }
+//        fileRepository.deleteById(imageId)
+        TODO()
     }
 
 }

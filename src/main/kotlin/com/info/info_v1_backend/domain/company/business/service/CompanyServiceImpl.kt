@@ -1,25 +1,25 @@
 package com.info.info_v1_backend.domain.company.business.service
 
 import com.info.info_v1_backend.domain.auth.data.entity.user.Student
+import com.info.info_v1_backend.domain.auth.data.entity.user.Teacher
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
 import com.info.info_v1_backend.domain.auth.data.repository.user.UserRepository
-import com.info.info_v1_backend.domain.auth.exception.ContactorNotFoundException
-import com.info.info_v1_backend.domain.auth.exception.StudentCannotOpenException
 import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
 import com.info.info_v1_backend.domain.company.business.dto.request.company.EditCompanyRequest
-import com.info.info_v1_backend.domain.company.business.dto.request.company.RegisterCompanyRequest
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MinimumCompanyResponse
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
 import com.info.info_v1_backend.domain.company.data.entity.company.CompanySearchDocument
-import com.info.info_v1_backend.domain.company.data.repository.company.CompanyCheckCodeRepository
+import com.info.info_v1_backend.domain.company.data.entity.company.file.BusinessRegisteredCertificateFile
+import com.info.info_v1_backend.domain.company.data.entity.company.file.CompanyIntroductionFile
+import com.info.info_v1_backend.domain.company.data.entity.company.file.CompanyLogoFile
+import com.info.info_v1_backend.domain.company.data.entity.company.file.CompanyPhotoFile
 import com.info.info_v1_backend.domain.company.data.repository.company.CompanyRepository
 import com.info.info_v1_backend.domain.company.data.repository.company.CompanySearchDocumentRepository
+import com.info.info_v1_backend.domain.company.data.repository.company.HiredStudentRepository
 import com.info.info_v1_backend.domain.company.data.repository.notice.NoticeSearchDocumentRepository
 import com.info.info_v1_backend.domain.company.exception.*
 import com.info.info_v1_backend.global.error.common.NoAuthenticationException
-import com.info.info_v1_backend.global.file.entity.File
-import com.info.info_v1_backend.global.file.entity.type.FileType
 import com.info.info_v1_backend.global.file.exception.FileNotFoundException
 import com.info.info_v1_backend.global.file.repository.FileRepository
 import com.info.info_v1_backend.global.util.user.CurrentUtil
@@ -27,113 +27,56 @@ import com.info.info_v1_backend.infra.amazon.s3.S3Util
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
+import java.time.LocalDate
 import javax.transaction.Transactional
 
 @Service
 @Transactional
 class CompanyServiceImpl(
     private val companyRepository: CompanyRepository,
-    private val companyCheckCodeRepository: CompanyCheckCodeRepository,
     private val currentUtil: CurrentUtil,
     private val studentRepository: UserRepository<Student>,
-    private val contactorRepository: UserRepository<Contactor>,
     private val companySearchDocumentRepository: CompanySearchDocumentRepository,
     private val noticeSearchDocumentRepository: NoticeSearchDocumentRepository,
     private val s3Util: S3Util,
-    private val fileRepository: FileRepository
+    private val businessRegisteredCertificateFileRepository: FileRepository<BusinessRegisteredCertificateFile>,
+    private val companyIntroductionFileRepository: FileRepository<CompanyIntroductionFile>,
+    private val companyLogoFileRepository: FileRepository<CompanyLogoFile>,
+    private val companyPhotoRepository: FileRepository<CompanyPhotoFile>,
+    private val hiredStudentRepository: HiredStudentRepository
 ): CompanyService {
-    override fun addContactor(newContactorEmail: String) {
-        val current = currentUtil.getCurrentUser()
-        if ((current is Contactor) && current.company?.contactorList?.contains(current) == true) {
-            val newContactor = contactorRepository.findByEmail(newContactorEmail).orElse(null)?: throw ContactorNotFoundException(newContactorEmail)
-            current.company!!.contactorList.add(newContactor)
-        } else throw NoAuthenticationException(current.roleList.toString())
-    }
 
-    override fun removeContactor(targetContactorEmail: String) {
-        val current = currentUtil.getCurrentUser()
-        if ((current is Contactor) && (current.company?.contactorList?.contains(current) == true)) {
-            if (current.company!!.contactorList.size <= 1) throw ContactorMustLeaveLeastAtOneOnCompanyException(current.company!!.contactorList.size.toString())
-            val targetContactor = contactorRepository.findByEmail(targetContactorEmail).orElse(null)?: throw ContactorNotFoundException(targetContactorEmail)
-            if (targetContactor.company != current.company) throw NoAuthenticationException(current.company.toString())
-            current.company!!.contactorList.remove(targetContactor)
-        } else throw NoAuthenticationException(current.roleList.toString())
-    }
+    override fun editCompany(user: User, request: EditCompanyRequest) {
 
-    override fun registerCompany(request: RegisterCompanyRequest) {
-        //checkEmailCode 로직 추가
-
-        val companyCode = companyCheckCodeRepository.findById(request.companyCheckCode).orElse(null)
-            ?: throw InvalidCompanyCheckCodeException(request.companyCheckCode)
-        companyCode.makeUsed()
-
-        //사업자 등록번호 조회 인증 로직 추가 https://www.data.go.kr/iim/api/selectAPIAcountView.do#/
-
-        val current: User = currentUtil.getCurrentUser()
-
-        if (current !is Contactor) throw NotContactorException(current.roleList.toString())
-
-        val company = companyRepository.save(
-            Company(
-                request.shortName,
-                request.fullName,
-                request.companyNumber,
-                request.companyPhone,
-                request.faxAddress,
-                current,
-                request.establishedAt,
-                request.annualSales,
-                request.workerCount,
-                request.industryType,
-                request.mainProduct,
-                request.introduction,
-                request.address,
-                request.companyPlace
-            )
-        )
-
-        companySearchDocumentRepository.save(
-            CompanySearchDocument(
-                company.fullName,
-                company.id,
-            )
-        )
-        
-    }
-
-    override fun editCompany(request: EditCompanyRequest, id: String) {
-        val current = currentUtil.getCurrentUser()
-
-        if (current is Contactor) {
-            val company = companyRepository.findById(id).orElse(null)?: throw CompanyNotFoundException(id.toString())
-            if (company != current.company) throw IsNotContactorCompany(current.email)
-            company.editCompany(
+        if (user is Company) {
+            user.editCompany(
                 request
             )
-            request.fullName?. let { fullName: String ->
+            request.companyName?. let { name: String ->
                 {
-                    companySearchDocumentRepository.findByCompanyId(company.id).orElse(null)
+                    companySearchDocumentRepository.findByCompanyId(user.id!!).orElse(null)
                         ?.let { companySearchDocument: CompanySearchDocument ->
                             {
-                                companySearchDocument.changeCompanyName(fullName)
+                                companySearchDocument.changeCompanyName(name)
                             }
                         }
                         ?: companySearchDocumentRepository.save(
                             CompanySearchDocument(
-                                company.fullName,
-                                company.id
+                                user.name,
+                                user.id!!
                             )
                         )
-                    noticeSearchDocumentRepository.findAllByCompanyId(company.id).map {
+                    noticeSearchDocumentRepository.findAllByCompanyId(user.id!!).map {
                         noticeSearchDocument -> {
-                            noticeSearchDocument.editCompanyName(request.fullName)
+                            noticeSearchDocument.editCompanyName(request.companyName)
                         }
                     }
                 }
             }
-        } else throw NotContactorException(current.roleList.toString())
+        } else throw NotContactorException(user.roleList.toString())
     }
 
     override fun getMinimumCompanyList(idx: Int, size: Int): Page<MinimumCompanyResponse> {
@@ -142,25 +85,37 @@ class CompanyServiceImpl(
         }
     }
 
-    override fun getMaximumCompany(id: String): MaximumCompanyResponse {
+    override fun getMaximumCompany(id: Long): MaximumCompanyResponse {
         return (companyRepository.findById(id).orElse(null)?: throw CompanyNotFoundException(id.toString()))
             .toMaximumCompanyResponse()
 
     }
 
-    override fun getMaximumCompanyByUserId(id: Long): List<MaximumCompanyResponse> {
-        val current = currentUtil.getCurrentUser()
+    override fun getMaximumCompanyByUserId(user: User, id: Long): List<MaximumCompanyResponse> {
 
-        if (current is Student) {
-            if (current.id != id) throw StudentCannotOpenException(current.email)
-            return companyRepository.findAllByStudentListContains(current).map {
-                it.toMaximumCompanyResponse()
+        if (user is Student) {
+            if (user.id != id) throw NoAuthenticationException(user.roleList.toString())
+            val result: MutableList<MaximumCompanyResponse> = ArrayList()
+            hiredStudentRepository.findAllByStudent(user).map {
+                companyRepository.findAllByHiredStudentListContains(it).map {
+                    result.add(
+                        it.toMaximumCompanyResponse()
+                    )
+                }
             }
+            return result
         } else {
             val student = studentRepository.findById(id).orElse(null)?: throw UserNotFoundException(id.toString())
-            return companyRepository.findAllByStudentListContains(student).map {
-                it.toMaximumCompanyResponse()
+
+            val result: MutableList<MaximumCompanyResponse> = ArrayList()
+            hiredStudentRepository.findAllByStudent(student).map {
+                companyRepository.findAllByHiredStudentListContains(it).map {
+                    result.add(
+                        it.toMaximumCompanyResponse()
+                    )
+                }
             }
+            return result
         }
     }
 
@@ -171,7 +126,7 @@ class CompanyServiceImpl(
         val minimumCompanyResponseList: MutableList<MinimumCompanyResponse> = ArrayList()
         companySearchDocumentList.map {
             companySearchDocument: CompanySearchDocument ->
-            companyRepository.findById(companySearchDocument.companyId).orElse(null)?. let{
+            companyRepository.findById(companySearchDocument.companyId.toLong()).orElse(null)?. let{
                 company:Company ->
                 minimumCompanyResponseList.add(
                     company.toMinimumCompanyResponse()
@@ -182,40 +137,147 @@ class CompanyServiceImpl(
         return minimumCompanyResponseList
     }
 
-    override fun addCompanyPhoto(multipartFile: MultipartFile, companyId: String) {
-        val current: User = currentUtil.getCurrentUser()
-        if (current is Contactor) {
-            current.company?.let {
-                val url = s3Util.uploadFile(multipartFile, "company", companyId)
-                val fileName = multipartFile.originalFilename!!
+    override fun changeBusinessRegisteredCertificate(user: User, multipartFile: MultipartFile) {
+        if (user is Company) {
+            user.let {
+                user.companyIntroduction.businessRegisteredCertificate?.let { it1 ->
+                    businessRegisteredCertificateFileRepository.delete(
+                        it1
+                    )
+                }
 
-                val ext: String = fileName.substring(fileName.lastIndexOf(".") + 1)
-
-                fileRepository.save(
-                    File(
-                        url,
-                        FileType.IMAGE,
-                        ext,
-                        null,
-                        it
+                user.companyIntroduction.changeBusinessRegisteredCertificate(
+                    BusinessRegisteredCertificateFile(
+                        s3Util.uploadFile(multipartFile, "company/${user.id!!}", "business_registered_file"),
+                        user
                     )
                 )
             }
         }
-        throw NoAuthenticationException(current.roleList.toString())
+        throw NoAuthenticationException(user.roleList.toString())
     }
 
-    override fun removeCompanyPhoto(companyId: String, fileId: Long) {
-        val current = currentUtil.getCurrentUser()
-        if (current is Contactor) {
-            current.company?.let{
-                val image = fileRepository.findById(fileId).orElse(null)
-                    ?: throw FileNotFoundException(fileId.toString())
-                fileRepository.delete(image)
+    override fun addCompanyIntroductionFile(user: User, multipartFile: MultipartFile) {
+        if (user is Company) {
+            user.let {
+                user.companyIntroduction.addCompanyIntroduction(
+                    CompanyIntroductionFile(
+                        s3Util.uploadFile(multipartFile, "company/${user.id!!}", "business_registered_file"),
+                        user
+                    )
+                )
             }
         }
-        throw CompanyNotFoundException(fileId.toString())
+        throw NoAuthenticationException(user.roleList.toString())
     }
 
+    override fun removeCompanyIntroductionFile(user: User, fileId: Long) {
+        if (user is Company) {
+            user.let {
+                user.companyIntroduction.removeCompanyIntroduction(
+                    companyIntroductionFileRepository.findByIdOrNull(fileId)?: throw FileNotFoundException(fileId.toString())
+                )
+            }
+        }
+        throw NoAuthenticationException(user.roleList.toString())
+    }
+
+    override fun changeCompanyLogo(user: User, multipartFile: MultipartFile) {
+        if (user is Company) {
+            user.let {
+                user.companyIntroduction.companyLogo?.let { it1 ->
+                    companyLogoFileRepository.delete(
+                        it1
+                    )
+                }
+                user.companyIntroduction.changeCompanyLogo(
+                    CompanyLogoFile(
+                        s3Util.uploadFile(multipartFile, "company/${user.id!!}", "company_introduction_file"),
+                        user
+                    )
+                )
+            }
+        }
+        throw NoAuthenticationException(user.roleList.toString())
+    }
+
+    override fun addCompanyPhoto(user: User, multipartFile: MultipartFile) {
+        if (user is Company) {
+            user.let {
+                user.companyIntroduction.addCompanyPhoto(
+                    CompanyPhotoFile(
+                        s3Util.uploadFile(multipartFile, "company/${user.id!!}", "company_photo"),
+                        user
+                    )
+                )
+            }
+        }
+        throw NoAuthenticationException(user.roleList.toString())
+    }
+
+    override fun removeCompanyPhoto(user: User, fileId: Long) {
+        if (user is Company) {
+            user.let {
+                companyPhotoRepository.delete(
+                    companyPhotoRepository.findByIdOrNull(fileId)?: throw FileNotFoundException(fileId.toString())
+                )
+
+                user.companyIntroduction.removeCompanyPhoto(
+                    companyPhotoRepository.findByIdOrNull(fileId)?: throw FileNotFoundException(fileId.toString())
+                )
+            }
+        }
+        throw NoAuthenticationException(user.roleList.toString())
+    }
+
+    override fun makeAssociated(user: User, companyId: Long) {
+        if (user is Teacher) {
+            (companyRepository.findByIdOrNull(companyId)?: throw CompanyNotFoundException(companyId.toString()))
+                .makeAssociated()
+        }
+        throw NoAuthenticationException(user.roleList.toString())
+    }
+
+    override fun hireStudent(user: User, studentId: Long, companyId: Long?, startDate: LocalDate, endDate: LocalDate) {
+        if (user is Company) {
+            user.fieldTrainingList.filter {
+                it.student.id!! == studentId
+            }.map {
+                hiredStudentRepository.save(
+                    it.toHiredStudent(startDate)
+                )
+            }
+
+        } else if(user is Teacher) {
+            val company = companyId?.let {
+                companyRepository.findByIdOrNull(it)?: throw CompanyNotFoundException(it.toString())
+            }?: throw CompanyNotFoundException("If you Teacher, must need CompanyId")
+            company.fieldTrainingList.filter {
+                it.student.id!! == studentId
+            }.map {
+                hiredStudentRepository.save(
+                    it.toHiredStudent(startDate)
+                )
+            }
+        } else throw NoAuthenticationException(user.roleList.toString())
+    }
+
+    override fun fireStudent(user: User, studentId: Long, companyId: Long?) {
+        if (user is Company) {
+            hiredStudentRepository.delete(
+                hiredStudentRepository.findByStudentAndCompany(
+                    studentRepository.findByIdOrNull(studentId)?: throw UserNotFoundException(studentId.toString()),
+                    user
+                ).orElse(null)?: throw HiredStudentNotFound(studentId.toString())
+            )
+        } else if (user is Teacher) {
+            hiredStudentRepository.delete(
+                hiredStudentRepository.findByStudentAndCompany(
+                    studentRepository.findByIdOrNull(studentId)?: throw UserNotFoundException(studentId.toString()),
+                    companyRepository.findByIdOrNull(companyId)?: throw CompanyNotFoundException(companyId.toString())
+                ).orElse(null)?: throw HiredStudentNotFound(studentId.toString())
+            )
+        } else throw NoAuthenticationException(user.roleList.toString())
+    }
 
 }

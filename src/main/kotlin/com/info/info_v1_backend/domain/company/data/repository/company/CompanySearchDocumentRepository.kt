@@ -6,11 +6,13 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.mongodb.core.query.TextCriteria
 import org.springframework.data.mongodb.repository.MongoRepository
+import org.springframework.stereotype.Repository
 import java.util.Optional
 
+@Repository
 interface CompanySearchDocumentRepository: MongoRepository<CompanySearchDocument, ObjectId> {
 
-    fun findByCompanyId(companyId: String): Optional<CompanySearchDocument>
+    fun findByCompanyId(companyId: Long): Optional<CompanySearchDocument>
     fun findAllBy(criteria: TextCriteria, pageable: Pageable): Page<CompanySearchDocument>
     fun findByCompanyNameOrderByTextScoreDesc(companyName: String, pageable: Pageable): Page<CompanySearchDocument>
 

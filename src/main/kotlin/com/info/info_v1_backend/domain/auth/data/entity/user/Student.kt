@@ -1,9 +1,12 @@
 package com.info.info_v1_backend.domain.auth.data.entity.user
 
 import com.info.info_v1_backend.domain.auth.data.entity.type.Role
-import com.info.info_v1_backend.domain.auth.presentation.dto.request.EditMyInfo
-import com.info.info_v1_backend.domain.auth.presentation.dto.response.MinimumStudentList
+import com.info.info_v1_backend.domain.auth.business.dto.request.EditStudentInfoRequest
+import com.info.info_v1_backend.domain.auth.business.dto.response.MinimumStudent
+import com.info.info_v1_backend.domain.auth.business.dto.response.StudentInfoResponse
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
+import com.info.info_v1_backend.domain.company.data.entity.company.work.field.FieldTraining
+import com.info.info_v1_backend.domain.company.data.entity.company.work.hired.HiredStudent
 import com.info.info_v1_backend.domain.project.data.entity.Creation
 import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
@@ -18,8 +21,6 @@ class Student(
     name: String,
     email: String,
     password: String,
-    githubLink: String,
-    isHired: Boolean = false,
     creationList: MutableList<Creation>?,
 ): User(
     name,
@@ -29,37 +30,36 @@ class Student(
 ) {
     val studentKey: String = studentKey
 
-    @Column(name = "github_link", nullable = false)
-    var githubLink: String = githubLink
-
-    @Column(name =  "is_hired", nullable = false)
-    var isHired: Boolean = isHired
-
     @OneToMany(mappedBy = "student", cascade = [CascadeType.REMOVE])
     var creationList: MutableList<Creation>? = creationList
-    
-    @ManyToOne
-    var company: Company? = null
 
-    fun editMyInfo(request: EditMyInfo){
-        request.name?. let{
-            this.name = it
-        }
-        request.isHired?.let {
-            this.isHired = it
-        }
-        request.githubLink?.let{
-            this.githubLink
-        }
-    }
+    @OneToMany(mappedBy = "student")
+    var hiredStudent: MutableList<HiredStudent> = ArrayList()
+        protected set
 
-    fun toMinimumStudent(): MinimumStudentList.MinimumStudent{
-        return MinimumStudentList.MinimumStudent(
+    @OneToMany(mappedBy = "student")
+    var fieldTraining: MutableList<FieldTraining> = ArrayList()
+        protected set
+
+    fun toMinimumStudent(): MinimumStudent {
+        return MinimumStudent(
                 this.name,
                 this.studentKey,
                 this.id!!
         )
     }
+
+    fun toStudentInfoResponse(): StudentInfoResponse{
+        return StudentInfoResponse(
+            this.name,
+            this.email,
+            this.studentKey,
+            this.hiredStudent.isNotEmpty(),
+            this.hiredStudent.first().company.toMinimumCompanyResponse()
+        )
+
+    }
+
 
 
 }

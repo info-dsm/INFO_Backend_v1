@@ -6,7 +6,7 @@ class TechnologyUsageIdClass(
     technologyId: String,
     recruitmentBusinessId: Long
 ): Serializable {
-    val technologyId: String = technologyId
+    val technology: String = technologyId
 
-    val recruitmentBusinessId: Long = recruitmentBusinessId
+    val recruitmentBusiness: Long = recruitmentBusinessId
 }

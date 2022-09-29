@@ -4,8 +4,7 @@ import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.ObjectMetadata
 import com.amazonaws.services.s3.model.PutObjectRequest
 import com.amazonaws.util.IOUtils
-import com.info.info_v1_backend.global.file.dto.FileResponse
-import com.info.info_v1_backend.global.file.entity.File
+import com.info.info_v1_backend.global.file.dto.FileDto
 import com.info.info_v1_backend.global.file.entity.type.DocsExt
 import com.info.info_v1_backend.global.file.entity.type.FileType
 import com.info.info_v1_backend.global.file.entity.type.ImageExt
@@ -24,7 +23,7 @@ class S3Util(
     private val s3: AmazonS3Client
 ) {
 
-    fun uploadFile(file: MultipartFile, rootPathName: String, middlePathName: String): FileResponse {
+    fun uploadFile(file: MultipartFile, rootPathName: String, middlePathName: String): FileDto {
         val objectMetadata = ObjectMetadata()
         val bytes: ByteArray = IOUtils.toByteArray(file.inputStream)
 
@@ -53,7 +52,7 @@ class S3Util(
         } catch (err: Exception) {
             throw S3Exception(err.message.toString())
         }
-        return FileResponse(
+        return FileDto(
             getFileUrl(fileName),
             fileType,
             ext
