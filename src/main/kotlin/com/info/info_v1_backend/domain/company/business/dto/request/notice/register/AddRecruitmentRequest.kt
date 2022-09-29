@@ -5,5 +5,6 @@ data class AddRecruitmentRequest (
     val smallClassification: String,
     val numberOfEmployee: Int,
     val detailBusinessDescription: String?,
-    val gradeCutLine: Int?
+    val gradeCutLine: Int?,
+    val needCertificateList: List<String>
 )

@@ -84,13 +84,10 @@ class Notice(
     var interviewProcessList: MutableList<InterviewProcessUsage> = interviewProcessList as MutableList<InterviewProcessUsage>
         protected set
 
-
+    @Column(name = "need_documents", nullable = true)
     var needDocuments: String? = needDocuments
         protected set
 
-    @OneToMany(mappedBy = "notice")
-    var reporterList: MutableList<Reporter> = ArrayList()
-        protected set
 
     @Column(name = "notice_other_features", nullable = true)
     var otherFeatures: String? = otherFeatures
@@ -101,7 +98,6 @@ class Notice(
 
     @Column(name = "is_personal_contact", nullable = false)
     var isPersonalContact: Boolean = isPersonalContact
-
 
     @OneToMany(mappedBy = "notice")
     var formAttachmentList: MutableList<FormAttachment> = ArrayList()

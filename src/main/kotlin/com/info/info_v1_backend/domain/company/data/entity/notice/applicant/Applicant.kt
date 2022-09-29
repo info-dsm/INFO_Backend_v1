@@ -2,19 +2,12 @@ package com.info.info_v1_backend.domain.company.data.entity.notice.applicant
 
 import com.info.info_v1_backend.domain.auth.data.entity.user.Student
 import com.info.info_v1_backend.domain.company.data.entity.notice.Notice
+import com.info.info_v1_backend.domain.company.data.entity.notice.file.Reporter
 import com.info.info_v1_backend.global.base.entity.BaseTimeEntity
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Where
 import org.springframework.data.domain.Persistable
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
-import javax.persistence.IdClass
-import javax.persistence.JoinColumn
-import javax.persistence.ManyToOne
-import javax.persistence.Table
+import javax.persistence.*
 
 
 @Entity
@@ -39,6 +32,10 @@ class Applicant(
 
     @Column(name = "applicant_is_delete", nullable = false)
     var isDelete: Boolean = false
+        protected set
+
+    @OneToMany(mappedBy = "applicant")
+    var reporterList: MutableList<Reporter> = ArrayList()
         protected set
 
 

@@ -91,13 +91,22 @@ class NoticeController(
 
 
 
-    @PutMapping("")
+    @PutMapping("/approve")
     fun approveNotice(
         @AuthenticationPrincipal user: User?,
         @RequestParam(required = true) noticeId: Long
     ) {
         return noticeService.approveNotice(user?: throw TokenNotFoundException(), noticeId)
     }
+
+    @DeleteMapping("/approve")
+    fun rejectNotice(
+        @AuthenticationPrincipal user: User?,
+        @RequestParam(required = true) noticeId: Long
+    ) {
+        return noticeService.rejectNotice(user?: throw TokenNotFoundException(), noticeId)
+    }
+
 
     @GetMapping("/waiting-notice/list")
     fun getWaitingNoticeList(

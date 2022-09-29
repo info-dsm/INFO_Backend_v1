@@ -21,6 +21,7 @@ interface NoticeService {
     fun changeInterviewProcess(user: User, interviewProcessMap: Map<Int, InterviewProcess>, noticeId: Long)
 
     fun approveNotice(user: User, noticeId: Long)
+    fun rejectNotice(user: User, noticeId: Long)
     fun getWaitingNoticeList(user: User, idx: Int, size: Int): Page<MinimumNoticeResponse>
 
     fun applyNotice(user: User, noticeId: Long, reporterList: List<MultipartFile>)
@@ -32,5 +33,9 @@ interface NoticeService {
     fun searchMinimumNoticeList(query: String): Page<MinimumNoticeResponse>
 
     fun printNotice(user: User, noticeId: Long)
+
+    fun searchCertificate()
+    fun searchBigClassification()
+    fun searchSmallClassification()
 
 }

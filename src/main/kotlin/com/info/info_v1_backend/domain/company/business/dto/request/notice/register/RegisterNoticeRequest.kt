@@ -13,6 +13,6 @@ data class RegisterNoticeRequest(
     val needDocuments: String?,
     val otherFeatures: String?,
     val workPlace: WorkPlaceRequest,
-    val isPersonalContact: Boolean
+    val isPersonalContact: Boolean,
 
 )

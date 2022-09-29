@@ -63,7 +63,7 @@ class RecruitmentBusiness(
     var technologyList: MutableList<TechnologyUsage> = ArrayList()
         protected set
 
-    @OneToMany()
+    @OneToMany
     var needCertificateList: MutableList<Certificate> = ArrayList()
         protected set
 

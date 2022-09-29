@@ -18,14 +18,14 @@ import com.info.info_v1_backend.domain.company.data.entity.company.work.field.Fi
 import com.info.info_v1_backend.domain.company.data.entity.notice.file.FormAttachment
 import com.info.info_v1_backend.domain.company.data.entity.notice.Notice
 import com.info.info_v1_backend.domain.company.data.entity.notice.applicant.Applicant
+import com.info.info_v1_backend.domain.company.data.entity.notice.certificate.Certificate
 import com.info.info_v1_backend.domain.company.data.entity.notice.classification.RecruitmentBigClassification
 import com.info.info_v1_backend.domain.company.data.entity.notice.classification.RecruitmentSmallClassification
+import com.info.info_v1_backend.domain.company.data.entity.notice.file.Reporter
 import com.info.info_v1_backend.domain.company.data.entity.notice.interview.InterviewProcess
 import com.info.info_v1_backend.domain.company.data.entity.notice.interview.InterviewProcessUsage
 import com.info.info_v1_backend.domain.company.data.entity.notice.recruitment.RecruitmentBusiness
-import com.info.info_v1_backend.domain.company.data.repository.company.CompanyRepository
-import com.info.info_v1_backend.domain.company.data.repository.company.FieldTrainingRepository
-import com.info.info_v1_backend.domain.company.data.repository.company.HiredStudentRepository
+import com.info.info_v1_backend.domain.company.data.repository.company.*
 import com.info.info_v1_backend.domain.company.data.repository.notice.*
 import com.info.info_v1_backend.domain.company.exception.CompanyNotFoundException
 import com.info.info_v1_backend.domain.company.exception.NoticeNotFoundException
@@ -55,7 +55,9 @@ class NoticeServiceImpl(
     private val applicantRepository: ApplicantRepository,
     private val hiredStudentRepository: HiredStudentRepository,
     private val fieldTrainingRepository: FieldTrainingRepository,
-    private val formAttachementRepository: FileRepository<FormAttachment>
+    private val formAttachmentRepository: FileRepository<FormAttachment>,
+    private val certificateRepository: CertificateRepository,
+    private val reporterFileRepository: ReporterFileRepository
 ): NoticeService {
 
     override fun registerNotice(user: User, request: RegisterNoticeRequest, attachmentList: List<MultipartFile>) {
@@ -119,6 +121,16 @@ class NoticeServiceImpl(
                 )
             }
 
+            request.recruitmentRequest.needCertificateList.map {
+                certificateRepository.save(
+                    certificateRepository.findByIdOrNull(it)
+                        ?: Certificate(
+                            it,
+                            notice.recruitmentBusiness!!
+                        )
+                )
+            }
+
         } else throw IsNotContactorOrTeacher(user.roleList.toString())
     }
 
@@ -129,7 +141,7 @@ class NoticeServiceImpl(
             }
 
             attachmentList.map {
-                formAttachementRepository.save(
+                formAttachmentRepository.save(
                     FormAttachment(
                         s3Util.uploadFile(it, "notice/${noticeId}", "attachment"),
                         notice
@@ -177,6 +189,14 @@ class NoticeServiceImpl(
         } else throw NoAuthenticationException(noticeId.toString())
     }
 
+    override fun rejectNotice(user: User, noticeId: Long) {
+        if (user is Teacher) {
+            noticeRepository.delete(
+                noticeRepository.findByIdOrNull(noticeId)?: throw NoticeNotFoundException(noticeId.toString())
+            )
+        } else throw NoAuthenticationException(noticeId.toString())
+    }
+
     override fun getWaitingNoticeList(user: User, idx: Int, size: Int): Page<MinimumNoticeResponse> {
         if (user is Teacher) {
             return noticeRepository.findAllByApprove(false, PageRequest.of(idx, size, Sort.by("created_at").descending())).map {
@@ -188,12 +208,22 @@ class NoticeServiceImpl(
     override fun applyNotice(user: User, noticeId: Long, reporterList: List<MultipartFile>) {
         if (user is Student) {
             val notice = noticeRepository.findByIdOrNull(noticeId)?: throw NoticeNotFoundException(noticeId.toString())
-            applicantRepository.save(
+            val applicant = applicantRepository.save(
                 Applicant(
                     user,
                     notice,
                 )
             )
+
+            reporterList.map {
+                reporterFileRepository.save(
+                    Reporter(
+                        s3Util.uploadFile(it, "notice/${notice.id!!}", "reporter"),
+                        applicant
+                    )
+                )
+            }
+
         } else throw IsNotStudentException(user.roleList.toString())
     }
 
@@ -257,6 +287,18 @@ class NoticeServiceImpl(
     }
 
     override fun printNotice(user: User, noticeId: Long) {
+        TODO("Not yet implemented")
+    }
+
+    override fun searchCertificate() {
+        TODO("Not yet implemented")
+    }
+
+    override fun searchBigClassification() {
+        TODO("Not yet implemented")
+    }
+
+    override fun searchSmallClassification() {
         TODO("Not yet implemented")
     }
 }
