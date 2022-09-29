@@ -122,9 +122,9 @@ class AuthController(
 
     @PostMapping("/changeEmail")
     fun changeEmail(
-            @RequestBody req: ChangeEmailRequest,
+            @RequestBody request: ChangeEmailRequest,
             @AuthenticationPrincipal user: User?
     ){
-        authService.changeEmail(user?: throw UserNotFoundException("No User Found"), req)
+        authService.changeEmail(user?: throw UserNotFoundException("No User Found"), request)
     }
 }
