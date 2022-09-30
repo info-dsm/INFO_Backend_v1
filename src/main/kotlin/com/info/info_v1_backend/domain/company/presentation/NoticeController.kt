@@ -10,6 +10,8 @@ import com.info.info_v1_backend.domain.company.business.dto.response.notice.Mini
 import com.info.info_v1_backend.domain.company.business.service.NoticeService
 import com.info.info_v1_backend.domain.company.data.entity.notice.interview.InterviewProcess
 import com.info.info_v1_backend.global.error.common.TokenNotFoundException
+import com.info.info_v1_backend.global.file.dto.FileDto
+import com.info.info_v1_backend.global.file.dto.FileResponse
 import org.springframework.data.domain.Page
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -174,5 +176,14 @@ class NoticeController(
     ): Page<MinimumNoticeResponse> {
         return noticeService.searchMinimumNoticeList(query)
     }
+
+    @PostMapping("/out")
+    fun printNotice(
+        @AuthenticationPrincipal user: User?,
+        @RequestParam(required = true) noticeId: Long
+    ): FileResponse {
+        return noticeService.printNotice(user?: throw TokenNotFoundException(), noticeId)
+    }
+
 
 }

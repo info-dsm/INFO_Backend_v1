@@ -30,6 +30,8 @@ import com.info.info_v1_backend.domain.company.data.repository.notice.*
 import com.info.info_v1_backend.domain.company.exception.CompanyNotFoundException
 import com.info.info_v1_backend.domain.company.exception.NoticeNotFoundException
 import com.info.info_v1_backend.global.error.common.NoAuthenticationException
+import com.info.info_v1_backend.global.file.dto.FileDto
+import com.info.info_v1_backend.global.file.dto.FileResponse
 import com.info.info_v1_backend.global.file.repository.FileRepository
 import com.info.info_v1_backend.infra.amazon.s3.S3Util
 import org.springframework.data.domain.Page
@@ -286,7 +288,7 @@ class NoticeServiceImpl(
         }
     }
 
-    override fun printNotice(user: User, noticeId: Long) {
+    override fun printNotice(user: User, noticeId: Long): FileResponse {
         TODO("Not yet implemented")
     }
 

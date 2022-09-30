@@ -8,6 +8,8 @@ import com.info.info_v1_backend.domain.company.business.dto.request.notice.regis
 import com.info.info_v1_backend.domain.company.business.dto.response.notice.MaximumNoticeWithoutPayResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.notice.MinimumNoticeResponse
 import com.info.info_v1_backend.domain.company.data.entity.notice.interview.InterviewProcess
+import com.info.info_v1_backend.global.file.dto.FileDto
+import com.info.info_v1_backend.global.file.dto.FileResponse
 import org.springframework.data.domain.Page
 import org.springframework.web.multipart.MultipartFile
 
@@ -32,7 +34,7 @@ interface NoticeService {
     fun getMaximumNotice(id: Long): MaximumNoticeWithoutPayResponse
     fun searchMinimumNoticeList(query: String): Page<MinimumNoticeResponse>
 
-    fun printNotice(user: User, noticeId: Long)
+    fun printNotice(user: User, noticeId: Long): FileResponse
 
     fun searchCertificate()
     fun searchBigClassification()
