@@ -33,7 +33,7 @@ class AuthController(
     @PostMapping("/email/school")
     fun sendSchoolEmail(
         @RequestParam
-        @Pattern(regexp = "[a-zA-Z0-9+\\_.]+@dsm\\.hs\\.kr\$")
+        @Pattern(regexp = "[a-zA-Z\\d+_.]+@dsm\\.hs\\.kr$")
         email: String
     ){
         emailService.sendCodeToEmail(email)
