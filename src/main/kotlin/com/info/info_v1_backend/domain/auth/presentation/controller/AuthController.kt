@@ -76,7 +76,7 @@ class AuthController(
     fun sendPasswordCode(
         @AuthenticationPrincipal user: User?
     ){
-        emailService.sendCodeToEmail(
+        emailService.sendPasswordCodeToEmail(
             (user?: throw UserNotFoundException("No User Found")).email
         )
     }

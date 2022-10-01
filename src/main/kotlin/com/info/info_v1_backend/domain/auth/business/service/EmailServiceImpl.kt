@@ -21,15 +21,23 @@ class EmailServiceImpl(
         const val AUTH_MAIL_TITLE = "[인증번호]"
     }
 
-    override fun sendCodeToEmail(email: String) {
-        userRepository.findByEmail(email).orElse(null)?. let{
-            throw UserAlreadyExists(email)
-        }
+    private fun sendCode(email: String){
         val random = RandomStringUtils.randomNumeric(CODE_LENGTH)
         val emailCheckCode = CheckEmailCode(email, random)
         checkEmailCodeRepository.save(emailCheckCode)
         val map = HashMap<String, String>()
         map["code"] = random
         mailSender.sendHtmlMail(email, AUTH_MAIL_TITLE, "mail.html", map)
+    }
+
+    override fun sendCodeToEmail(email: String) {
+        userRepository.findByEmail(email).orElse(null)?. let{
+            throw UserAlreadyExists(email)
+        }
+        sendCode(email)
+    }
+
+    override fun sendPasswordCodeToEmail(email: String) {
+        sendCode(email)
     }
 }
