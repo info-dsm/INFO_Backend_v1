@@ -13,7 +13,6 @@ import java.util.Optional
 interface CompanySearchDocumentRepository: MongoRepository<CompanySearchDocument, ObjectId> {
 
     fun findByCompanyId(companyId: Long): Optional<CompanySearchDocument>
-    fun findAllBy(criteria: TextCriteria, pageable: Pageable): Page<CompanySearchDocument>
     fun findByCompanyNameOrderByTextScoreDesc(companyName: String, pageable: Pageable): Page<CompanySearchDocument>
 
 }

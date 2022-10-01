@@ -7,6 +7,7 @@ import com.info.info_v1_backend.domain.auth.business.dto.response.StudentInfoRes
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
 import com.info.info_v1_backend.domain.company.data.entity.company.work.field.FieldTraining
 import com.info.info_v1_backend.domain.company.data.entity.company.work.hired.HiredStudent
+import com.info.info_v1_backend.domain.company.data.entity.notice.applicant.Applicant
 import com.info.info_v1_backend.domain.project.data.entity.Creation
 import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
@@ -39,6 +40,10 @@ class Student(
 
     @OneToMany(mappedBy = "student")
     var fieldTraining: MutableList<FieldTraining> = ArrayList()
+        protected set
+
+    @OneToMany(mappedBy = "student")
+    var applicantList: MutableList<Applicant> = ArrayList()
         protected set
 
     fun toMinimumStudent(): MinimumStudent {

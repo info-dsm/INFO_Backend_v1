@@ -14,8 +14,11 @@ import com.info.info_v1_backend.domain.company.data.entity.company.file.Business
 import com.info.info_v1_backend.domain.company.data.entity.company.file.CompanyIntroductionFile
 import com.info.info_v1_backend.domain.company.data.entity.company.file.CompanyLogoFile
 import com.info.info_v1_backend.domain.company.data.entity.company.file.CompanyPhotoFile
+import com.info.info_v1_backend.domain.company.data.entity.company.work.field.FieldTraining
+import com.info.info_v1_backend.domain.company.data.entity.company.work.field.FieldTrainingIdClass
 import com.info.info_v1_backend.domain.company.data.repository.company.CompanyRepository
 import com.info.info_v1_backend.domain.company.data.repository.company.CompanySearchDocumentRepository
+import com.info.info_v1_backend.domain.company.data.repository.company.FieldTrainingRepository
 import com.info.info_v1_backend.domain.company.data.repository.company.HiredStudentRepository
 import com.info.info_v1_backend.domain.company.data.repository.notice.NoticeSearchDocumentRepository
 import com.info.info_v1_backend.domain.company.exception.*
@@ -37,7 +40,6 @@ import javax.transaction.Transactional
 @Transactional
 class CompanyServiceImpl(
     private val companyRepository: CompanyRepository,
-    private val currentUtil: CurrentUtil,
     private val studentRepository: UserRepository<Student>,
     private val companySearchDocumentRepository: CompanySearchDocumentRepository,
     private val noticeSearchDocumentRepository: NoticeSearchDocumentRepository,
@@ -237,45 +239,5 @@ class CompanyServiceImpl(
         throw NoAuthenticationException(user.roleList.toString())
     }
 
-    override fun hireStudent(user: User, studentId: Long, companyId: Long?, startDate: LocalDate, endDate: LocalDate) {
-        if (user is Company) {
-            user.fieldTrainingList.filter {
-                it.student.id!! == studentId
-            }.map {
-                hiredStudentRepository.save(
-                    it.toHiredStudent(startDate)
-                )
-            }
-
-        } else if(user is Teacher) {
-            val company = companyId?.let {
-                companyRepository.findByIdOrNull(it)?: throw CompanyNotFoundException(it.toString())
-            }?: throw CompanyNotFoundException("If you Teacher, must need CompanyId")
-            company.fieldTrainingList.filter {
-                it.student.id!! == studentId
-            }.map {
-                hiredStudentRepository.save(
-                    it.toHiredStudent(startDate)
-                )
-            }
-        } else throw NoAuthenticationException(user.roleList.toString())
-    }
-
-    override fun fireStudent(user: User, studentId: Long, companyId: Long?) {
-        if (user is Company) {
-        (hiredStudentRepository.findByStudentAndCompany(
-                studentRepository.findByIdOrNull(studentId)?: throw UserNotFoundException(studentId.toString()),
-                    user
-                ).orElse(null)?: throw HiredStudentNotFound(studentId.toString())
-                ).makeFire()
-        } else if (user is Teacher) {
-            (hiredStudentRepository.findByStudentAndCompany(
-                studentRepository.findByIdOrNull(studentId)?: throw UserNotFoundException(studentId.toString()),
-                companyRepository.findByIdOrNull(companyId)?: throw CompanyNotFoundException(companyId.toString())
-            ).orElse(null)?: throw HiredStudentNotFound(studentId.toString())
-            ).makeFire()
-
-        } else throw NoAuthenticationException(user.roleList.toString())
-    }
 
 }

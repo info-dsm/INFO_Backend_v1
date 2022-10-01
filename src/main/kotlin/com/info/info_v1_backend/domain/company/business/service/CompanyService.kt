@@ -30,9 +30,4 @@ interface CompanyService {
     //Associate
     fun makeAssociated(user: User, companyId: Long)
 
-    //Student
-    fun hireStudent(user: User, studentId: Long, companyId: Long?, startDate: LocalDate, endDate: LocalDate)
-    fun fireStudent(user: User, studentId: Long, companyId: Long?)
-
-
 }

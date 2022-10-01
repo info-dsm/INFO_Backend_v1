@@ -60,6 +60,14 @@ class OpenApiConfiguration {
     }
 
     @Bean
+    fun hireOpenApi(): GroupedOpenApi {
+        return GroupedOpenApi.builder()
+            .group("채용 인원 이동")
+            .pathsToMatch("/api/info/v1/hire/**")
+            .build()
+    }
+
+    @Bean
     fun projectOpenApi(): GroupedOpenApi {
         return GroupedOpenApi.builder()
             .group("프로젝트")

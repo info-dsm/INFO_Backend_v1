@@ -16,6 +16,7 @@ import javax.persistence.IdClass
 import javax.persistence.JoinColumn
 import javax.persistence.JoinColumns
 import javax.persistence.ManyToOne
+import javax.persistence.OneToMany
 import javax.persistence.OneToOne
 import javax.persistence.Table
 
@@ -32,7 +33,7 @@ class HiredStudent(
 ): BaseTimeEntity(), Persistable<String>, java.io.Serializable {
 
     @Id
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "student_id")
     val student: Student = student
 

@@ -18,6 +18,8 @@ enum class ErrorCode(
     INVALID_COMPANY_CHECK_CODE("Invalid Company Check Code", HttpStatus.BAD_REQUEST),
     STUDENT_ALREADY_WRITTEN_COMMENT("you have Already Written comment", HttpStatus.BAD_REQUEST),
     CONTACTOR_MUST_LEAVE_LEAST_AT_ONE_ON_COMPANY("Contactor Must leave least at one on company", HttpStatus.BAD_REQUEST),
+    IS_NOT_FIELD_TRAINING_STUDENT("Is not fieldtraining student", HttpStatus.BAD_REQUEST),
+    IS_ALREADY_FIELD_TRAINING_STUDENT("Is already field training student", HttpStatus.BAD_REQUEST),
 
     //401
     TOKEN_NOT_FOUND("Token Not Found", HttpStatus.UNAUTHORIZED),
@@ -46,6 +48,7 @@ enum class ErrorCode(
     IS_NOT_CONTACTOR_OR_TEACHER("Is Not Contactor Or Teacher", HttpStatus.NOT_FOUND),
     FILE_NOT_FOUND("File not Found", HttpStatus.NOT_FOUND),
     HIRED_STUDENT_NOT_FOUND("Hired Student Not Found", HttpStatus.NOT_FOUND),
+    FIELD_TRAINING_NOT_FOUND("Field training not found", HttpStatus.NOT_FOUND),
 
 
     //500

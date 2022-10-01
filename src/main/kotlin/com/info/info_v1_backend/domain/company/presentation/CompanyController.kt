@@ -1,6 +1,7 @@
 package com.info.info_v1_backend.domain.company.presentation
 
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
+import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
 import com.info.info_v1_backend.domain.company.business.dto.request.company.EditCompanyRequest
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MinimumCompanyResponse
@@ -37,7 +38,6 @@ class CompanyController(
     fun editCompany(
         @AuthenticationPrincipal user: User?,
         @RequestBody request: EditCompanyRequest,
-        @RequestParam(required = true) id: Long
     ) {
         companyService.editCompany(user?: throw TokenNotFoundException(), request)
     }
@@ -146,35 +146,6 @@ class CompanyController(
         )
     }
 
-    @PostMapping("/{companyId}/student/{studentId}")
-    fun hireStudent(
-        @AuthenticationPrincipal user: User?,
-        @PathVariable studentId: Long,
-        @PathVariable companyId: Long,
-        @RequestParam(required = true) startDate: LocalDate,
-        @RequestParam(required = true) endDate: LocalDate
-    ) {
-        companyService.hireStudent(
-            user?: throw TokenNotFoundException(),
-            studentId,
-            companyId,
-            startDate,
-            endDate
-        )
-    }
-
-    @DeleteMapping("/{companyId}/student/{studentId}")
-    fun fireStudent(
-        @AuthenticationPrincipal user: User?,
-        @PathVariable studentId: Long,
-        @PathVariable companyId: Long,
-    ) {
-        companyService.fireStudent(
-            user?: throw TokenNotFoundException(),
-            studentId,
-            companyId
-        )
-    }
 
 
 }

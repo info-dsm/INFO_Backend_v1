@@ -124,36 +124,6 @@ class NoticeController(
     }
 
 
-
-
-
-    @PostMapping("/apply")
-    fun applyNotice(
-        @AuthenticationPrincipal user: User?,
-        @RequestParam noticeId: Long,
-        @RequestPart reporterList: List<MultipartFile>
-    ) {
-        noticeService.applyNotice(user?: throw TokenNotFoundException(), noticeId, reporterList)
-    }
-
-    @GetMapping("/notice/{noticeId}")
-    fun getApplierList(
-        @AuthenticationPrincipal user: User?,
-        @PathVariable noticeId: Long
-    ): List<MinimumStudent> {
-        return noticeService.getApplierList(user?: throw TokenNotFoundException(), noticeId)
-    }
-
-    @PutMapping("/notice/{noticeId}/field")
-    fun makeFieldTrainingAndCloseNotice(
-        @AuthenticationPrincipal user: User?,
-        @PathVariable noticeId: Long,
-        @RequestBody request: CloseNoticeRequest
-    ) {
-        noticeService.makeFieldTrainingAndCloseNotice(user?: throw TokenNotFoundException(), request, noticeId)
-    }
-
-
     @GetMapping("/list")
     fun getMinimumNoticeList(
         @RequestParam(defaultValue = "0") idx: Int,

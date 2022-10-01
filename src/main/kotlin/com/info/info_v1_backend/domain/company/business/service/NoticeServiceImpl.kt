@@ -11,14 +11,14 @@ import com.info.info_v1_backend.domain.company.business.dto.request.notice.Close
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.edit.EditNoticeRequest
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.register.AddRecruitmentRequest
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.register.RegisterNoticeRequest
-import com.info.info_v1_backend.domain.company.business.dto.response.notice.MaximumNoticeWithoutPayResponse
-import com.info.info_v1_backend.domain.company.business.dto.response.notice.MinimumNoticeResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.notice.*
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
 import com.info.info_v1_backend.domain.company.data.entity.company.work.field.FieldTraining
 import com.info.info_v1_backend.domain.company.data.entity.notice.file.FormAttachment
 import com.info.info_v1_backend.domain.company.data.entity.notice.Notice
 import com.info.info_v1_backend.domain.company.data.entity.notice.applicant.Applicant
 import com.info.info_v1_backend.domain.company.data.entity.notice.certificate.Certificate
+import com.info.info_v1_backend.domain.company.data.entity.notice.certificate.CertificateSearchDocument
 import com.info.info_v1_backend.domain.company.data.entity.notice.classification.RecruitmentBigClassification
 import com.info.info_v1_backend.domain.company.data.entity.notice.classification.RecruitmentSmallClassification
 import com.info.info_v1_backend.domain.company.data.entity.notice.file.Reporter
@@ -50,16 +50,11 @@ class NoticeServiceImpl(
     private val recruitmentBusinessRepository: RecruitmentBusinessRepository,
     private val bigClassificationRepository: RecruitmentBigClassificationRepository,
     private val smallClassificationRepository: RecruitmentSmallClassificationRepository,
-    private val studentRepository: StudentRepository,
     private val noticeSearchDocumentRepository: NoticeSearchDocumentRepository,
-    private val companyRepository: CompanyRepository,
     private val s3Util: S3Util,
-    private val applicantRepository: ApplicantRepository,
-    private val hiredStudentRepository: HiredStudentRepository,
-    private val fieldTrainingRepository: FieldTrainingRepository,
     private val formAttachmentRepository: FileRepository<FormAttachment>,
     private val certificateRepository: CertificateRepository,
-    private val reporterFileRepository: ReporterFileRepository
+    private val certificateSearchDocumentRepository: CertificateSearchDocumentRepository
 ): NoticeService {
 
     override fun registerNotice(user: User, request: RegisterNoticeRequest, attachmentList: List<MultipartFile>) {
@@ -207,57 +202,7 @@ class NoticeServiceImpl(
         } else throw NoAuthenticationException(user.roleList.toString())
     }
 
-    override fun applyNotice(user: User, noticeId: Long, reporterList: List<MultipartFile>) {
-        if (user is Student) {
-            val notice = noticeRepository.findByIdOrNull(noticeId)?: throw NoticeNotFoundException(noticeId.toString())
-            val applicant = applicantRepository.save(
-                Applicant(
-                    user,
-                    notice,
-                )
-            )
 
-            reporterList.map {
-                reporterFileRepository.save(
-                    Reporter(
-                        s3Util.uploadFile(it, "notice/${notice.id!!}", "reporter"),
-                        applicant
-                    )
-                )
-            }
-
-        } else throw IsNotStudentException(user.roleList.toString())
-    }
-
-    override fun getApplierList(user: User, noticeId: Long): List<MinimumStudent> {
-        if (user is Company || user is Teacher) {
-            val notice = noticeRepository.findByIdOrNull(noticeId)?: throw NoticeNotFoundException(noticeId.toString())
-            return notice.applicantList.map {
-                it.student.toMinimumStudent()
-            }
-        } else throw NoAuthenticationException(noticeId.toString())
-    }
-
-    override fun makeFieldTrainingAndCloseNotice(user: User, request: CloseNoticeRequest, noticeId: Long) {
-        if (user is Company || user is Teacher) {
-            val notice = noticeRepository.findByIdOrNull(noticeId) ?: throw NoticeNotFoundException(noticeId.toString())
-
-            notice.applicantList.filter {
-                request.studentIdList.contains(
-                    it.student.id!!
-                )
-            }.map { applicant: Applicant ->
-                fieldTrainingRepository.save(
-                    FieldTraining(
-                        applicant.student,
-                        notice.company,
-                        request.fieldTrainingStartDate,
-                        request.fieldTrainingEndDate
-                    )
-                )
-            }
-        } else throw NoAuthenticationException(user.roleList.toString())
-    }
 
     private fun checkAuthentication(current: User, notice: Notice): Boolean {
         return (current is Company && current.noticeList.contains(notice))
@@ -292,15 +237,28 @@ class NoticeServiceImpl(
         TODO("Not yet implemented")
     }
 
-    override fun searchCertificate() {
+    override fun searchCertificate(query: String): Page<CertificateResponse> {
+        return certificateSearchDocumentRepository.findByCertificateNameOrderBOrderByTextScoreDesc(query, PageRequest.of(0, 10)).map {
+                certificateSearchDocument: CertificateSearchDocument ->
+            certificateRepository.findByIdOrNull(certificateSearchDocument.certificateName)?.let {
+                CertificateResponse(
+                    certificateSearchDocument.certificateName
+                )
+            }?: let<NoticeServiceImpl, CertificateResponse> {
+                certificateRepository.deleteById(certificateSearchDocument.certificateName)
+                return@let CertificateResponse(
+                    certificateSearchDocument.certificateName
+                )
+            }
+        }
+    }
+
+    override fun searchBigClassification(query: String): List<BigClassificationResponse> {
         TODO("Not yet implemented")
     }
 
-    override fun searchBigClassification() {
+    override fun searchSmallClassification(query: String): List<SmallClassificationResponse> {
         TODO("Not yet implemented")
     }
 
-    override fun searchSmallClassification() {
-        TODO("Not yet implemented")
-    }
 }

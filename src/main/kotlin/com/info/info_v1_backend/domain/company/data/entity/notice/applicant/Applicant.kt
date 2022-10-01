@@ -47,5 +47,4 @@ class Applicant(
         return this.createdAt == null
     }
 
-
 }

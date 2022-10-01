@@ -32,7 +32,7 @@ class FieldTraining(
 ): BaseTimeEntity(), Persistable<String>, java.io.Serializable {
 
     @Id
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "student_id", nullable = false, insertable = false, updatable = false)
     val student: Student = student
 
@@ -64,6 +64,10 @@ class FieldTraining(
     var hiredStudent: HiredStudent? = null
         protected set
 
+    @Column(name = "field_training_is_linked")
+    var isLinked: Boolean = false
+        protected set
+
     @Column(name = "hired_student_is_delete", nullable = false)
     var isDelete: Boolean = false
         protected set
@@ -76,7 +80,14 @@ class FieldTraining(
         return this.createdAt == null
     }
 
+    fun makeNoLinked() {
+        this.isLinked = false
+    }
+
+
+
     fun toHiredStudent(startDate: LocalDate): HiredStudent {
+        this.isLinked = true
         this.endDate = startDate
         return HiredStudent(
             this.student,
@@ -99,5 +110,8 @@ class FieldTraining(
             }?: false
         )
     }
+
+
+
 
 }
