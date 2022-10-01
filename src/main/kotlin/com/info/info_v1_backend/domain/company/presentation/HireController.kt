@@ -49,7 +49,7 @@ class HireController(
 
 
 
-    @PutMapping("/{companyId}/student/{studentId}")
+    @PutMapping("/field-training/{noticeId}")
     fun makeFieldTrainingStudent(
         @AuthenticationPrincipal user: User?,
         @PathVariable noticeId: Long,
@@ -62,7 +62,7 @@ class HireController(
         )
     }
 
-    @DeleteMapping("/{companyId}/student/{studentId}")
+    @DeleteMapping("/field-training/{companyId}/student/{studentId}")
     fun fireFieldTrainingStudent(
         @AuthenticationPrincipal user: User?,
         @PathVariable companyId: Long,

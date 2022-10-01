@@ -238,7 +238,7 @@ class NoticeServiceImpl(
     }
 
     override fun searchCertificate(query: String): Page<CertificateResponse> {
-        return certificateSearchDocumentRepository.findByCertificateNameOrderBOrderByTextScoreDesc(query, PageRequest.of(0, 10)).map {
+        return certificateSearchDocumentRepository.findByCertificateNameOrderByTextScoreDesc(query, PageRequest.of(0, 10)).map {
                 certificateSearchDocument: CertificateSearchDocument ->
             certificateRepository.findByIdOrNull(certificateSearchDocument.certificateName)?.let {
                 CertificateResponse(

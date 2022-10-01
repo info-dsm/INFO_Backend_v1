@@ -8,5 +8,5 @@ import org.springframework.data.mongodb.repository.MongoRepository
 
 interface CertificateSearchDocumentRepository: MongoRepository<CertificateSearchDocument, ObjectId> {
 
-    fun findByCertificateNameOrderBOrderByTextScoreDesc(certificateName: String, pageable: Pageable): Page<CertificateSearchDocument>
+    fun findByCertificateNameOrderByTextScoreDesc(certificateName: String, pageable: Pageable): Page<CertificateSearchDocument>
 }
