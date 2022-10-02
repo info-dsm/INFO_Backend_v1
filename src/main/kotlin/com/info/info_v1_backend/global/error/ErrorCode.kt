@@ -49,6 +49,7 @@ enum class ErrorCode(
     FILE_NOT_FOUND("File not Found", HttpStatus.NOT_FOUND),
     HIRED_STUDENT_NOT_FOUND("Hired Student Not Found", HttpStatus.NOT_FOUND),
     FIELD_TRAINING_NOT_FOUND("Field training not found", HttpStatus.NOT_FOUND),
+    APPLICANT_USER_NOT_FOUND("Applicant user not found", HttpStatus.NOT_FOUND),
 
 
     //500

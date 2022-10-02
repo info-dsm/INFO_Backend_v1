@@ -137,7 +137,10 @@ class Notice(
         return MinimumNoticeResponse(
             this.id!!,
             this.company.toMinimumCompanyResponse(),
-            this.recruitmentBusiness!!.toRecruitmentBusinessResponse()
+            this.recruitmentBusiness!!.toRecruitmentBusinessResponse(),
+            this.applicantList.filter {
+                !it.isDelete
+            }.size
         )
     }
 
@@ -158,7 +161,10 @@ class Notice(
             this.workPlace.toWorkPlaceRequest(),
             this.formAttachmentList.map {
                 it.toFileResponse()
-            }
+            },
+            this.applicantList.filter {
+                !it.isDelete
+            }.size
         )
     }
 

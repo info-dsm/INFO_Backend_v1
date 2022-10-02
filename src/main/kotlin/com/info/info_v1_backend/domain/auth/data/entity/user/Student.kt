@@ -35,11 +35,11 @@ class Student(
     var creationList: MutableList<Creation>? = creationList
 
     @OneToMany(mappedBy = "student")
-    var hiredStudent: MutableList<HiredStudent> = ArrayList()
+    var hiredStudentList: MutableList<HiredStudent> = ArrayList()
         protected set
 
     @OneToMany(mappedBy = "student")
-    var fieldTraining: MutableList<FieldTraining> = ArrayList()
+    var fieldTrainingList: MutableList<FieldTraining> = ArrayList()
         protected set
 
     @OneToMany(mappedBy = "student")
@@ -59,12 +59,15 @@ class Student(
             this.name,
             this.email,
             this.studentKey,
-            this.hiredStudent.isNotEmpty(),
-            this.hiredStudent.filter {
-                !it.isFire
-            }.first().let {
-                it.company.toMinimumCompanyResponse()
-            }
+            this.fieldTrainingList.filter {
+                !it.isDelete || !it.isLinked
+            }.isNotEmpty(),
+            this.hiredStudentList.filter {
+                !it.isFire || !it.isDelete
+            }.isNotEmpty(),
+            this.hiredStudentList.first {
+                !it.isFire || !it.isDelete
+            }?.company.toMinimumCompanyResponse()
         )
     }
 

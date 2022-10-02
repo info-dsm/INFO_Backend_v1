@@ -6,6 +6,7 @@ import com.info.info_v1_backend.domain.company.business.dto.request.notice.Close
 import com.info.info_v1_backend.domain.company.business.service.HireService
 import com.info.info_v1_backend.global.error.common.TokenNotFoundException
 import org.springframework.data.domain.Page
+import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
@@ -23,7 +24,7 @@ class HireController(
     fun applyNotice(
         @AuthenticationPrincipal user: User?,
         @PathVariable noticeId: Long,
-        @RequestPart reporter: List<MultipartFile>
+        @RequestPart(required = true) reporter: List<MultipartFile>
     ){
         return hireService.applyNotice(
             user?: throw TokenNotFoundException(),
@@ -47,9 +48,24 @@ class HireController(
         )
     }
 
+    @DeleteMapping("/apply/{noticeId}/{studentId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun cancelApply(
+        @AuthenticationPrincipal user: User?,
+        @PathVariable noticeId: Long,
+        @PathVariable studentId: Long
+    ) {
+        return hireService.cancelApply(
+            user?: throw TokenNotFoundException(),
+            noticeId,
+            studentId
+        )
+    }
 
 
-    @PutMapping("/field-training/{noticeId}")
+
+    @PostMapping("/field-training/{noticeId}")
+    @ResponseStatus(HttpStatus.CREATED)
     fun makeFieldTrainingStudent(
         @AuthenticationPrincipal user: User?,
         @PathVariable noticeId: Long,
@@ -63,6 +79,7 @@ class HireController(
     }
 
     @DeleteMapping("/field-training/{companyId}/student/{studentId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     fun fireFieldTrainingStudent(
         @AuthenticationPrincipal user: User?,
         @PathVariable companyId: Long,
@@ -91,6 +108,7 @@ class HireController(
     }
 
     @DeleteMapping("/{companyId}/student/{studentId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     fun fireStudent(
         @AuthenticationPrincipal user: User?,
         @PathVariable studentId: Long,

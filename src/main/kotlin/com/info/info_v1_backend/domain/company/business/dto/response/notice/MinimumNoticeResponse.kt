@@ -6,5 +6,6 @@ data class MinimumNoticeResponse(
     val noticeId: Long,
     val company: MinimumCompanyResponse,
     val recruitmentBusinessResponse: RecruitmentBusinessResponse,
+    val applicantCount: Int
 
 )

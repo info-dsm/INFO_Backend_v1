@@ -36,7 +36,9 @@ class BoardServiceImpl(
         var employStudentCnt = 0
 
         studentRepository.findAllByStudentKeyStartingWith("3${classInfo.classNum}").map { student ->
-            student.hiredStudent.map {
+            student.hiredStudentList.filter {
+                !it.isFire || !it.isDelete
+            }.map {
                     hiredStudent: HiredStudent ->
                 indicationDtoList.add(
                     IndicationDto(
@@ -53,6 +55,26 @@ class BoardServiceImpl(
                     )
                 )
                 employStudentCnt++
+            }.isEmpty().let {
+                student.fieldTrainingList.filter {
+                    !it.isDelete
+                }.map {
+                    indicationDtoList.add(
+                        IndicationDto(
+                            it.company.id!!,
+                            it.company.name,
+                            (it.company.companyIntroduction.companyLogo
+                                ?.toFileResponse())
+                                ?: FileResponse(
+                                    0,
+                                    "https://cdn.pixabay.com/photo/2017/02/13/01/26/the-question-mark-2061539_960_720.png",
+                                    FileType.DOCS,
+                                    "png"
+                                )
+                        )
+                    )
+                    employStudentCnt++
+                }
             }
             totalStudentCnt++
         }

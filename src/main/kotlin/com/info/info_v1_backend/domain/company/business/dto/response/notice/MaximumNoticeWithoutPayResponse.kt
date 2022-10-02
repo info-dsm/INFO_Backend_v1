@@ -20,6 +20,7 @@ data class MaximumNoticeWithoutPayResponse(
     val needDocuments: String?,
     val otherFeatures: String?,
     val workPlace: WorkPlaceRequest,
-    val formAttachmentList: List<FileResponse>
+    val formAttachmentList: List<FileResponse>,
+    val applicantCount: Int
 
 )

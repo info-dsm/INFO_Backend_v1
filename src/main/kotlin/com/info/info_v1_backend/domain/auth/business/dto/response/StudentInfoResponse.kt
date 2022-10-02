@@ -6,6 +6,7 @@ data class StudentInfoResponse(
     override val name: String,
     override val email: String,
     val studentKey: String,
+    val isFieldTraining: Boolean,
     val isHired: Boolean,
     val company: MinimumCompanyResponse?
 ) : UserInfoResponse()

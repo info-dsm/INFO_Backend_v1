@@ -79,6 +79,23 @@ class HireServiceImpl(
         } else throw NoAuthenticationException(noticeId.toString())
     }
 
+    override fun cancelApply(user: User, noticeId: Long, studentId: Long) {
+        if (user is Student) {
+            applicantRepository.delete(
+                user.applicantList.filter {
+                    !it.isDelete && it.student.id == user.id && it.notice.id!! == noticeId
+                }.firstOrNull()?: throw ApplicantUserNotFoundException("${user.id}, $noticeId")
+            )
+        } else if (user is Teacher) {
+            applicantRepository.delete(
+                applicantRepository.findByNoticeAndStudent(
+                    noticeRepository.findByIdOrNull(noticeId)?: throw NoticeNotFoundException(noticeId.toString()),
+                    studentRepository.findByIdOrNull(studentId)?: throw UserNotFoundException(studentId.toString())
+                ).orElse(null)?: throw ApplicantUserNotFoundException("$studentId, $noticeId")
+            )
+        } else throw NoAuthenticationException(user.roleList.toString())
+    }
+
     override fun makeFieldTrainingAndCloseNotice(user: User, request: CloseNoticeRequest, noticeId: Long) {
         if (user is Company || user is Teacher) {
             val notice = noticeRepository.findByIdOrNull(noticeId) ?: throw NoticeNotFoundException(noticeId.toString())

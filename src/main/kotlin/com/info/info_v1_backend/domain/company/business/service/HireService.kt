@@ -11,8 +11,9 @@ interface HireService {
 
     fun applyNotice(user: User, noticeId: Long, reporterList: List<MultipartFile>)
     fun getApplierList(user: User, noticeId: Long, idx: Int, size: Int): Page<MinimumStudent>
-    fun makeFieldTrainingAndCloseNotice(user: User, request: CloseNoticeRequest, noticeId: Long)
+    fun cancelApply(user: User, noticeId: Long, studentId: Long)
 
+    fun makeFieldTrainingAndCloseNotice(user: User, request: CloseNoticeRequest, noticeId: Long)
     fun fireFieldTrainingStudent(user: User, studentId: Long, companyId: Long)
 
     fun hireStudent(user: User, studentId: Long, companyId: Long, startDate: LocalDate)
