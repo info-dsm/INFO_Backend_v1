@@ -12,7 +12,7 @@ class CustomAuthDetailsService(
     private val userRepository: UserRepository<User>
 ): UserDetailsService {
     override fun loadUserByUsername(username: String): UserDetails {
-        return userRepository.findById(11).orElse(null)?: throw UserNotFoundException(username)
+        return userRepository.findById(username.toLong()).orElse(null)?: throw UserNotFoundException(username)
     }
 
 }
