@@ -75,20 +75,5 @@ class UserServiceImpl(
             }
     }
 
-    override fun getFieldTrainingStudentList(user: User, idx: Int, size: Int): Page<MinimumStudent> {
-        if (user is Teacher) {
-            return fieldTrainingRepository.findAll(PageRequest.of(idx, size)).map {
-                it.student.toMinimumStudent()
-            }
-        } else throw NoAuthenticationException(user.roleList.toString())
-    }
-
-    override fun getHiredStudentList(user: User, idx: Int, size: Int): Page<MinimumStudent> {
-        if (user is Teacher) {
-            return hiredStudentRepository.findAll(PageRequest.of(idx, size)).map {
-                it.student.toMinimumStudent()
-            }
-        } else throw NoAuthenticationException(user.roleList.toString())
-    }
 
 }

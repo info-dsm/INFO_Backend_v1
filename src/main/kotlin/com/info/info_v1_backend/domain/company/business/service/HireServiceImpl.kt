@@ -24,6 +24,7 @@ import com.info.info_v1_backend.domain.company.data.repository.notice.NoticeRepo
 import com.info.info_v1_backend.domain.company.exception.*
 import com.info.info_v1_backend.global.error.common.NoAuthenticationException
 import com.info.info_v1_backend.infra.amazon.s3.S3Util
+import org.joda.time.Days
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -32,6 +33,8 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.Month
 import java.time.Year
 
 @Service
@@ -105,7 +108,7 @@ class HireServiceImpl(
         else {
             companyRepository.findByIdOrNull(companyId)?. let {
                 return it.fieldTrainingList.filter {
-                    !it.isDelete && !it.isLinked
+                    !it.isDelete && !it.isLinked && it.createdAt!!.year == LocalDateTime.now().year
                 }.map {
                     it.toFieldTrainingResponse()
                 }
@@ -160,7 +163,7 @@ class HireServiceImpl(
         else {
             companyRepository.findByIdOrNull(companyId)?. let {
                 return it.hiredStudentList.filter {
-                    !it.isDelete && !it.isFire
+                    !it.isDelete && !it.isFire && it.createdAt!!.year == LocalDateTime.now().year
                 }.map {
                     it.toHiredStudentResponse()
                 }
@@ -219,7 +222,10 @@ class HireServiceImpl(
         size: Int,
         year: Year
     ): Page<FieldTrainingStudentWithHiredResponse> {
-        return fieldTrainingRepository.findAllByCreatedAtIsStartingWith(year, PageRequest.of(idx, size)).map {
+        return fieldTrainingRepository.findAllByCreatedAtBetween(
+            LocalDateTime.of(year.value, Month.JANUARY, 1, 0, 0, 0),
+            LocalDateTime.of(year.value, Month.DECEMBER, 31, 23, 59, 59),
+            PageRequest.of(idx, size)).map {
             it.toFieldTrainingStudentWithHiredResponse()
         }
     }

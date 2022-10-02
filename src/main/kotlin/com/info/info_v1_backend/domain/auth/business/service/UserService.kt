@@ -12,7 +12,5 @@ interface UserService {
 
     fun getStudentList(user: User, idx: Int, size: Int): Page<MinimumStudent>
 
-    fun getFieldTrainingStudentList(user: User, idx: Int, size: Int): Page<MinimumStudent>
-    fun getHiredStudentList(user: User, idx: Int, size: Int): Page<MinimumStudent>
 
 }
