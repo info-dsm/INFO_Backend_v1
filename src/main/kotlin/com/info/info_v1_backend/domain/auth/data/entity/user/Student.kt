@@ -32,7 +32,7 @@ class Student(
 ) {
     val studentKey: String = studentKey
 
-    val entranceYear: Year = Year.now().minusYears((studentKey.substring(0, 1).toLong()-1))
+    val entranceYear: Int = Year.now().minusYears((studentKey.substring(0, 1).toLong()-1)).value
 
     @OneToMany(mappedBy = "student", cascade = [CascadeType.REMOVE])
     var creationList: MutableList<Creation>? = creationList
