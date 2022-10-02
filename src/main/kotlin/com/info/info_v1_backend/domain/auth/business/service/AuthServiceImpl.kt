@@ -9,12 +9,12 @@ import com.info.info_v1_backend.domain.auth.data.repository.token.CheckEmailCode
 import com.info.info_v1_backend.domain.auth.data.repository.token.RefreshTokenRepository
 import com.info.info_v1_backend.domain.auth.data.repository.user.UserRepository
 import com.info.info_v1_backend.domain.auth.exception.*
+import com.info.info_v1_backend.domain.company.business.dto.request.company.CompanyIntroductionRequest
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
 import com.info.info_v1_backend.domain.company.data.entity.company.CompanySearchDocument
 import com.info.info_v1_backend.domain.company.data.entity.company.embeddable.CompanyIntroduction
 import com.info.info_v1_backend.domain.company.data.entity.company.file.BusinessRegisteredCertificateFile
 import com.info.info_v1_backend.domain.company.data.entity.company.file.CompanyIntroductionFile
-import com.info.info_v1_backend.domain.company.data.entity.company.file.CompanyLogoFile
 import com.info.info_v1_backend.domain.company.data.entity.company.file.CompanyPhotoFile
 import com.info.info_v1_backend.domain.company.data.repository.company.CompanyRepository
 import com.info.info_v1_backend.domain.company.data.repository.company.CompanySearchDocumentRepository
@@ -73,7 +73,7 @@ class AuthServiceImpl(
         } else throw CheckEmailCodeException(req.emailCheckCode)
     }
 
-    override fun companySignup(req: CompanySignupRequest, emailCheckCode: String) {
+    override fun companySignup(req: CompanySignupRequest, emailCheckCode: String, companyIntroduction: CompanyIntroductionRequest) {
         if (checkEmail(req.companyContact.email, emailCheckCode)) {
 
             val company = companyRepository.save(
@@ -83,42 +83,42 @@ class AuthServiceImpl(
                     req.companyInformation.toCompanyInformation(),
                     req.companyContact.toCompanyContact(),
                     CompanyIntroduction(
-                        req.companyIntroduction.introduction
+                        req.introduction
                     ),
                     req.isLeading
                 )
             )
-            req.companyIntroduction.businessRegisteredCertificate.let{
+            companyIntroduction.businessRegisteredCertificate.let{
                 businessRegisteredCertificateFileRepository.save(
                     BusinessRegisteredCertificateFile(
-                        s3Util.uploadFile(it, "company", "businessRegisteredCertificate"),
+                        s3Util.uploadFile(it, "company/${company.id!!}", "businessRegisteredCertificate"),
                         company
                     )
                 )
             }
 
-            req.companyIntroduction.companyIntroductionFile.map {
+            companyIntroduction.companyIntroductionFile.map {
                 companyIntroductionFileRepository.save(
                     CompanyIntroductionFile(
-                        s3Util.uploadFile(it, "company", "companyIntroduction"),
+                        s3Util.uploadFile(it, "company/${company.id!!}", "companyIntroduction"),
                         company
                     )
                 )
             }
 
-            req.companyIntroduction.companyLogo?.let {
+            companyIntroduction.companyLogo?.let {
                 companyIntroductionFileRepository.save(
                     CompanyIntroductionFile(
-                        s3Util.uploadFile(it, "company", "companyLogo"),
+                        s3Util.uploadFile(it, "company/${company.id!!}", "companyLogo"),
                         company
                     )
                 )
             }
 
-            req.companyIntroduction.companyPhotoList.map {
+            companyIntroduction.companyPhotoList.map {
                 companyPhotoFileRepository.save(
                     CompanyPhotoFile(
-                        s3Util.uploadFile(it, "company", "companyPhoto"),
+                        s3Util.uploadFile(it, "company/${company.id!!}", "companyPhoto"),
                         company
                     )
                 )

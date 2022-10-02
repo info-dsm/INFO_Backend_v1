@@ -119,7 +119,8 @@ class Company(
             },
             this.commentList.map {
                 it.toCommentResponse()
-            }
+            },
+            this.companyIntroduction.toCompanyIntroductionResponse(),
         )
     }
 
@@ -143,7 +144,21 @@ class Company(
     }
 
     fun editCompany(r: EditCompanyRequest) {
-
+        r.companyName?.let {
+            this.name = r.companyName
+        }
+        r.companyInformation?.let {
+            this.companyInformation.editCompanyInformation(it)
+        }
+        r.companyContact?.let {
+            this.companyContact.editCompanyContact(it)
+        }
+        r.introduction?.let {
+            this.companyIntroduction.editCompanyIntroduction(it)
+        }
+        r.isLeading?.let {
+            this.isLeading = it
+        }
     }
 
 }

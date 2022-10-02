@@ -8,6 +8,7 @@ import com.info.info_v1_backend.domain.auth.business.dto.response.UserInfoRespon
 import com.info.info_v1_backend.domain.auth.business.service.UserService
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
 import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
+import com.info.info_v1_backend.domain.company.business.dto.request.company.CompanyIntroductionRequest
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
 import com.info.info_v1_backend.global.security.jwt.data.TokenResponse
 import com.info.info_v1_backend.global.util.user.CurrentUtil
@@ -18,7 +19,9 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.multipart.MultipartFile
 import javax.validation.Valid
 import javax.validation.constraints.Pattern
 
@@ -66,9 +69,22 @@ class AuthController(
     @PostMapping("/signup/company")
     fun companySignup(
         @RequestBody request: CompanySignupRequest,
-        @RequestParam emailCheckCode: String
+        @RequestParam emailCheckCode: String,
+        @RequestPart businessRegisteredCertificate: MultipartFile,
+        @RequestPart companyIntroductionFile: List<MultipartFile>,
+        @RequestPart companyLogo: MultipartFile?,
+        @RequestPart companyPhotoList: List<MultipartFile>
     ) {
-        authService.companySignup(request, emailCheckCode)
+        authService.companySignup(
+            request,
+            emailCheckCode,
+            CompanyIntroductionRequest(
+                businessRegisteredCertificate,
+                companyIntroductionFile,
+                companyLogo,
+                companyPhotoList
+            )
+        )
     }
 
 

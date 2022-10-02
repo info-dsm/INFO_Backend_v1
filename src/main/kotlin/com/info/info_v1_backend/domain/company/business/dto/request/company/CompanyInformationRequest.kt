@@ -11,7 +11,7 @@ data class CompanyInformationRequest(
     val homeAddress: AddressInfo,
     val agentAddress: AddressInfo?,
     val representative: String,
-    val establishedAt: Year,
+    val establishedAt: Int,
     @field:Max(100000)
     val workerCount: Int,
     @field:Size(max = 20)

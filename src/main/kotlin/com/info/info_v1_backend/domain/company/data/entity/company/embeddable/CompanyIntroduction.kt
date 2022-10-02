@@ -13,10 +13,6 @@ import javax.persistence.OneToOne
 @Embeddable
 class CompanyIntroduction(
     introduction: String,
-//    businessRegisteredCertificate: BusinessRegisteredCertificateFile,
-//    companyIntroductionFile: MutableList<CompanyIntroductionFile>,
-//    companyLogo: CompanyLogoFile?,
-//    companyPhotoList: MutableList<CompanyPhotoFile>
 ) {
 
     var introduction: String = introduction
@@ -80,6 +76,10 @@ class CompanyIntroduction(
 
     fun getBusinessRegisteredCertificateResponse(): BusinessRegisteredCertificateFile {
         return this.businessRegisteredCertificate!!
+    }
+
+    fun editCompanyIntroduction(introduction: String) {
+        this.introduction = introduction
     }
 
 }
