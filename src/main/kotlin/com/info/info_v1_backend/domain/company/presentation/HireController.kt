@@ -3,6 +3,8 @@ package com.info.info_v1_backend.domain.company.presentation
 import com.info.info_v1_backend.domain.auth.business.dto.response.MinimumStudent
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.CloseNoticeRequest
+import com.info.info_v1_backend.domain.company.business.dto.response.company.FieldTrainingResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.company.HiredStudentResponse
 import com.info.info_v1_backend.domain.company.business.service.HireService
 import com.info.info_v1_backend.global.error.common.TokenNotFoundException
 import org.springframework.data.domain.Page
@@ -20,18 +22,6 @@ class HireController(
     private val hireService: HireService
 ) {
 
-    @PostMapping("/apply/{noticeId}")
-    fun applyNotice(
-        @AuthenticationPrincipal user: User?,
-        @PathVariable noticeId: Long,
-        @RequestPart(required = true) reporter: List<MultipartFile>
-    ){
-        return hireService.applyNotice(
-            user?: throw TokenNotFoundException(),
-            noticeId,
-            reporter
-        )
-    }
 
     @GetMapping("/apply/{noticeId}")
     fun getApplierList(
@@ -48,6 +38,20 @@ class HireController(
         )
     }
 
+    @PostMapping("/apply/{noticeId}")
+    fun applyNotice(
+        @AuthenticationPrincipal user: User?,
+        @PathVariable noticeId: Long,
+        @RequestPart(required = true) reporter: List<MultipartFile>
+    ){
+        return hireService.applyNotice(
+            user?: throw TokenNotFoundException(),
+            noticeId,
+            reporter
+        )
+    }
+
+
     @DeleteMapping("/apply/{noticeId}/{studentId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun cancelApply(
@@ -62,6 +66,17 @@ class HireController(
         )
     }
 
+
+    @GetMapping("/field-training")
+    fun getFieldTrainingStudentList(
+        @AuthenticationPrincipal user: User?,
+        @RequestParam(required = true) companyId: Long
+    ): List<FieldTrainingResponse> {
+        return hireService.getFieldTrainingStudentList(
+            user?: throw TokenNotFoundException(),
+            companyId
+        )
+    }
 
 
     @PostMapping("/field-training/{noticeId}")
@@ -91,6 +106,20 @@ class HireController(
             companyId
         )
     }
+
+
+
+    @GetMapping("/{companyId}/student")
+    fun getHiredStudentList(
+        @AuthenticationPrincipal user: User?,
+        @PathVariable(required = true) companyId: Long
+    ): List<HiredStudentResponse> {
+        return hireService.getHiredStudentList(
+            user?: throw TokenNotFoundException(),
+            companyId
+        )
+    }
+
 
     @PostMapping("/{companyId}/student/{studentId}")
     fun hireStudent(

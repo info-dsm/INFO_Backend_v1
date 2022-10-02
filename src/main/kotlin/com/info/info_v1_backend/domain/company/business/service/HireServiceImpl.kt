@@ -8,6 +8,8 @@ import com.info.info_v1_backend.domain.auth.data.repository.user.StudentReposito
 import com.info.info_v1_backend.domain.auth.exception.IsNotStudentException
 import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.CloseNoticeRequest
+import com.info.info_v1_backend.domain.company.business.dto.response.company.FieldTrainingResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.company.HiredStudentResponse
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
 import com.info.info_v1_backend.domain.company.data.entity.company.work.field.FieldTraining
 import com.info.info_v1_backend.domain.company.data.entity.notice.applicant.Applicant
@@ -96,6 +98,19 @@ class HireServiceImpl(
         } else throw NoAuthenticationException(user.roleList.toString())
     }
 
+    override fun getFieldTrainingStudentList(user: User, companyId: Long): List<FieldTrainingResponse> {
+        if (user is Student) throw NoAuthenticationException(user.roleList.toString())
+        else {
+            companyRepository.findByIdOrNull(companyId)?. let {
+                return it.fieldTrainingList.filter {
+                    !it.isDelete && !it.isLinked
+                }.map {
+                    it.toFieldTrainingResponse()
+                }
+            }?: throw CompanyNotFoundException(companyId.toString())
+        }
+    }
+
     override fun makeFieldTrainingAndCloseNotice(user: User, request: CloseNoticeRequest, noticeId: Long) {
         if (user is Company || user is Teacher) {
             val notice = noticeRepository.findByIdOrNull(noticeId) ?: throw NoticeNotFoundException(noticeId.toString())
@@ -136,6 +151,19 @@ class HireServiceImpl(
                     ).makeNoLinked()
 
         } else throw NoAuthenticationException(user.roleList.toString())
+    }
+
+    override fun getHiredStudentList(user: User, companyId: Long): List<HiredStudentResponse> {
+        if (user is Student) throw NoAuthenticationException(user.roleList.toString())
+        else {
+            companyRepository.findByIdOrNull(companyId)?. let {
+                return it.hiredStudentList.filter {
+                    !it.isDelete && !it.isFire
+                }.map {
+                    it.toHiredStudentResponse()
+                }
+            }?: throw CompanyNotFoundException(companyId.toString())
+        }
     }
 
     override fun hireStudent(user: User, studentId: Long, companyId: Long, startDate: LocalDate) {

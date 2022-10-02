@@ -16,9 +16,6 @@ data class MaximumCompanyResponse(
     val companyIntroduction: CompanyIntroductionResponse,
     val commentList: List<CommentResponse>,
     val isLeading: Boolean,
-    val noticeList: List<MinimumNoticeResponse>,
-    val hiredStudentList: List<HiredStudentResponse>,
-    val fieldStudentList: List<FieldTrainingResponse>,
     val isAssociated: Boolean
 
 )
