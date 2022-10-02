@@ -1,47 +1,65 @@
 package com.info.info_v1_backend.domain.company.data.entity.notice
 
-import com.info.info_v1_backend.domain.company.business.dto.request.notice.PayRequest
-import com.info.info_v1_backend.domain.company.data.entity.notice.embeddable.EmploymentPay
+import com.info.info_v1_backend.domain.company.business.dto.request.notice.edit.EditPayRequest
+import com.info.info_v1_backend.domain.company.business.dto.request.notice.register.EmploymentPayRequest
+import com.info.info_v1_backend.domain.company.business.dto.request.notice.register.PayRequest
 import javax.persistence.Column
+import javax.persistence.Embeddable
 import javax.persistence.Embedded
 import javax.persistence.Entity
 import javax.persistence.Id
-import javax.persistence.JoinColumn
 import javax.persistence.MapsId
 import javax.persistence.OneToOne
 
-@Entity
+@Embeddable
 class Pay(
-    fieldTrainingPay: Long,
-    employmentPay: EmploymentPay,
-    notice: Notice
+    fieldTrainingPayPerMonth: Long,
+    yearPayStart: Long,
+    yearPayEnd: Long,
+    bonus: Long?
 ) {
 
     @Id
     val id: Long? = null
 
     @Column(name = "field_training_pay", nullable = false)
-    var fieldTrainingPay: Long = fieldTrainingPay
+    var fieldTrainingPayPerMonth: Long = fieldTrainingPayPerMonth
 
-    @Embedded
-    var employmentPay: EmploymentPay = employmentPay
+    @Column(name = "year_pay_start", nullable = false)
+    var yearPayStart: Long = yearPayStart
 
-    @OneToOne @MapsId
-    var notice: Notice = notice
+    @Column(name = "year_pay_end", nullable = false)
+    var yearPayEnd: Long = yearPayEnd
 
-    fun editPay(r: PayRequest) {
-        this.fieldTrainingPay = r.fieldTrainingPay
-        this.employmentPay = EmploymentPay(
-            r.employmentPay.yearPay,
-            r.employmentPay.monthPay,
-            r.employmentPay.bonus
-        )
+    @Column(name = "bonus", nullable = true)
+    var bonus: Long? = bonus
+
+
+    fun editPay(r: EditPayRequest) {
+        r.fieldTrainingPayPerMonth?.let {
+            this.fieldTrainingPayPerMonth = r.fieldTrainingPayPerMonth
+        }
+        r.editFullTimeEmploymentPay?.let {
+            it.bonus?.let {
+                this.bonus = it
+            }
+            it.yearPayStart?.let {
+                this.yearPayStart = it
+            }
+            it.yearPayEnd?.let {
+                this.yearPayEnd =it
+            }
+        }
     }
 
     fun toPayRequest(): PayRequest {
         return PayRequest(
-            this.fieldTrainingPay,
-            this.employmentPay.toEmploymentPay(),
+            this.fieldTrainingPayPerMonth,
+            EmploymentPayRequest(
+                this.yearPayStart,
+                this.yearPayEnd,
+                this.bonus
+            )
         )
     }
 }

@@ -1,7 +1,6 @@
 package com.info.info_v1_backend.domain.auth.data.entity.user
 
 import com.info.info_v1_backend.domain.auth.data.entity.type.Role
-import com.info.info_v1_backend.domain.auth.presentation.dto.request.EditPasswordRequest
 import com.info.info_v1_backend.global.base.entity.BaseTimeEntity
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Where
@@ -11,12 +10,12 @@ import org.springframework.security.core.userdetails.UserDetails
 import javax.persistence.*
 
 
-@Where(clause = "is_deleted = false")
-@SQLDelete(sql = "UPDATE user SET is_deleted = true where id = ?")
-@Entity
+@Where(clause = "user_is_delete = false")
+@SQLDelete(sql = "UPDATE `user` SET user_is_delete = true where id = ?")
 @Table(name = "user")
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "user_type")
+@Entity
 abstract class User(
     name: String,
     email: String,
@@ -40,11 +39,11 @@ abstract class User(
         return this.password
     }
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     var roleList: MutableList<Role> = ArrayList()
         protected set
 
-    @Column(name = "is_deleted")
+    @Column(name = "user_is_delete")
     var isDeleted: Boolean = false
         protected set
 
@@ -63,6 +62,7 @@ abstract class User(
     override fun getUsername(): String {
         return this.id.toString()
     }
+
     override fun isAccountNonLocked(): Boolean {
         return this.roleList.contains(Role.BLOCK)
     }
@@ -83,7 +83,7 @@ abstract class User(
         this.password = password
     }
     fun changeEmail(email: String){
-        email?.let {
+        email.let {
             this.email = it
         }
     }

@@ -14,10 +14,21 @@ enum class ErrorCode(
     EXPIRED_TOKEN("token Expired", HttpStatus.BAD_REQUEST),
     INCORRECT_PASSWORD("Incorrect Password", HttpStatus.BAD_REQUEST),
     EMAIL_ERROR("Email 전송 과정 중 에러가 발생했습니다.", HttpStatus.BAD_GATEWAY),
+    INVALID_FILE_EXTENSION("Invalid File Extension", HttpStatus.BAD_REQUEST),
+    INVALID_COMPANY_CHECK_CODE("Invalid Company Check Code", HttpStatus.BAD_REQUEST),
+    STUDENT_ALREADY_WRITTEN_COMMENT("you have Already Written comment", HttpStatus.BAD_REQUEST),
+    CONTACTOR_MUST_LEAVE_LEAST_AT_ONE_ON_COMPANY("Contactor Must leave least at one on company", HttpStatus.BAD_REQUEST),
+    IS_NOT_FIELD_TRAINING_STUDENT("Is not fieldtraining student", HttpStatus.BAD_REQUEST),
+    IS_ALREADY_FIELD_TRAINING_STUDENT("Is already field training student", HttpStatus.BAD_REQUEST),
+
+    //401
+    TOKEN_NOT_FOUND("Token Not Found", HttpStatus.UNAUTHORIZED),
 
     //403
     NOT_HAVE_ACCESS_TO_THE_PROJECT("Not Have Access To The project", HttpStatus.FORBIDDEN),
     FORBIDDEN("권한이 없습니다", HttpStatus.FORBIDDEN),
+    IS_NOT_STUDENT("You are not student", HttpStatus.FORBIDDEN),
+    NO_AUTHENTICATION("you have No Authentication", HttpStatus.FORBIDDEN),
 
     //404
     HEADER_NOT_FOUND("Header Not Found", HttpStatus.NOT_FOUND),
@@ -29,20 +40,17 @@ enum class ErrorCode(
     NEWS_NOT_FOUND("News Not Found", HttpStatus.NOT_FOUND),
     PROJECT_NOT_FOUND("Project Not Found", HttpStatus.NOT_FOUND),
     CHECK_TEACHER_CODE_ERROR("Error Occurred while Checking Teacher Code", HttpStatus.NOT_FOUND),
-    INVALID_COMPANY_CHECK_CODE("Invalid Company Check Code", HttpStatus.BAD_REQUEST),
-    NOT_CONTACTOR("You are Not Contactor", HttpStatus.FORBIDDEN),
+    CHECK_CONTACTOR_CODE_ERROR("Error Occurred while Checking Contactor Code", HttpStatus.NOT_FOUND),
     COMPANY_NOT_FOUND("Company Not Found", HttpStatus.NOT_FOUND),
-    IS_NOT_CONTACTOR_COMPANY("You are not Contactor Company", HttpStatus.FORBIDDEN),
-    STUDENT_CANNOT_OPEN("Student Cannot Open this", HttpStatus.FORBIDDEN),
-    IS_NOT_STUDENT("You are not student", HttpStatus.FORBIDDEN),
-    STUDENT_ALREADY_WRITTEN_COMMENT("you have Already Written comment", HttpStatus.BAD_REQUEST),
     COMMENT_NOT_FOUND("Comment Not Found", HttpStatus.NOT_FOUND),
     NOTICE_NOT_FOUND("Notice Not Found", HttpStatus.NOT_FOUND),
-    TEAM_NOT_FOUND("Team Not Found", HttpStatus.NOT_FOUND),
-    NO_AUTHENTICATION("you have No Authentication", HttpStatus.FORBIDDEN),
     CONTACTOR_NOT_FOUND("Contactor Not Found", HttpStatus.NOT_FOUND),
-    CONTACTOR_MUST_LEAVE_LEAST_AT_ONE_ON_COMPANY("Contactor Must leave least at one on company", HttpStatus.BAD_REQUEST),
     IS_NOT_CONTACTOR_OR_TEACHER("Is Not Contactor Or Teacher", HttpStatus.NOT_FOUND),
+    FILE_NOT_FOUND("File not Found", HttpStatus.NOT_FOUND),
+    HIRED_STUDENT_NOT_FOUND("Hired Student Not Found", HttpStatus.NOT_FOUND),
+    FIELD_TRAINING_NOT_FOUND("Field training not found", HttpStatus.NOT_FOUND),
+    APPLICANT_USER_NOT_FOUND("Applicant user not found", HttpStatus.NOT_FOUND),
+
 
     //500
     INTERNAL_SERVER_ERROR("internal server error", HttpStatus.INTERNAL_SERVER_ERROR),

@@ -1,9 +1,12 @@
 package com.info.info_v1_backend.domain.company.presentation
 
+import com.info.info_v1_backend.domain.auth.data.entity.user.User
 import com.info.info_v1_backend.domain.company.business.dto.request.comment.EditCommentRequest
 import com.info.info_v1_backend.domain.company.business.dto.request.comment.WriteCommentRequest
 import com.info.info_v1_backend.domain.company.business.service.CommentService
+import com.info.info_v1_backend.global.error.common.TokenNotFoundException
 import org.springframework.http.HttpStatus
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -24,27 +27,30 @@ class CommentController(
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun writeComment(
+        @AuthenticationPrincipal user: User?,
         @RequestBody request: WriteCommentRequest,
         @RequestParam(required = true) companyId: Long
     ) {
-        commentService.writeComment(request, companyId)
+        commentService.writeComment(user?: throw TokenNotFoundException(), request, companyId)
     }
 
     @PatchMapping
     @ResponseStatus(HttpStatus.OK)
     fun editComment(
+        @AuthenticationPrincipal user: User?,
         @RequestBody request: EditCommentRequest,
         @RequestParam(required = true) commentId: Long
     ) {
-        commentService.editComment(request, commentId)
+        commentService.editComment(user?: throw TokenNotFoundException(), request, commentId)
     }
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteComment(
-        @RequestParam id: Long
+        @AuthenticationPrincipal user: User?,
+        @RequestParam(required = true) commentId: Long
     ) {
-        commentService.deleteComment(id)
+        commentService.deleteComment(user?: throw TokenNotFoundException(), commentId)
     }
 
 }

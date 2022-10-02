@@ -1,16 +1,19 @@
 package com.info.info_v1_backend.domain.auth.presentation.controller
 
+import com.info.info_v1_backend.domain.auth.business.dto.request.*
+import com.info.info_v1_backend.domain.auth.business.dto.response.MinimumStudent
 import com.info.info_v1_backend.domain.auth.business.service.AuthService
 import com.info.info_v1_backend.domain.auth.business.service.EmailService
-import com.info.info_v1_backend.domain.auth.presentation.dto.request.*
-import com.info.info_v1_backend.domain.auth.presentation.dto.response.GetUserInfo
-import com.info.info_v1_backend.domain.auth.presentation.dto.response.MinimumStudentList
+import com.info.info_v1_backend.domain.auth.business.dto.response.UserInfoResponse
+import com.info.info_v1_backend.domain.auth.business.service.UserService
+import com.info.info_v1_backend.domain.auth.data.entity.user.User
+import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
+import com.info.info_v1_backend.domain.company.data.entity.company.Company
 import com.info.info_v1_backend.global.security.jwt.data.TokenResponse
 import com.info.info_v1_backend.global.util.user.CurrentUtil
+import org.springframework.data.domain.Page
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.validation.annotation.Validated
-import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -25,52 +28,70 @@ import javax.validation.constraints.Pattern
 class AuthController(
     private val authService: AuthService,
     private val emailService: EmailService,
-    private val current: CurrentUtil,
+    private val userService: UserService
 ) {
-    @PostMapping("/email")
-    fun sendEmail(
+    @PostMapping("/email/school")
+    fun sendSchoolEmail(
         @RequestParam
-        @Pattern(regexp = "[a-zA-Z0-9+\\_.]+@dsm\\.hs\\.kr\$")
+        @Pattern(regexp = "[a-zA-Z\\d+_.]+@dsm\\.hs\\.kr$")
         email: String
     ){
         emailService.sendCodeToEmail(email)
     }
 
-    @PostMapping("/passwordCode")
-    fun sendPasswordCode(){
-        emailService.sendCodeToEmail(current.getCurrentUser().email)
+    @PostMapping("/email/company")
+    fun sendCompanyEmail(
+        @RequestParam
+        email: String
+    ){
+        emailService.sendCodeToEmail(email)
     }
 
-    @PostMapping("/studentSignUp")
-    fun studentSignUp(
+    @PostMapping("/signup/student")
+    fun studentSignup(
         @RequestBody @Valid
         request: StudentSignUpRequest
     ){
         authService.studentSignUp(request)
     }
 
-    @PostMapping("/teacherSingUp")
-    fun teacherSignUp(
+    @PostMapping("/signup/teacher")
+    fun teacherSignup(
         @RequestBody @Valid
         request: TeacherSingUpRequest
     ){
         authService.teacherSignUp(request)
     }
 
-    @PostMapping("/changePassword")
-    fun password(
-        @RequestBody
-        request: EditPasswordRequest
+    @PostMapping("/signup/company")
+    fun companySignup(
+        @RequestBody request: CompanySignupRequest,
+        @RequestParam emailCheckCode: String
+    ) {
+        authService.companySignup(request, emailCheckCode)
+    }
+
+
+    @PostMapping("/password/code")
+    fun sendPasswordCode(
+        @AuthenticationPrincipal user: User?
     ){
-        authService.editPassword(request)
+        emailService.sendPasswordCodeToEmail(
+            (user?: throw UserNotFoundException("No User Found")).email
+        )
     }
-    @PostMapping("/reissue")
-    fun reissue(
-        @RequestBody
-        request: ReissueRequest
-    ): TokenResponse{
-       return authService.reissue(request)
+
+    @PostMapping("/password")
+    fun changePassword(
+        @RequestBody request: EditPasswordRequest,
+        @AuthenticationPrincipal user: User?
+    ){
+        authService.changePassword(
+            user?: throw UserNotFoundException("No User Found"),
+            request
+        )
     }
+
 
     @PostMapping("/login")
     fun login(
@@ -80,34 +101,30 @@ class AuthController(
         return authService.login(request)
     }
 
-    @DeleteMapping("/me")
-    fun deleteMe() {
-        authService.deleteMe()
-    }
-    @PatchMapping("/me")
-    fun editMyInfo(
-            @RequestBody
-            request: EditMyInfo
-    ){
-        authService.editMyInfo(request)
-    }
-    @GetMapping("/me")
-    fun getStudentInfo(
-            @RequestParam(required = false)
-            name: String?
-    ): GetUserInfo {
-        return authService.getUserInfo(name)
+
+    @PostMapping("/reissue")
+    fun reissue(
+        @RequestBody
+        request: ReissueRequest
+    ): TokenResponse{
+       return authService.reissue(request)
     }
 
-    @PostMapping("/getStudentList")
-    fun getStudentList(): MinimumStudentList{
-        return authService.getStudentList()
-    }
+
+//    @DeleteMapping("/me")
+//    fun deleteMe(@AuthenticationPrincipal user: User?) {
+//
+//        authService.deleteMe(user?: throw UserNotFoundException(""))
+//    }
+
+
+
+
     @PostMapping("/changeEmail")
     fun changeEmail(
-            @RequestBody
-            req: ChangeEmailRequest
+            @RequestBody request: ChangeEmailRequest,
+            @AuthenticationPrincipal user: User?
     ){
-        authService.changeEmail(req)
+        authService.changeEmail(user?: throw UserNotFoundException("No User Found"), request)
     }
 }

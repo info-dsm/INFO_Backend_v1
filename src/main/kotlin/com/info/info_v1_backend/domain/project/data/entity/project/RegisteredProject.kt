@@ -1,8 +1,9 @@
  package com.info.info_v1_backend.domain.project.data.entity.project
 
-import com.info.info_v1_backend.domain.project.business.controller.dto.request.EditRegisteredProjectDto
+import com.info.info_v1_backend.domain.project.business.dto.request.EditRegisteredProjectDto
 import com.info.info_v1_backend.domain.project.data.entity.Creation
 import com.info.info_v1_backend.domain.project.data.entity.type.ProjectStatus
+import com.info.info_v1_backend.global.file.entity.File
 import javax.persistence.*
 
 
@@ -19,7 +20,7 @@ class RegisteredProject(
     conclusion: String,
     referenceList: MutableList<String>,
     creationList: MutableList<Creation>?,
-    codeLinkList: MutableList<String>,
+    codeLinkList: MutableList<String>?,
     tagList: MutableList<String>
 ): Project(
     name,
@@ -97,4 +98,11 @@ class RegisteredProject(
         }
     }
 
+    fun eddHaveSeenCount(){
+        this.haveSeenCount++
+    }
+
+    fun changeStatus(status: ProjectStatus){
+        this.status = status
+    }
 }

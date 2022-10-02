@@ -1,10 +1,10 @@
 package com.info.info_v1_backend.domain.project.data.entity.project
 
-import com.info.info_v1_backend.domain.auth.presentation.dto.response.ProjectList
+import com.info.info_v1_backend.domain.auth.business.dto.response.ProjectList
 import com.info.info_v1_backend.domain.project.data.entity.Creation
 import com.info.info_v1_backend.domain.project.data.entity.type.ProjectStatus
 import com.info.info_v1_backend.global.base.entity.BaseAuthorEntity
-import com.info.info_v1_backend.global.image.entity.File
+import com.info.info_v1_backend.global.file.entity.File
 import javax.persistence.*
 
 @Entity
@@ -13,7 +13,7 @@ sealed class Project(
     name: String,
     shortContent: String,
     creationList: MutableList<Creation>?,
-    codeLinkList: MutableList<String>,
+    codeLinkList: MutableList<String>?,
     tagList: MutableList<String>,
     projectStatus: ProjectStatus
 ): BaseAuthorEntity() {
@@ -40,7 +40,7 @@ sealed class Project(
         protected set
 
     @ElementCollection
-    var codeLinkList: MutableList<String> = codeLinkList
+    var codeLinkList: MutableList<String>? = codeLinkList
         protected set
 
     @ElementCollection
@@ -51,14 +51,12 @@ sealed class Project(
     var status: ProjectStatus = projectStatus
         protected set
 
-    @OneToMany(mappedBy = "project", cascade = [CascadeType.REMOVE])
-    var imageLinkList: MutableList<File>? = null
-        protected set
-
-    fun toProjectList(): ProjectList{
+    fun toProjectList(): ProjectList {
         return ProjectList(
                 this.name,
-                this.codeLinkList,
+                this.codeLinkList?.map {
+                    it
+                }?.toList(),
                 this.status,
         )
     }

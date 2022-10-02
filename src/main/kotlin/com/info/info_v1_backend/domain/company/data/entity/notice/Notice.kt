@@ -1,96 +1,68 @@
 package com.info.info_v1_backend.domain.company.data.entity.notice
 
-import com.info.info_v1_backend.domain.company.business.dto.request.notice.EditNoticeRequest
-import com.info.info_v1_backend.domain.company.business.dto.response.notice.MaximumNoticeResponse
-import com.info.info_v1_backend.domain.company.business.dto.response.notice.MinimumNoticeResponse
+import com.info.info_v1_backend.domain.company.business.dto.request.notice.edit.EditNoticeRequest
+import com.info.info_v1_backend.domain.company.business.dto.response.notice.*
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
+import com.info.info_v1_backend.domain.company.data.entity.notice.applicant.Applicant
 import com.info.info_v1_backend.domain.company.data.entity.notice.embeddable.*
-import com.info.info_v1_backend.domain.company.data.entity.type.WorkTime
+import com.info.info_v1_backend.domain.company.data.entity.notice.file.FormAttachment
+import com.info.info_v1_backend.domain.company.data.entity.notice.file.Reporter
+import com.info.info_v1_backend.domain.company.data.entity.notice.interview.InterviewProcess
+import com.info.info_v1_backend.domain.company.data.entity.notice.interview.InterviewProcessUsage
+import com.info.info_v1_backend.domain.company.data.entity.notice.recruitment.RecruitmentBusiness
 import com.info.info_v1_backend.global.base.entity.BaseAuthorEntity
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Where
-import java.time.LocalDate
-import javax.persistence.CascadeType
-import javax.persistence.Column
-import javax.persistence.ElementCollection
-import javax.persistence.Embedded
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
-import javax.persistence.JoinColumn
-import javax.persistence.ManyToOne
-import javax.persistence.OneToMany
-import javax.persistence.OneToOne
+import javax.persistence.*
 
 
 @Entity
-@SQLDelete(sql = "UPDATE shop SET notice_is_delete = true WHERE id = ?")
+@Table(name = "notice")
+@SQLDelete(sql = "UPDATE `notice` SET notice_is_delete = true WHERE id = ?")
 @Where(clause = "notice_is_delete = false")
 class Notice(
     company: Company,
-    businessInformation: String,
-    certificateList: MutableList<String>,
-    cutLine: Int?,
-    personalRemark: String,
-    commuteTime: CommuteTime,
+//    recruitmentBusinessList: MutableList<RecruitmentBusiness>,
     workTime: WorkTime,
-    screeningProcedure: ScreeningProcedure,
-    alternativeMilitaryPlan: Boolean,
+    pay: Pay,
+
     mealSupport: MealSupport,
     welfare: Welfare,
-    needDocuments: String?,
-    deadLine: LocalDate?,
-    isAlwaysOpen: Boolean,
-    interviewHopeMonth: LocalDate?,
-    workHopeMonth: LocalDate?
 
-): BaseAuthorEntity() {
+    noticeOpenPeriod: NoticeOpenPeriod,
+
+    interviewProcessList: List<InterviewProcessUsage>,
+
+    needDocuments: String?,
+
+    otherFeatures: String?,
+    workPlace: WorkPlace,
+    isPersonalContact: Boolean,
+
+
+    ): BaseAuthorEntity() {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(
+        strategy = GenerationType.IDENTITY,
+    )
     val id: Long? = null
 
     @ManyToOne(cascade = [CascadeType.REMOVE])
-    @JoinColumn(name = "id", nullable = false)
+    @JoinColumn(name = "company_id", nullable = false)
     val company: Company = company
 
-    @OneToMany(mappedBy = "notice")
-    var targetMajorList: MutableList<TargetMajor> = ArrayList()
-        protected set
-    @Column(name = "business_information", length = 255)
-    var businessInformation: String = businessInformation
-        protected set
 
-    @ElementCollection
-    var certificateList: MutableList<String> = certificateList
-        protected set
-
-    @Column(name = "cut_line", nullable = false)
-    var cutLine: Int? = cutLine
-        protected set
-
-    @Column(name = "work_remark", nullable = false)
-    var personalRemark: String = personalRemark
+    @OneToOne
+    @JoinColumn(name = "recruitment_business_id", nullable = false)
+    var recruitmentBusiness: RecruitmentBusiness? = null
         protected set
 
     @Embedded
-    var commuteTime: CommuteTime = commuteTime
-        protected set
-
-    @Column(name = "work_time", nullable = false)
     var workTime: WorkTime = workTime
         protected set
 
-    @OneToOne
-    var pay: Pay? = null
-        protected set
-
     @Embedded
-    var screeningProcedure: ScreeningProcedure = screeningProcedure
-        protected set
-
-    @Column(name = "alternative_military_plan", nullable = false)
-    var alternativeMilitaryPlan: Boolean = alternativeMilitaryPlan
+    var pay: Pay = pay
         protected set
 
     @Embedded
@@ -101,148 +73,156 @@ class Notice(
     var welfare: Welfare = welfare
         protected set
 
+    @Embedded
+    var noticeOpenPeriod: NoticeOpenPeriod = noticeOpenPeriod
+        protected set
+
+
+    @ElementCollection
+    var interviewProcessList: MutableList<InterviewProcessUsage> = interviewProcessList as MutableList<InterviewProcessUsage>
+        protected set
+
     @Column(name = "need_documents", nullable = true)
     var needDocuments: String? = needDocuments
         protected set
 
-    @Column(name = "dead_line", nullable = true)
-    var deadLine: LocalDate? = deadLine
+
+    @Column(name = "notice_other_features", nullable = true)
+    var otherFeatures: String? = otherFeatures
         protected set
 
-    @Column(name = "is_always_open", nullable = false)
-    var isAlwaysOpen: Boolean = isAlwaysOpen
+    @Embedded
+    var workPlace: WorkPlace = workPlace
+
+    @Column(name = "is_personal_contact", nullable = false)
+    var isPersonalContact: Boolean = isPersonalContact
+
+    @OneToMany(mappedBy = "notice")
+    var formAttachmentList: MutableList<FormAttachment> = ArrayList()
         protected set
 
-    @Column(name = "interview_hope_month", nullable = true)
-    var interviewHopeMonth: LocalDate? = interviewHopeMonth
-        protected set
-
-    @Column(name = "work_hope_month", nullable = true)
-    var workHopeMonth: LocalDate? = workHopeMonth
-        protected set
 
     @Column(name = "notice_is_delete", nullable = false)
     var isDelete: Boolean = false
         protected set
 
-    @Column(name = "notice_is_expired", nullable = false)
-    var isExpired: Boolean = false
+    @Column(name = "notice_is_approve", nullable = false)
+    var isApprove: NoticeWaitingStatus = NoticeWaitingStatus.WAITING
         protected set
 
-    var isPayOpen: Boolean = false
+    @OneToMany(mappedBy = "notice")
+    var applicantList: MutableList<Applicant> = ArrayList()
         protected set
 
 
-    fun makeExpired() {
-        this.isExpired = true
+    fun addAttachment(formAttachment: FormAttachment) {
+        this.formAttachmentList.add(formAttachment)
+    }
+
+    fun addRecruitmentBusiness(recruitmentBusiness: RecruitmentBusiness) {
+        this.recruitmentBusiness = recruitmentBusiness
+    }
+
+    fun changeInterviewProcess(key: Int, interviewProcess: InterviewProcess) {
+        this.interviewProcessList.first { it.sequence == key }.changeInterviewProcess(interviewProcess)
+    }
+
+    fun approveNotice() {
+        this.isApprove = NoticeWaitingStatus.APPROVE
     }
 
     fun toMinimumNoticeResponse(): MinimumNoticeResponse {
         return MinimumNoticeResponse(
             this.id!!,
             this.company.toMinimumCompanyResponse(),
-            this.targetMajorList.map {
-                it.toTargetMajorRequest()
-            }.toList(),
-            this.businessInformation,
-            this.certificateList,
-            this.cutLine,
-            this.personalRemark
+            this.recruitmentBusiness!!.toRecruitmentBusinessResponse(),
+            this.applicantList.filter {
+                !it.isDelete
+            }.size
         )
     }
 
-    fun toMaximumNoticeResponse(): MaximumNoticeResponse {
-        return MaximumNoticeResponse(
+    fun toMaximumNoticeWithoutPayResponse(): MaximumNoticeWithoutPayResponse {
+        return MaximumNoticeWithoutPayResponse(
             this.id!!,
             this.company.toMaximumCompanyResponse(),
-            this.targetMajorList.map {
-                it.toTargetMajorRequest()
-            }.toList(),
-            this.deadLine,
-            this.businessInformation,
-            this.certificateList,
-            this.cutLine,
-            this.personalRemark,
-            this.commuteTime.toCommuteTimeRequest(),
-            this.workTime,
-            if (this.isPayOpen) {
-                this.pay?.toPayRequest()
-            } else null,
-            this.screeningProcedure.toScreeningProcedureRequest(),
-            this.alternativeMilitaryPlan,
+            this.recruitmentBusiness!!.toRecruitmentBusinessResponse(),
+            this.workTime.toWorkTimeRequest(),
             this.mealSupport.toMealSupportRequest(),
-            this.welfare.toWelfareRequest(),
-            this.needDocuments
+            this.welfare.toWelfare(),
+            this.noticeOpenPeriod.toNoticeOpenPeriod(),
+            this.interviewProcessList.map {
+                it.interviewProcess
+            },
+            this.needDocuments,
+            this.otherFeatures,
+            this.workPlace.toWorkPlaceRequest(),
+            this.formAttachmentList.map {
+                it.toFileResponse()
+            },
+            this.applicantList.filter {
+                !it.isDelete
+            }.size
         )
     }
 
     fun editNotice(r: EditNoticeRequest) {
-        r.businessInformation?.let {
-            this.businessInformation = it
+        r.workTime?.let {
+            this.workTime.editWorkTime(r.workTime)
         }
-        r.certificateList?.let {
-            this.certificateList = it
+        r.pay?.let {
+            this.pay
         }
-        r.cutLine?.let {
-            this.cutLine = it
+        r.mealSupport?.let {
+            this.mealSupport.editMealSupport(it)
         }
-        r.personalRemark ?.let {
-            this.personalRemark = it
+        r.welfare?.let {
+            this.welfare.editWelfare(r.welfare)
         }
-        r.commuteTime ?.let {
-            this.commuteTime = CommuteTime(
-                it.startTime,
-                it.endTime
-            )
+        r.needDocuments?.let {
+            this.needDocuments = r.needDocuments
         }
-        r.workTime ?.let {
-            this.workTime = it
+        r.otherFeatures?.let {
+            this.otherFeatures = r.otherFeatures
         }
-        r.screeningProcedure ?.let {
-            this.screeningProcedure = ScreeningProcedure(
-                it.document,
-                it.technicalInterview,
-                it.physicalCheck,
-                it.assignment,
-                it.executiveInterview,
-                it.elseProcedure
-            )
+        r.workPlace?.let {
+            this.workPlace.editWorkPlace(r.workPlace)
         }
-        r.alternativeMilitaryPlan ?.let {
-            this.alternativeMilitaryPlan = it
+        r.isPersonalContact?.let {
+            this.isPersonalContact = r.isPersonalContact
         }
-        r.mealSupport ?.let {
-            this.mealSupport = MealSupport(
-                it.mealSupportPay,
-                it.breakfast,
-                it.lunch,
-                it.dinner
-            )
-        }
-        r.welfare ?.let {
-            this.welfare = Welfare(
-                it.dormitorySupport,
-                it.selfDevelopmentPay,
-                it.equipmentSupport,
-                it.elseSupport
-            )
-        }
-        r.needDocuments ?.let {
-            this.needDocuments = it
-        }
-        r.deadLine ?.let {
-            this.deadLine = it
-        }
-        r.isAlwaysOpen ?.let {
-            this.isAlwaysOpen = it
-        }
-        r.interviewHopeMonth ?.let {
-            this.interviewHopeMonth = it
-        }
-        r.workHopeMonth ?.let {
-            this.workHopeMonth = it
-        }
+    }
 
+    fun toNoticeWithIsApproveResponse(): NoticeWithIsApproveResponse {
+        return NoticeWithIsApproveResponse(
+            this.toMaximumNoticeWithPayResponse(),
+            this.isApprove == NoticeWaitingStatus.APPROVE
+        )
+    }
+
+    fun toMaximumNoticeWithPayResponse(): MaximumNoticeWithPayResponse {
+        return MaximumNoticeWithPayResponse(
+            this.id!!,
+            this.company.toMaximumCompanyResponse(),
+            this.recruitmentBusiness!!.toRecruitmentBusinessResponse(),
+            this.pay.toPayRequest(),
+            this.workTime.toWorkTimeRequest(),
+            this.mealSupport.toMealSupportRequest(),
+            this.welfare.toWelfare(),
+            this.noticeOpenPeriod.toNoticeOpenPeriod(),
+            this.interviewProcessList.map {
+                it.interviewProcess
+            },
+            this.needDocuments,
+            this.otherFeatures,
+            this.workPlace.toWorkPlaceRequest(),
+            this.formAttachmentList.map {
+                it.toFileResponse()
+            },
+            this.applicantList.filter {
+                !it.isDelete
+            }.size
+        )
     }
 
 }
