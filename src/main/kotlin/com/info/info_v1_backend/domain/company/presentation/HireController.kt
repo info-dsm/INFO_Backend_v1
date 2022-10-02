@@ -4,6 +4,7 @@ import com.info.info_v1_backend.domain.auth.business.dto.response.MinimumStudent
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.CloseNoticeRequest
 import com.info.info_v1_backend.domain.company.business.dto.response.company.FieldTrainingResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.company.FieldTrainingStudentWithHiredResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.HiredStudentResponse
 import com.info.info_v1_backend.domain.company.business.service.HireService
 import com.info.info_v1_backend.global.error.common.TokenNotFoundException
@@ -14,6 +15,7 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDate
+import java.time.Year
 
 @RestController
 @RequestMapping("/api/info/v1/hire")
@@ -147,6 +149,21 @@ class HireController(
             user?: throw TokenNotFoundException(),
             studentId,
             companyId
+        )
+    }
+
+    @GetMapping("/all")
+    fun getFieldTrainingStudentWithHiredResponse(
+        @AuthenticationPrincipal user: User?,
+        @RequestParam year: Year?,
+        @RequestParam(defaultValue = "0") idx: Int,
+        @RequestParam(defaultValue = "10") size: Int
+    ): Page<FieldTrainingStudentWithHiredResponse> {
+        return hireService.getFieldTrainingStudentWithHiredListInThisYear(
+            user?: throw TokenNotFoundException(),
+            idx,
+            size,
+            year?:Year.now()
         )
     }
 

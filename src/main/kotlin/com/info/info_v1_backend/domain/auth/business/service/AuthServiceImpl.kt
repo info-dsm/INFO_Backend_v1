@@ -18,6 +18,7 @@ import com.info.info_v1_backend.domain.company.data.entity.company.file.CompanyL
 import com.info.info_v1_backend.domain.company.data.entity.company.file.CompanyPhotoFile
 import com.info.info_v1_backend.domain.company.data.repository.company.CompanyRepository
 import com.info.info_v1_backend.domain.company.data.repository.company.CompanySearchDocumentRepository
+import com.info.info_v1_backend.global.error.common.NoAuthenticationException
 import com.info.info_v1_backend.global.file.repository.FileRepository
 import com.info.info_v1_backend.global.security.jwt.TokenProvider
 import com.info.info_v1_backend.global.security.jwt.data.TokenResponse
@@ -180,6 +181,6 @@ class AuthServiceImpl(
             if (passwordEncoder.matches(request.password, user.password)) {
                 user.changeEmail(request.email)
             } else throw IncorrectPassword(request.password)
-        } else throw IsNotContactorOrTeacher(user.roleList.toString())
+        } else throw NoAuthenticationException(user.roleList.toString())
     }
 }

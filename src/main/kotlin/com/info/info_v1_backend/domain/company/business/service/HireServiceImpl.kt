@@ -9,6 +9,7 @@ import com.info.info_v1_backend.domain.auth.exception.IsNotStudentException
 import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.CloseNoticeRequest
 import com.info.info_v1_backend.domain.company.business.dto.response.company.FieldTrainingResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.company.FieldTrainingStudentWithHiredResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.HiredStudentResponse
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
 import com.info.info_v1_backend.domain.company.data.entity.company.work.field.FieldTraining
@@ -31,6 +32,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDate
+import java.time.Year
 
 @Service
 @Transactional
@@ -209,6 +211,17 @@ class HireServiceImpl(
                     ).makeFire()
 
         } else throw NoAuthenticationException(user.roleList.toString())
+    }
+
+    override fun getFieldTrainingStudentWithHiredListInThisYear(
+        user: User,
+        idx: Int,
+        size: Int,
+        year: Year
+    ): Page<FieldTrainingStudentWithHiredResponse> {
+        return fieldTrainingRepository.findAllByCreatedAtIsStartingWith(year, PageRequest.of(idx, size)).map {
+            it.toFieldTrainingStudentWithHiredResponse()
+        }
     }
 
 }

@@ -2,6 +2,7 @@ package com.info.info_v1_backend.domain.company.data.entity.company.work.field
 
 import com.info.info_v1_backend.domain.auth.data.entity.user.Student
 import com.info.info_v1_backend.domain.company.business.dto.response.company.FieldTrainingResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.company.FieldTrainingStudentWithHiredResponse
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
 import com.info.info_v1_backend.domain.company.data.entity.company.work.hired.HiredStudent
 import com.info.info_v1_backend.global.base.entity.BaseTimeEntity
@@ -111,7 +112,19 @@ class FieldTraining(
         )
     }
 
-
-
+    fun toFieldTrainingStudentWithHiredResponse(): FieldTrainingStudentWithHiredResponse {
+        return FieldTrainingStudentWithHiredResponse(
+            this.student.id!!,
+            this.student.name,
+            this.student.studentKey,
+            this.company.id!!,
+            this.startDate,
+            this.endDate,
+            this.hiredStudent?. let {
+                return@let true
+            }?: false,
+            this.hiredStudent?.toHiredStudentResponse()
+        )
+    }
 
 }

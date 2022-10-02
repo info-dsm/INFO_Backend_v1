@@ -6,6 +6,7 @@ import com.info.info_v1_backend.domain.company.business.dto.request.company.Edit
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MinimumCompanyResponse
 import com.info.info_v1_backend.domain.company.business.service.CompanyService
+import com.info.info_v1_backend.domain.company.data.entity.company.file.BusinessRegisteredCertificateFile
 import com.info.info_v1_backend.global.error.common.TokenNotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.http.HttpStatus
@@ -72,6 +73,16 @@ class CompanyController(
         return companyService.searchCompany(query)
     }
 
+    @GetMapping("/{companyId}/business-registered-certificate")
+    fun getBusinessRegisteredCertificate(
+        @AuthenticationPrincipal user: User?,
+        @PathVariable(required = true) companyId: Long
+    ): BusinessRegisteredCertificateFile {
+        return companyService.getBusinessRegisteredCertificate(
+            user?: throw TokenNotFoundException(),
+            companyId
+        )
+    }
 
     
     @PutMapping("/certificate")

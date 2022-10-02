@@ -1,9 +1,7 @@
 package com.info.info_v1_backend.domain.company.data.entity.notice
 
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.edit.EditNoticeRequest
-import com.info.info_v1_backend.domain.company.business.dto.response.notice.BigClassificationResponse
-import com.info.info_v1_backend.domain.company.business.dto.response.notice.MaximumNoticeWithoutPayResponse
-import com.info.info_v1_backend.domain.company.business.dto.response.notice.MinimumNoticeResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.notice.*
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
 import com.info.info_v1_backend.domain.company.data.entity.notice.applicant.Applicant
 import com.info.info_v1_backend.domain.company.data.entity.notice.embeddable.*
@@ -109,7 +107,7 @@ class Notice(
         protected set
 
     @Column(name = "notice_is_approve", nullable = false)
-    var isApprove: Boolean = false
+    var isApprove: NoticeWaitingStatus = NoticeWaitingStatus.WAITING
         protected set
 
     @OneToMany(mappedBy = "notice")
@@ -130,7 +128,7 @@ class Notice(
     }
 
     fun approveNotice() {
-        this.isApprove = true
+        this.isApprove = NoticeWaitingStatus.APPROVE
     }
 
     fun toMinimumNoticeResponse(): MinimumNoticeResponse {
@@ -144,7 +142,7 @@ class Notice(
         )
     }
 
-    fun toMaximumNoticeResponse(): MaximumNoticeWithoutPayResponse {
+    fun toMaximumNoticeWithoutPayResponse(): MaximumNoticeWithoutPayResponse {
         return MaximumNoticeWithoutPayResponse(
             this.id!!,
             this.company.toMaximumCompanyResponse(),
@@ -193,6 +191,38 @@ class Notice(
         r.isPersonalContact?.let {
             this.isPersonalContact = r.isPersonalContact
         }
+    }
+
+    fun toNoticeWithIsApproveResponse(): NoticeWithIsApproveResponse {
+        return NoticeWithIsApproveResponse(
+            this.toMaximumNoticeWithPayResponse(),
+            this.isApprove == NoticeWaitingStatus.APPROVE
+        )
+    }
+
+    fun toMaximumNoticeWithPayResponse(): MaximumNoticeWithPayResponse {
+        return MaximumNoticeWithPayResponse(
+            this.id!!,
+            this.company.toMaximumCompanyResponse(),
+            this.recruitmentBusiness!!.toRecruitmentBusinessResponse(),
+            this.pay.toPayRequest(),
+            this.workTime.toWorkTimeRequest(),
+            this.mealSupport.toMealSupportRequest(),
+            this.welfare.toWelfare(),
+            this.noticeOpenPeriod.toNoticeOpenPeriod(),
+            this.interviewProcessList.map {
+                it.interviewProcess
+            },
+            this.needDocuments,
+            this.otherFeatures,
+            this.workPlace.toWorkPlaceRequest(),
+            this.formAttachmentList.map {
+                it.toFileResponse()
+            },
+            this.applicantList.filter {
+                !it.isDelete
+            }.size
+        )
     }
 
 }

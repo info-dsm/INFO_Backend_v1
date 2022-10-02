@@ -68,7 +68,6 @@ class CompanyIntroduction(
     fun toCompanyIntroductionResponse(): CompanyIntroductionResponse {
         return CompanyIntroductionResponse(
             this.introduction,
-            this.businessRegisteredCertificate?.toFileResponse(),
             this.companyIntroductionFile.map {
                 it.toFileResponse()
             },
@@ -77,6 +76,10 @@ class CompanyIntroduction(
                 it.toFileResponse()
             }
         )
+    }
+
+    fun getBusinessRegisteredCertificateResponse(): BusinessRegisteredCertificateFile {
+        return this.businessRegisteredCertificate!!
     }
 
 }

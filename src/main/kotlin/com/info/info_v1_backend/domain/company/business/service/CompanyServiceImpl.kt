@@ -48,7 +48,7 @@ class CompanyServiceImpl(
     private val companyIntroductionFileRepository: FileRepository<CompanyIntroductionFile>,
     private val companyLogoFileRepository: FileRepository<CompanyLogoFile>,
     private val companyPhotoRepository: FileRepository<CompanyPhotoFile>,
-    private val hiredStudentRepository: HiredStudentRepository
+    private val hiredStudentRepository: HiredStudentRepository,
 ): CompanyService {
 
     override fun editCompany(user: User, request: EditCompanyRequest) {
@@ -136,6 +136,15 @@ class CompanyServiceImpl(
 
         }
         return minimumCompanyResponseList
+    }
+
+    override fun getBusinessRegisteredCertificate(user: User, companyId: Long): BusinessRegisteredCertificateFile {
+        if (user is Student) throw NoAuthenticationException(user.roleList.toString())
+        else {
+            return companyRepository.findByIdOrNull(companyId)?. let {
+                return it.companyIntroduction.getBusinessRegisteredCertificateResponse()
+            }?: throw CompanyNotFoundException(companyId.toString())
+        }
     }
 
     override fun changeBusinessRegisteredCertificate(user: User, multipartFile: MultipartFile) {

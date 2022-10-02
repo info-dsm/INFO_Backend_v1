@@ -1,6 +1,8 @@
 package com.info.info_v1_backend.domain.company.data.entity.notice
 
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.edit.EditPayRequest
+import com.info.info_v1_backend.domain.company.business.dto.request.notice.register.EmploymentPayRequest
+import com.info.info_v1_backend.domain.company.business.dto.request.notice.register.PayRequest
 import javax.persistence.Column
 import javax.persistence.Embeddable
 import javax.persistence.Embedded
@@ -48,5 +50,16 @@ class Pay(
                 this.yearPayEnd =it
             }
         }
+    }
+
+    fun toPayRequest(): PayRequest {
+        return PayRequest(
+            this.fieldTrainingPayPerMonth,
+            EmploymentPayRequest(
+                this.yearPayStart,
+                this.yearPayEnd,
+                this.bonus
+            )
+        )
     }
 }

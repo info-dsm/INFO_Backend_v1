@@ -7,6 +7,7 @@ import com.info.info_v1_backend.domain.company.business.dto.request.notice.edit.
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.register.RegisterNoticeRequest
 import com.info.info_v1_backend.domain.company.business.dto.response.notice.MaximumNoticeWithoutPayResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.notice.MinimumNoticeResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.notice.NoticeWithIsApproveResponse
 import com.info.info_v1_backend.domain.company.business.service.NoticeService
 import com.info.info_v1_backend.domain.company.data.entity.notice.interview.InterviewProcess
 import com.info.info_v1_backend.global.error.common.TokenNotFoundException
@@ -91,6 +92,14 @@ class NoticeController(
         noticeService.deleteNotice(user?: throw TokenNotFoundException(), noticeId)
     }
 
+    @GetMapping("/me")
+    fun getMyNoticeList(
+        @AuthenticationPrincipal user: User?
+    ): List<NoticeWithIsApproveResponse> {
+        return noticeService.getMyNoticeList(
+            user?: throw TokenNotFoundException()
+        )
+    }
 
 
     @PutMapping("/approve")
@@ -102,6 +111,7 @@ class NoticeController(
     }
 
     @DeleteMapping("/approve")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     fun rejectNotice(
         @AuthenticationPrincipal user: User?,
         @RequestParam(required = true) noticeId: Long
@@ -113,8 +123,8 @@ class NoticeController(
     @GetMapping("/waiting-notice/list")
     fun getWaitingNoticeList(
         @AuthenticationPrincipal user: User?,
-        @RequestParam(required = true) idx: Int,
-        @RequestParam(required = true) size: Int
+        @RequestParam(defaultValue = "0") idx: Int,
+        @RequestParam(defaultValue = "10") size: Int
     ): Page<MinimumNoticeResponse> {
         return noticeService.getWaitingNoticeList(
             user?: throw TokenNotFoundException(),
@@ -128,9 +138,8 @@ class NoticeController(
     fun getMinimumNoticeList(
         @RequestParam(defaultValue = "0") idx: Int,
         @RequestParam(defaultValue = "10") size: Int,
-        @RequestParam(defaultValue = "true") isApprove: Boolean
     ): Page<MinimumNoticeResponse> {
-        return noticeService.getMinimumNoticeList(idx, size, isApprove)
+        return noticeService.getMinimumNoticeList(idx, size)
     }
 
     @GetMapping

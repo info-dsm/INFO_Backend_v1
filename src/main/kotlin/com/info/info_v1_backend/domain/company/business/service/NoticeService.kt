@@ -25,7 +25,8 @@ interface NoticeService {
     fun rejectNotice(user: User, noticeId: Long)
     fun getWaitingNoticeList(user: User, idx: Int, size: Int): Page<MinimumNoticeResponse>
 
-    fun getMinimumNoticeList(idx: Int, size: Int, isApprove: Boolean): Page<MinimumNoticeResponse>
+    fun getMyNoticeList(user: User): List<NoticeWithIsApproveResponse>
+    fun getMinimumNoticeList(idx: Int, size: Int): Page<MinimumNoticeResponse>
     fun getMaximumNotice(id: Long): MaximumNoticeWithoutPayResponse
     fun searchMinimumNoticeList(query: String): Page<MinimumNoticeResponse>
 

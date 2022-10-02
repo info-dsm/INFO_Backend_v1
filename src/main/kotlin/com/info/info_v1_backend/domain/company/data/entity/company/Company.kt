@@ -6,6 +6,7 @@ import com.info.info_v1_backend.domain.company.business.dto.request.company.Comp
 import com.info.info_v1_backend.domain.company.business.dto.request.company.EditCompanyRequest
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MinimumCompanyResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.notice.NoticeWithIsApproveResponse
 import com.info.info_v1_backend.domain.company.data.entity.comment.Comment
 import com.info.info_v1_backend.domain.company.data.entity.company.embeddable.CompanyContact
 import com.info.info_v1_backend.domain.company.data.entity.company.embeddable.CompanyInformation
@@ -137,19 +138,6 @@ class Company(
                 it.toCommentResponse()
             },
             this.isLeading,
-            this.noticeList.map {
-                it.toMinimumNoticeResponse()
-            },
-            this.hiredStudentList.filter {
-                !it.isFire
-            }.map {
-                it.toHiredStudentResponse()
-            },
-            this.fieldTrainingList.filter {
-                it.endDate.isAfter(LocalDate.now())
-            }.map {
-                it.toFieldTrainingResponse()
-            },
             this.isAssociated
         )
     }

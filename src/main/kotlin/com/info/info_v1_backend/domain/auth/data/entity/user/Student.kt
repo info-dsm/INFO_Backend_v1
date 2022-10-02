@@ -11,6 +11,7 @@ import com.info.info_v1_backend.domain.company.data.entity.notice.applicant.Appl
 import com.info.info_v1_backend.domain.project.data.entity.Creation
 import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
+import java.time.Year
 import javax.persistence.*
 
 
@@ -30,6 +31,8 @@ class Student(
     Role.STUDENT
 ) {
     val studentKey: String = studentKey
+
+    val entranceYear: Year = Year.now().minusYears((studentKey.substring(0, 1).toLong()-1))
 
     @OneToMany(mappedBy = "student", cascade = [CascadeType.REMOVE])
     var creationList: MutableList<Creation>? = creationList
