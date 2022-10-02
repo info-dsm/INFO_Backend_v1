@@ -10,12 +10,12 @@ import org.springframework.security.core.userdetails.UserDetails
 import javax.persistence.*
 
 
-@Where(clause = "is_delete = false")
+@Where(clause = "user_is_delete = false")
 @SQLDelete(sql = "UPDATE `user` SET user_is_delete = true where id = ?")
-@Entity
 @Table(name = "user")
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "user_type")
+@Entity
 abstract class User(
     name: String,
     email: String,
@@ -39,7 +39,7 @@ abstract class User(
         return this.password
     }
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     var roleList: MutableList<Role> = ArrayList()
         protected set
 

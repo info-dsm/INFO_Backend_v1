@@ -1,13 +1,16 @@
 package com.info.info_v1_backend.domain.auth.presentation.controller
 
 import com.info.info_v1_backend.domain.auth.business.dto.response.MinimumStudent
+import com.info.info_v1_backend.domain.auth.business.dto.response.StudentInfoResponse
 import com.info.info_v1_backend.domain.auth.business.dto.response.UserInfoResponse
 import com.info.info_v1_backend.domain.auth.business.service.UserService
+import com.info.info_v1_backend.domain.auth.data.entity.user.Student
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
 import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
 import com.info.info_v1_backend.global.error.common.TokenNotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam

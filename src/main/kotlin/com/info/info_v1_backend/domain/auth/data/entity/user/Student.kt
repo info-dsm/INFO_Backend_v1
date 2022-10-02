@@ -68,9 +68,9 @@ class Student(
             this.hiredStudentList.filter {
                 !it.isFire || !it.isDelete
             }.isNotEmpty(),
-            this.hiredStudentList.first {
+            this.hiredStudentList.filter {
                 !it.isFire || !it.isDelete
-            }?.company.toMinimumCompanyResponse()
+            }.firstOrNull()?.company?.toMinimumCompanyResponse()
         )
     }
 

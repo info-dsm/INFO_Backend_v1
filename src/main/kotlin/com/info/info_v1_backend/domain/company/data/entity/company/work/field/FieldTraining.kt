@@ -69,7 +69,7 @@ class FieldTraining(
     var isLinked: Boolean = false
         protected set
 
-    @Column(name = "hired_student_is_delete", nullable = false)
+    @Column(name = "field_training_is_delete", nullable = false)
     var isDelete: Boolean = false
         protected set
 

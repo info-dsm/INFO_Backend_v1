@@ -24,8 +24,8 @@ import javax.persistence.*
 
 @Entity
 @DiscriminatorValue("company")
-@Where(clause = "company_is_delete = false")
-@SQLDelete(sql = "UPDATE `company` SET company_is_delete = true where id = ?")
+@Where(clause = "user_is_delete = false")
+@SQLDelete(sql = "UPDATE `user` SET user_is_delete = true where id = ?")
 class Company(
     password: String,
     companyName: CompanyNameRequest,

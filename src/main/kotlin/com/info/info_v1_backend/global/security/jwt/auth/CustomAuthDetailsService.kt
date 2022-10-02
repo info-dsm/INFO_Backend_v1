@@ -6,13 +6,14 @@ import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 
 @Component
 class CustomAuthDetailsService(
     private val userRepository: UserRepository<User>
 ): UserDetailsService {
     override fun loadUserByUsername(username: String): UserDetails {
-        return userRepository.findById(11).orElse(null)?: throw UserNotFoundException(username)
+        return userRepository.findById(username.toLong()).orElse(null)?: throw UserNotFoundException(username)
     }
 
 }
