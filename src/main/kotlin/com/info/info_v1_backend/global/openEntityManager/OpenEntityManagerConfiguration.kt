@@ -11,7 +11,7 @@ class OpenEntityManagerConfiguration {
     @Bean
     fun openEntityManagerInViewFilter(): FilterRegistrationBean<OpenEntityManagerInViewFilter> {
         val filterFilterRegistrationBean = FilterRegistrationBean<OpenEntityManagerInViewFilter>()
-        filterFilterRegistrationBean.setFilter(OpenEntityManagerInViewFilter())
+        filterFilterRegistrationBean.filter = OpenEntityManagerInViewFilter()
         filterFilterRegistrationBean.order = Int.MIN_VALUE
         return filterFilterRegistrationBean
     }
