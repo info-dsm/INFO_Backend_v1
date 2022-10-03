@@ -51,7 +51,7 @@ class TokenProvider(
     fun getSubjectWithExpiredCheck(token: String): String {
         val body = decodeBody(token)
         val now = Date()
-        if (now.after(Date(now.time + body.expiration.time))) throw ExpiredTokenException(token)
+        if (now.after(Date(body.expiration.time))) throw ExpiredTokenException(token)
         return body.subject
     }
 

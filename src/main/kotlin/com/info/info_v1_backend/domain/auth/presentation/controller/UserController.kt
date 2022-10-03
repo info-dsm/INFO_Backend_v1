@@ -23,19 +23,6 @@ class UserController(
     private val userService: UserService
 ) {
 
-    @GetMapping("/test")
-    fun getTest(
-        @AuthenticationPrincipal user: User?
-    ): StudentInfoResponse {
-        return (user as Student).toStudentInfoResponse()
-    }
-
-    @GetMapping("/test/no")
-    fun getT1(): Int {
-        println("t1")
-        return 1
-    }
-
     @GetMapping("/info")
     fun getMyInfo(
         @AuthenticationPrincipal user: User?,
