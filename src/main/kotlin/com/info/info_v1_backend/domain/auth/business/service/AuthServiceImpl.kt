@@ -20,11 +20,13 @@ import com.info.info_v1_backend.domain.company.data.entity.company.file.CompanyP
 import com.info.info_v1_backend.domain.company.data.repository.company.CompanyRepository
 import com.info.info_v1_backend.domain.company.data.repository.company.CompanySearchDocumentRepository
 import com.info.info_v1_backend.global.error.common.NoAuthenticationException
+import com.info.info_v1_backend.global.error.common.TokenNotFoundException
 import com.info.info_v1_backend.global.file.repository.FileRepository
 import com.info.info_v1_backend.global.security.jwt.TokenProvider
 import com.info.info_v1_backend.global.security.jwt.data.TokenResponse
 import com.info.info_v1_backend.global.security.jwt.exception.ExpiredTokenException
 import com.info.info_v1_backend.infra.amazon.s3.S3Util
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -164,14 +166,14 @@ class AuthServiceImpl(
     }
 
     override fun reissue(req: ReissueRequest): TokenResponse {
-        if (tokenProvider.isExpired(req.refreshToken)) throw ExpiredTokenException(req.refreshToken)
+        val userId = tokenProvider.getSubjectWithExpiredCheck(req.accessToken)
+        val refreshToken = refreshTokenRepository.findByIdOrNull(userId)?: throw TokenNotFoundException()
+        if (refreshToken.token != req.refreshToken) throw ExpiredTokenException(req.refreshToken)
 
-        val userId = tokenProvider.decodeBody(req.accessToken).subject
-        val user = userRepository.findById(userId.toLong()).orElse(null) ?: throw UserNotFoundException(userId)
-        val tokenResponse = tokenProvider.encode(user.id.toString())
-        val token = RefreshToken(user.id.toString(), tokenResponse.refreshToken)
+        val tokenResponse = tokenProvider.encode(userId.toString())
+        val token = RefreshToken(userId.toString(), tokenResponse.refreshToken)
 
-        refreshTokenRepository.findById(user.id.toString()).map {
+        refreshTokenRepository.findById(userId.toString()).map {
             it.reset(token.token)
         }.orElse(null) ?: refreshTokenRepository.save(token)
         return tokenResponse
