@@ -16,7 +16,6 @@ import javax.persistence.IdClass
 import javax.persistence.JoinColumn
 import javax.persistence.JoinColumns
 import javax.persistence.ManyToOne
-import javax.persistence.OneToMany
 import javax.persistence.OneToOne
 import javax.persistence.Table
 
@@ -87,7 +86,7 @@ class HiredStudent(
         return HiredStudentResponse(
             this.student.id!!,
             this.student.name,
-            this.student.studentKey,
+            this.student.entranceYear - 2014,
             this.company.id!!,
             this.startDate
         )

@@ -1,11 +1,11 @@
 package com.info.info_v1_backend.domain.company.presentation
 
-import com.info.info_v1_backend.domain.auth.business.dto.response.MinimumStudent
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.CloseNoticeRequest
 import com.info.info_v1_backend.domain.company.business.dto.response.company.FieldTrainingResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.FieldTrainingStudentWithHiredResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.HiredStudentResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.notice.ApplicantResponse
 import com.info.info_v1_backend.domain.company.business.service.HireService
 import com.info.info_v1_backend.global.error.common.TokenNotFoundException
 import org.springframework.data.domain.Page
@@ -31,7 +31,7 @@ class HireController(
         @PathVariable noticeId: Long,
         @RequestParam(defaultValue = "0") idx: Int,
         @RequestParam(defaultValue = "10") size: Int
-    ): Page<MinimumStudent> {
+    ): List<ApplicantResponse> {
         return hireService.getApplierList(
             user?: throw TokenNotFoundException(),
             noticeId,

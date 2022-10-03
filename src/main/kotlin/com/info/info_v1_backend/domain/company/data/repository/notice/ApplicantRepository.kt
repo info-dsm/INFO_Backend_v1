@@ -11,6 +11,6 @@ import java.util.Optional
 
 interface ApplicantRepository: JpaRepository<Applicant, ApplicantIdClass> {
 
-    fun findByNotice(notice: Notice, pageable: Pageable): Page<Applicant>
+    fun findByNotice(notice: Notice): List<Applicant>
     fun findByNoticeAndStudent(notice: Notice, student: Student): Optional<Applicant>
 }

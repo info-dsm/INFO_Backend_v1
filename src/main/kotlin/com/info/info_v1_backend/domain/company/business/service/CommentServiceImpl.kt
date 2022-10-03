@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service
 class CommentServiceImpl(
     private val companyRepository: CompanyRepository,
     private val commentRepository: CommentRepository,
-    private val currentUtil: CurrentUtil
 ): CommentService {
 
     override fun writeComment(user: User, request: WriteCommentRequest, companyId: Long) {

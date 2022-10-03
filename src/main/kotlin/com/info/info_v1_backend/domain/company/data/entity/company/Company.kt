@@ -77,6 +77,10 @@ class Company(
     var noticeList: MutableList<Notice> = ArrayList()
         protected set
 
+    @ElementCollection
+    var noticeRegisteredYearList: MutableList<Int> = ArrayList()
+        protected set
+
     @OneToMany(mappedBy = "company")
     var hiredStudentList: MutableList<HiredStudent> = ArrayList()
         protected set
@@ -92,6 +96,12 @@ class Company(
     @Column(name = "company_is_delete", nullable = false)
     var isDelete: Boolean = false
         protected set
+
+    fun updateLastNoticeYear() {
+        if (!this.noticeRegisteredYearList.contains(
+            LocalDate.now().year
+        )) this.noticeRegisteredYearList.add(LocalDate.now().year)
+    }
 
     fun makeAssociated() {
         this.isAssociated = true
@@ -114,9 +124,7 @@ class Company(
             Year.of(this.noticeList.last().createdAt?.year ?: LocalDate.now().year),
             this.hiredStudentList.filter {
                 !it.isFire
-            }.map {
-                it.toHiredStudentResponse()
-            },
+            }.size,
             this.commentList.map {
                 it.toCommentResponse()
             },
@@ -139,7 +147,11 @@ class Company(
                 it.toCommentResponse()
             },
             this.isLeading,
-            this.isAssociated
+            this.isAssociated,
+            this.noticeList.last().createdAt!!.toLocalDate(),
+            this.hiredStudentList.map {
+                it.toHiredStudentResponse()
+            }
         )
     }
 

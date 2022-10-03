@@ -8,4 +8,5 @@ data class MinimumNoticeResponse(
     val recruitmentBusinessResponse: RecruitmentBusinessResponse,
     val applicantCount: Int
 
+
 )

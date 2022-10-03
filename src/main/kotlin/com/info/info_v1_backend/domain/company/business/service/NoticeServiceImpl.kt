@@ -193,7 +193,7 @@ class NoticeServiceImpl(
 
     override fun getMyNoticeList(user: User): List<NoticeWithIsApproveResponse> {
         if (user is Company) {
-            return noticeRepository.findAllByCompany(user).map { 
+            return noticeRepository.findAllByCompanyOrderByCreatedAtDesc(user).map {
                 it.toNoticeWithIsApproveResponse()
             }
         } else throw NoAuthenticationException(user.roleList.toString())

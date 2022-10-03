@@ -6,6 +6,6 @@ import org.springframework.web.multipart.MultipartFile
 data class CompanyIntroductionRequest(
     val businessRegisteredCertificate: MultipartFile,
     val companyIntroductionFile: List<MultipartFile>,
-    val companyLogo: MultipartFile?,
+    val companyLogo: MultipartFile,
     val companyPhotoList: List<MultipartFile>
 )

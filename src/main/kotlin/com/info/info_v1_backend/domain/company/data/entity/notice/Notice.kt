@@ -114,6 +114,10 @@ class Notice(
     var applicantList: MutableList<Applicant> = ArrayList()
         protected set
 
+    init {
+        this.company.updateLastNoticeYear()
+    }
+
 
     fun addAttachment(formAttachment: FormAttachment) {
         this.formAttachmentList.add(formAttachment)

@@ -8,6 +8,7 @@ import com.info.info_v1_backend.domain.company.business.dto.response.company.Min
 import com.info.info_v1_backend.domain.company.business.service.CompanyService
 import com.info.info_v1_backend.domain.company.data.entity.company.file.BusinessRegisteredCertificateFile
 import com.info.info_v1_backend.global.error.common.TokenNotFoundException
+import com.info.info_v1_backend.global.file.dto.FileResponse
 import org.springframework.data.domain.Page
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDate
+import java.time.Year
 
 @RestController
 @RequestMapping("/api/info/v1/company")
@@ -77,10 +79,25 @@ class CompanyController(
     fun getBusinessRegisteredCertificate(
         @AuthenticationPrincipal user: User?,
         @PathVariable(required = true) companyId: Long
-    ): BusinessRegisteredCertificateFile {
+    ): FileResponse {
         return companyService.getBusinessRegisteredCertificate(
             user?: throw TokenNotFoundException(),
             companyId
+        ).toFileResponse()
+    }
+
+    @GetMapping("/")
+    fun getNoticeRegisteredCompanyListByYear(
+        @AuthenticationPrincipal user: User?,
+        @RequestParam year: Year,
+        @RequestParam idx: Int,
+        @RequestParam size: Int
+    ): Page<MinimumCompanyResponse> {
+        return companyService.getNoticeRegisteredCompanyListByYear(
+            user?: throw TokenNotFoundException(),
+            year,
+            idx,
+            size
         )
     }
 
@@ -102,6 +119,7 @@ class CompanyController(
     }
 
     @DeleteMapping("/introduction")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     fun removeCompanyIntroductionFile(
         @AuthenticationPrincipal user: User?,
         @RequestParam(required = true) fileId: Long
@@ -135,6 +153,7 @@ class CompanyController(
     }
 
     @DeleteMapping("/photo")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     fun removeCompanyPhoto(
         @AuthenticationPrincipal user: User?,
         @RequestParam(required = true) fileId: Long

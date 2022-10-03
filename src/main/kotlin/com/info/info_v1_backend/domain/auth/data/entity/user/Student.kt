@@ -53,9 +53,11 @@ class Student(
         return MinimumStudent(
                 this.name,
                 this.studentKey,
+                this.email,
                 this.id!!
         )
     }
+
 
     fun toStudentInfoResponse(): StudentInfoResponse {
         return StudentInfoResponse(

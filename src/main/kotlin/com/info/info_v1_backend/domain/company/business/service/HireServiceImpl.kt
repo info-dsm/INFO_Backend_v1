@@ -1,6 +1,5 @@
 package com.info.info_v1_backend.domain.company.business.service
 
-import com.info.info_v1_backend.domain.auth.business.dto.response.MinimumStudent
 import com.info.info_v1_backend.domain.auth.data.entity.user.Student
 import com.info.info_v1_backend.domain.auth.data.entity.user.Teacher
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
@@ -11,6 +10,7 @@ import com.info.info_v1_backend.domain.company.business.dto.request.notice.Close
 import com.info.info_v1_backend.domain.company.business.dto.response.company.FieldTrainingResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.FieldTrainingStudentWithHiredResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.HiredStudentResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.notice.ApplicantResponse
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
 import com.info.info_v1_backend.domain.company.data.entity.company.work.field.FieldTraining
 import com.info.info_v1_backend.domain.company.data.entity.notice.applicant.Applicant
@@ -24,7 +24,6 @@ import com.info.info_v1_backend.domain.company.data.repository.notice.NoticeRepo
 import com.info.info_v1_backend.domain.company.exception.*
 import com.info.info_v1_backend.global.error.common.NoAuthenticationException
 import com.info.info_v1_backend.infra.amazon.s3.S3Util
-import org.joda.time.Days
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -72,16 +71,14 @@ class HireServiceImpl(
         } else throw IsNotStudentException(user.roleList.toString())
     }
 
-    override fun getApplierList(user: User, noticeId: Long, idx: Int, size: Int): Page<MinimumStudent> {
+    override fun getApplierList(user: User, noticeId: Long, idx: Int, size: Int): List<ApplicantResponse> {
         if (user is Company || user is Teacher) {
             val notice = noticeRepository.findByIdOrNull(noticeId)?: throw NoticeNotFoundException(noticeId.toString())
 
             return applicantRepository.findByNotice(
-                notice,
-                PageRequest.of(idx, size, Sort.by("created_at").descending())
+                notice
             ).map {
-                (studentRepository.findByIdOrNull(it.student.id!!)?: throw UserNotFoundException(it.student.id.toString()))
-                    .toMinimumStudent()
+                it.toApplicantResponse()
             }
         } else throw NoAuthenticationException(noticeId.toString())
     }

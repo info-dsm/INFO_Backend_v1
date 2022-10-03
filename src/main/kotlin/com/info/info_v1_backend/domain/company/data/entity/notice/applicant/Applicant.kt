@@ -1,6 +1,7 @@
 package com.info.info_v1_backend.domain.company.data.entity.notice.applicant
 
 import com.info.info_v1_backend.domain.auth.data.entity.user.Student
+import com.info.info_v1_backend.domain.company.business.dto.response.notice.ApplicantResponse
 import com.info.info_v1_backend.domain.company.data.entity.notice.Notice
 import com.info.info_v1_backend.domain.company.data.entity.notice.file.Reporter
 import com.info.info_v1_backend.global.base.entity.BaseTimeEntity
@@ -45,6 +46,13 @@ class Applicant(
 
     override fun isNew(): Boolean {
         return this.createdAt == null
+    }
+
+    fun toApplicantResponse(): ApplicantResponse {
+        return ApplicantResponse(
+            this.student.toMinimumStudent(),
+            this.reporterList
+        )
     }
 
 }

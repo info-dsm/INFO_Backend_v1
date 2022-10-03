@@ -72,7 +72,7 @@ class AuthController(
         @RequestParam emailCheckCode: String,
         @RequestPart businessRegisteredCertificate: MultipartFile,
         @RequestPart companyIntroductionFile: List<MultipartFile>,
-        @RequestPart companyLogo: MultipartFile?,
+        @RequestPart companyLogo: MultipartFile,
         @RequestPart companyPhotoList: List<MultipartFile>
     ) {
         authService.companySignup(

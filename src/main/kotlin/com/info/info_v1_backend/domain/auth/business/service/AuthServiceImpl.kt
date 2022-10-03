@@ -15,6 +15,7 @@ import com.info.info_v1_backend.domain.company.data.entity.company.CompanySearch
 import com.info.info_v1_backend.domain.company.data.entity.company.embeddable.CompanyIntroduction
 import com.info.info_v1_backend.domain.company.data.entity.company.file.BusinessRegisteredCertificateFile
 import com.info.info_v1_backend.domain.company.data.entity.company.file.CompanyIntroductionFile
+import com.info.info_v1_backend.domain.company.data.entity.company.file.CompanyLogoFile
 import com.info.info_v1_backend.domain.company.data.entity.company.file.CompanyPhotoFile
 import com.info.info_v1_backend.domain.company.data.repository.company.CompanyRepository
 import com.info.info_v1_backend.domain.company.data.repository.company.CompanySearchDocumentRepository
@@ -42,6 +43,7 @@ class AuthServiceImpl(
     private val companyRepository: CompanyRepository,
     private val tokenProvider: TokenProvider,
     private val refreshTokenRepository: RefreshTokenRepository,
+    private val companyLogoFileRepository: FileRepository<CompanyLogoFile>
 ): AuthService {
 
     override fun studentSignUp(req: StudentSignUpRequest) {
@@ -88,28 +90,29 @@ class AuthServiceImpl(
                     req.isLeading
                 )
             )
-            companyIntroduction.businessRegisteredCertificate.let{
-                businessRegisteredCertificateFileRepository.save(
-                    BusinessRegisteredCertificateFile(
-                        s3Util.uploadFile(it, "company/${company.id!!}", "businessRegisteredCertificate"),
-                        company
+            company.companyIntroduction.registerCompanyLogoAndBusinessCertificate(
+                companyIntroduction.companyLogo.let {
+                    return@let companyLogoFileRepository.save(
+                        CompanyLogoFile(
+                            s3Util.uploadFile(it, "company/${company.id!!}", "companyLogo"),
+                            company
+                        )
                     )
-                )
-            }
+                },
+                companyIntroduction.businessRegisteredCertificate.let{
+                    return@let businessRegisteredCertificateFileRepository.save(
+                        BusinessRegisteredCertificateFile(
+                            s3Util.uploadFile(it, "company/${company.id!!}", "businessRegisteredCertificate"),
+                            company
+                        )
+                    )
+                }
+            )
 
             companyIntroduction.companyIntroductionFile.map {
                 companyIntroductionFileRepository.save(
                     CompanyIntroductionFile(
                         s3Util.uploadFile(it, "company/${company.id!!}", "companyIntroduction"),
-                        company
-                    )
-                )
-            }
-
-            companyIntroduction.companyLogo?.let {
-                companyIntroductionFileRepository.save(
-                    CompanyIntroductionFile(
-                        s3Util.uploadFile(it, "company/${company.id!!}", "companyLogo"),
                         company
                     )
                 )

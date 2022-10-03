@@ -8,6 +8,7 @@ import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
 import com.info.info_v1_backend.domain.company.business.dto.request.company.EditCompanyRequest
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MinimumCompanyResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.notice.MinimumNoticeResponse
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
 import com.info.info_v1_backend.domain.company.data.entity.company.CompanySearchDocument
 import com.info.info_v1_backend.domain.company.data.entity.company.file.BusinessRegisteredCertificateFile
@@ -20,6 +21,7 @@ import com.info.info_v1_backend.domain.company.data.repository.company.CompanyRe
 import com.info.info_v1_backend.domain.company.data.repository.company.CompanySearchDocumentRepository
 import com.info.info_v1_backend.domain.company.data.repository.company.FieldTrainingRepository
 import com.info.info_v1_backend.domain.company.data.repository.company.HiredStudentRepository
+import com.info.info_v1_backend.domain.company.data.repository.notice.NoticeRepository
 import com.info.info_v1_backend.domain.company.data.repository.notice.NoticeSearchDocumentRepository
 import com.info.info_v1_backend.domain.company.exception.*
 import com.info.info_v1_backend.global.error.common.NoAuthenticationException
@@ -34,6 +36,8 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.Year
 import javax.transaction.Transactional
 
 @Service
@@ -49,6 +53,7 @@ class CompanyServiceImpl(
     private val companyLogoFileRepository: FileRepository<CompanyLogoFile>,
     private val companyPhotoRepository: FileRepository<CompanyPhotoFile>,
     private val hiredStudentRepository: HiredStudentRepository,
+    private val noticeRepository: NoticeRepository
 ): CompanyService {
 
     override fun editCompany(user: User, request: EditCompanyRequest) {
@@ -144,6 +149,14 @@ class CompanyServiceImpl(
             return companyRepository.findByIdOrNull(companyId)?. let {
                 return it.companyIntroduction.getBusinessRegisteredCertificateResponse()
             }?: throw CompanyNotFoundException(companyId.toString())
+        }
+    }
+
+    override fun getNoticeRegisteredCompanyListByYear(user: User, year: Year, idx: Int, size: Int): Page<MinimumCompanyResponse> {
+        return companyRepository.findAllByNoticeRegisteredYearListContains(
+            year.value,
+        PageRequest.of(idx, size, Sort.by("created_at").descending())).map {
+            it.toMinimumCompanyResponse()
         }
     }
 

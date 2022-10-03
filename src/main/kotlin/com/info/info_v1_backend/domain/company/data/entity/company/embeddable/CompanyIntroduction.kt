@@ -35,6 +35,11 @@ class CompanyIntroduction(
         protected set
 
 
+    fun registerCompanyLogoAndBusinessCertificate(logo: CompanyLogoFile, businessRegisteredCertificate: BusinessRegisteredCertificateFile) {
+        this.companyLogo = logo
+        this.businessRegisteredCertificate = businessRegisteredCertificate
+    }
+
     fun changeBusinessRegisteredCertificate(file: BusinessRegisteredCertificateFile) {
         this.businessRegisteredCertificate = file
     }
