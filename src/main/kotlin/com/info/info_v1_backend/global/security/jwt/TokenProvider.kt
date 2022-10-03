@@ -56,7 +56,7 @@ class TokenProvider(
     }
 
     fun isExpired(token: String): Boolean {
-        val body = Jwts.parser().setSigningKey(jwtProperty.secretKey).parseClaimsJwt(token).body
+        val body = Jwts.parser().setSigningKey(jwtProperty.secretKey).parseClaimsJws(token).body
         val now = Date()
         return now.after(Date(now.time + body.expiration.time))
     }
