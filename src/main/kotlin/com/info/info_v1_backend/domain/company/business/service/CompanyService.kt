@@ -3,6 +3,7 @@ package com.info.info_v1_backend.domain.company.business.service
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
 import com.info.info_v1_backend.domain.company.business.dto.request.company.EditCompanyRequest
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyWithIsWorkingResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MinimumCompanyResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.notice.MinimumNoticeResponse
 import com.info.info_v1_backend.domain.company.data.entity.company.file.BusinessRegisteredCertificateFile
@@ -16,7 +17,7 @@ interface CompanyService {
     fun editCompany(user: User, request: EditCompanyRequest)
     fun getMinimumCompanyList(idx: Int, size: Int): Page<MinimumCompanyResponse>
     fun getMaximumCompany(id: Long): MaximumCompanyResponse
-    fun getEntireMaximumCompanyByUserId(user: User, id: Long): List<MaximumCompanyResponse>
+    fun getEntireMaximumCompanyByUserId(user: User, id: Long): List<MaximumCompanyWithIsWorkingResponse>
     fun searchCompany(query: String): List<MinimumCompanyResponse>
 
     fun getBusinessRegisteredCertificate(user: User, companyId: Long): BusinessRegisteredCertificateFile

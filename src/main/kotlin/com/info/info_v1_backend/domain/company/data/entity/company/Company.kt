@@ -5,6 +5,7 @@ import com.info.info_v1_backend.domain.auth.data.entity.user.User
 import com.info.info_v1_backend.domain.company.business.dto.request.company.CompanyNameRequest
 import com.info.info_v1_backend.domain.company.business.dto.request.company.EditCompanyRequest
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyWithIsWorkingResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MinimumCompanyResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.notice.NoticeWithIsApproveResponse
 import com.info.info_v1_backend.domain.company.data.entity.comment.Comment
@@ -152,6 +153,21 @@ class Company(
             this.hiredStudentList.map {
                 it.toHiredStudentResponse()
             }
+        )
+    }
+
+    fun toMaximumCompanyWithIsWorkingResponse(): MaximumCompanyWithIsWorkingResponse {
+        return MaximumCompanyWithIsWorkingResponse(
+            this.toMaximumCompanyResponse(),
+            this.fieldTrainingList.filter {
+                !it.isDelete && !it.isLinked
+            }.firstOrNull()?.let {
+                return@let true
+            }?: this.hiredStudentList.filter {
+                !it.isFire && !it.isDelete
+            }.firstOrNull()?. let {
+                return@let true
+            }?: false
         )
     }
 

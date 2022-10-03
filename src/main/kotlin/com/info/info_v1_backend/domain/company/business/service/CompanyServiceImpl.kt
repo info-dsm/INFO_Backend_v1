@@ -7,6 +7,7 @@ import com.info.info_v1_backend.domain.auth.data.repository.user.UserRepository
 import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
 import com.info.info_v1_backend.domain.company.business.dto.request.company.EditCompanyRequest
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyWithIsWorkingResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MinimumCompanyResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.notice.MinimumNoticeResponse
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
@@ -98,14 +99,14 @@ class CompanyServiceImpl(
 
     }
 
-    override fun getEntireMaximumCompanyByUserId(user: User, id: Long): List<MaximumCompanyResponse> {
+    override fun getEntireMaximumCompanyByUserId(user: User, id: Long): List<MaximumCompanyWithIsWorkingResponse> {
         if (user is Student) {
             if (user.id != id) throw NoAuthenticationException(user.roleList.toString())
-            val result: MutableList<MaximumCompanyResponse> = ArrayList()
+            val result: MutableList<MaximumCompanyWithIsWorkingResponse> = ArrayList()
             hiredStudentRepository.findAllByStudent(user).map {
                 companyRepository.findAllByHiredStudentListContains(it).map {
                     result.add(
-                        it.toMaximumCompanyResponse()
+                        it.toMaximumCompanyWithIsWorkingResponse()
                     )
                 }
             }
@@ -113,11 +114,11 @@ class CompanyServiceImpl(
         } else {
             val student = studentRepository.findById(id).orElse(null)?: throw UserNotFoundException(id.toString())
 
-            val result: MutableList<MaximumCompanyResponse> = ArrayList()
+            val result: MutableList<MaximumCompanyWithIsWorkingResponse> = ArrayList()
             hiredStudentRepository.findAllByStudent(student).map {
                 companyRepository.findAllByHiredStudentListContains(it).map {
                     result.add(
-                        it.toMaximumCompanyResponse()
+                        it.toMaximumCompanyWithIsWorkingResponse()
                     )
                 }
             }

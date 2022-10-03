@@ -1,5 +1,6 @@
 package com.info.info_v1_backend.domain.company.data.entity.notice.file
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
 import com.info.info_v1_backend.domain.company.data.entity.notice.Notice
 import com.info.info_v1_backend.domain.company.data.entity.notice.applicant.Applicant
@@ -32,6 +33,7 @@ class Reporter(
         JoinColumn(name = "student_id"),
         JoinColumn(name = "notice_id")
     )
+    @JsonIgnore
     var applicant: Applicant = applicant
         protected set
 

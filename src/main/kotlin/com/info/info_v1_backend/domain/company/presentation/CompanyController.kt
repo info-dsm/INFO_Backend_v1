@@ -4,6 +4,7 @@ import com.info.info_v1_backend.domain.auth.data.entity.user.User
 import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
 import com.info.info_v1_backend.domain.company.business.dto.request.company.EditCompanyRequest
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyWithIsWorkingResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MinimumCompanyResponse
 import com.info.info_v1_backend.domain.company.business.service.CompanyService
 import com.info.info_v1_backend.domain.company.data.entity.company.file.BusinessRegisteredCertificateFile
@@ -64,7 +65,7 @@ class CompanyController(
     fun getMaximumCompanyByUserId(
         @AuthenticationPrincipal user: User?,
         @RequestParam(required = true) id: Long
-    ): List<MaximumCompanyResponse> {
+    ): List<MaximumCompanyWithIsWorkingResponse> {
         return companyService.getEntireMaximumCompanyByUserId(user?: throw TokenNotFoundException(), id)
     }
 
@@ -86,7 +87,7 @@ class CompanyController(
         ).toFileResponse()
     }
 
-    @GetMapping("/")
+    @GetMapping("/list/year")
     fun getNoticeRegisteredCompanyListByYear(
         @AuthenticationPrincipal user: User?,
         @RequestParam year: Year,
