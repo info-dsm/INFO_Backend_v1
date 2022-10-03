@@ -36,7 +36,7 @@ class AuthController(
     @PostMapping("/email/school")
     fun sendSchoolEmail(
         @RequestParam
-        @Pattern(regexp = "[a-zA-Z\\d+_.]+@dsm\\.hs\\.kr$")
+        @Pattern(regexp = "[a-zA-Z\\d+_.]+@dsm\\.hs\\.kr$", message = "올바른 이메일 형식이 아닙니다.")
         email: String
     ){
         emailService.sendCodeToEmail(email)
