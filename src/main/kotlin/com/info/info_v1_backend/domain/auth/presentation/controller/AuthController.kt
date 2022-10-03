@@ -68,7 +68,7 @@ class AuthController(
 
     @PostMapping("/signup/company")
     fun companySignup(
-        @RequestBody request: CompanySignupRequest,
+        @RequestPart request: CompanySignupRequest,
         @RequestParam emailCheckCode: String,
         @RequestPart businessRegisteredCertificate: MultipartFile,
         @RequestPart companyIntroductionFile: List<MultipartFile>,
