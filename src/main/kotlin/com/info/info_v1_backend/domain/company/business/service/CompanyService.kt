@@ -2,6 +2,7 @@ package com.info.info_v1_backend.domain.company.business.service
 
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
 import com.info.info_v1_backend.domain.company.business.dto.request.company.EditCompanyRequest
+import com.info.info_v1_backend.domain.company.business.dto.response.company.BusinessAreaResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyWithIsWorkingResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MinimumCompanyResponse
@@ -14,7 +15,7 @@ import java.time.Year
 
 interface CompanyService {
 
-    fun editCompany(user: User, request: EditCompanyRequest)
+    fun editCompany(user: User, request: EditCompanyRequest, companyId: Long)
     fun getMinimumCompanyList(idx: Int, size: Int): Page<MinimumCompanyResponse>
     fun getMaximumCompany(id: Long): MaximumCompanyResponse
     fun getEntireMaximumCompanyByUserId(user: User, id: Long): List<MaximumCompanyWithIsWorkingResponse>
@@ -23,6 +24,8 @@ interface CompanyService {
     fun getBusinessRegisteredCertificate(user: User, companyId: Long): BusinessRegisteredCertificateFile
 
     fun getNoticeRegisteredCompanyListByYear(user: User, year: Year, idx: Int, size: Int): Page<MinimumCompanyResponse>
+
+    fun getBusinessArea(): List<BusinessAreaResponse>
 
     //photo
     fun changeBusinessRegisteredCertificate(user: User, multipartFile: MultipartFile)

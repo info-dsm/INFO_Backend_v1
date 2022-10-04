@@ -11,13 +11,19 @@ import com.info.info_v1_backend.domain.company.data.entity.notice.Notice
 import com.info.info_v1_backend.domain.company.data.entity.notice.NoticeWaitingStatus
 import com.info.info_v1_backend.domain.company.data.entity.notice.certificate.Certificate
 import com.info.info_v1_backend.domain.company.data.entity.notice.certificate.CertificateSearchDocument
+import com.info.info_v1_backend.domain.company.data.entity.notice.certificate.CertificateUsage
+import com.info.info_v1_backend.domain.company.data.entity.notice.certificate.CertificateUsageIdClass
 import com.info.info_v1_backend.domain.company.data.entity.notice.classification.RecruitmentBigClassification
 import com.info.info_v1_backend.domain.company.data.entity.notice.classification.RecruitmentSmallClassification
 import com.info.info_v1_backend.domain.company.data.entity.notice.interview.InterviewProcess
 import com.info.info_v1_backend.domain.company.data.entity.notice.interview.InterviewProcessUsage
 import com.info.info_v1_backend.domain.company.data.entity.notice.language.Language
 import com.info.info_v1_backend.domain.company.data.entity.notice.language.LanguageUsage
+import com.info.info_v1_backend.domain.company.data.entity.notice.language.LanguageUsageIdClass
 import com.info.info_v1_backend.domain.company.data.entity.notice.recruitment.RecruitmentBusiness
+import com.info.info_v1_backend.domain.company.data.entity.notice.technology.Technology
+import com.info.info_v1_backend.domain.company.data.entity.notice.technology.TechnologyUsage
+import com.info.info_v1_backend.domain.company.data.entity.notice.technology.TechnologyUsageIdClass
 import com.info.info_v1_backend.domain.company.data.repository.company.*
 import com.info.info_v1_backend.domain.company.data.repository.notice.*
 import com.info.info_v1_backend.domain.company.exception.NoticeNotFoundException
@@ -45,9 +51,11 @@ class NoticeServiceImpl(
     private val s3Util: S3Util,
     private val formAttachmentRepository: FileRepository<FormAttachment>,
     private val certificateRepository: CertificateRepository,
-    private val certificateSearchDocumentRepository: CertificateSearchDocumentRepository,
     private val languageUsageRepository: LanguageUsageRepository,
-    private val languageRepository: LanguageRepository
+    private val languageRepository: LanguageRepository,
+    private val technologyRepository: TechnologyRepository,
+    private val technologyUsageRepository: TechnologyUsageRepository,
+    private val certificateUsageRepository: CertificateUsageRepository
 ): NoticeService {
 
     override fun getBigClassificationList(): List<BigClassificationResponse> {
@@ -128,7 +136,6 @@ class NoticeServiceImpl(
                     certificateRepository.findByIdOrNull(it)
                         ?: Certificate(
                             it,
-                            notice.recruitmentBusiness!!
                         )
                 )
             }
@@ -166,6 +173,46 @@ class NoticeServiceImpl(
                     it.value
                 )
             }
+
+        } else throw NoAuthenticationException(user.roleList.toString())
+    }
+
+    override fun getCertificateList(): List<CertificateResponse> {
+        return certificateRepository.findAll().map {
+            it.toCertificateResponse()
+        }
+    }
+
+    override fun addCertificate(user: User, certificateName: String, noticeId: Long) {
+        if (user is Company) {
+            val notice = noticeRepository.findByIdOrNull(noticeId)?: throw NoticeNotFoundException(noticeId.toString())
+            certificateUsageRepository.save(
+                CertificateUsage(
+                    certificateRepository.findByIdOrNull(certificateName)?:
+                    certificateRepository.save(
+                        Certificate(
+                            certificateName
+                        )
+                    ),
+                    notice.recruitmentBusiness!!
+                )
+            )
+
+        } else throw NoAuthenticationException(user.roleList.toString())
+    }
+
+    override fun removeCertificate(user: User, certificateName: String, noticeId: Long) {
+        if (user is Company) {
+            val notice = noticeRepository.findByIdOrNull(noticeId)?: throw NoticeNotFoundException(noticeId.toString())
+
+            certificateUsageRepository.delete(
+                certificateUsageRepository.findByIdOrNull(
+                    CertificateUsageIdClass(
+                        "",
+                        notice.recruitmentBusiness!!.id!!
+                    )
+                )?: return
+            )
 
         } else throw NoAuthenticationException(user.roleList.toString())
     }
@@ -212,6 +259,12 @@ class NoticeServiceImpl(
         } else throw NoAuthenticationException(user.roleList.toString())
     }
 
+    override fun getLanguageList(): List<LanguageResponse> {
+        return languageRepository.findAll().map {
+            it.toLanguageResponse()
+        }
+    }
+
     override fun addLanguageSet(user: User, languageName: String, noticeId: Long) {
         if (user is Company) {
             val notice = noticeRepository.findByIdAndCompanyAndIsApproveNot(noticeId, user, NoticeWaitingStatus.REJECT)
@@ -242,23 +295,56 @@ class NoticeServiceImpl(
 
     override fun removeLanguageSet(user: User, languageName: String, noticeId: Long) {
         if (user is Company) {
-//            val notice = noticeRepository.findByIdOrNull(noticeId)?: throw NoticeNotFoundException(noticeId.toString())
-//            notice.recruitmentBusiness!!.languageUsageSet.remove(
-//                languageUsageRepository.findByLanguageAndRecruitmentBusiness(
-//                    languageRepository.findByIdOrNull(languageName)?: return,
-//                    notice.recruitmentBusiness!!
-//                )
-//            )
+            languageUsageRepository.delete(
+                languageUsageRepository.findByIdOrNull(
+                    LanguageUsageIdClass(
+                        languageName,
+                        (noticeRepository.findByIdAndCompanyAndIsApproveNot(noticeId, user, NoticeWaitingStatus.REJECT)
+                            .orElse(null)?: return).recruitmentBusiness!!.id!!
+                    )
+                )?: return
+            )
 
         } else throw NoAuthenticationException(user.roleList.toString())
     }
 
+    override fun getTechnologyList(): List<TechnologyResponse> {
+        return technologyRepository.findAll().map {
+            it.toTechnologyResponse()
+        }
+    }
+
     override fun addTechnologySet(user: User, technologyName: String, noticeId: Long) {
-        TODO("Not yet implemented")
+        if (user is Company) {
+            technologyUsageRepository.save(
+                TechnologyUsage(
+                    technologyRepository.findByIdOrNull(
+                        technologyName
+                    ) ?: technologyRepository.save(
+                        Technology(
+                            technologyName
+                        )
+                    ),
+                    (noticeRepository.findByIdAndCompanyAndIsApproveNot(noticeId, user, NoticeWaitingStatus.REJECT)
+                        .orElse(null)?: throw NoticeNotFoundException(noticeId.toString()))
+                        .recruitmentBusiness!!
+                )
+            )
+        } else throw NoAuthenticationException(user.roleList.toString())
     }
 
     override fun removeTechnologySet(user: User, technologyName: String, noticeId: Long) {
-        TODO("Not yet implemented")
+        if (user is Company) {
+            technologyUsageRepository.delete(
+                technologyUsageRepository.findByIdOrNull(
+                    TechnologyUsageIdClass(
+                        technologyName,
+                        user.id!!
+                    )
+                )?: return
+            )
+
+        } else throw NoAuthenticationException(user.roleList.toString())
     }
 
     override fun deleteNotice(user: User, noticeId: Long) {
@@ -326,30 +412,6 @@ class NoticeServiceImpl(
     }
 
     override fun printNotice(user: User, noticeId: Long): FileResponse {
-        TODO("Not yet implemented")
-    }
-
-    override fun searchCertificate(query: String): Page<CertificateResponse> {
-        return certificateSearchDocumentRepository.findByCertificateNameOrderByTextScoreDesc(query, PageRequest.of(0, 10)).map {
-                certificateSearchDocument: CertificateSearchDocument ->
-            certificateRepository.findByIdOrNull(certificateSearchDocument.certificateName)?.let {
-                CertificateResponse(
-                    certificateSearchDocument.certificateName
-                )
-            }?: let<NoticeServiceImpl, CertificateResponse> {
-                certificateRepository.deleteById(certificateSearchDocument.certificateName)
-                return@let CertificateResponse(
-                    certificateSearchDocument.certificateName
-                )
-            }
-        }
-    }
-
-    override fun searchBigClassification(query: String): List<BigClassificationResponse> {
-        TODO("Not yet implemented")
-    }
-
-    override fun searchSmallClassification(query: String): List<SmallClassificationResponse> {
         TODO("Not yet implemented")
     }
 

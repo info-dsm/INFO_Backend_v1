@@ -17,9 +17,9 @@ import com.info.info_v1_backend.domain.company.data.entity.company.file.Business
 import com.info.info_v1_backend.domain.company.data.entity.company.file.CompanyIntroductionFile
 import com.info.info_v1_backend.domain.company.data.entity.company.file.CompanyLogoFile
 import com.info.info_v1_backend.domain.company.data.entity.company.file.CompanyPhotoFile
-import com.info.info_v1_backend.domain.company.data.repository.company.CompanyLogoFileRepository
-import com.info.info_v1_backend.domain.company.data.repository.company.CompanyRepository
-import com.info.info_v1_backend.domain.company.data.repository.company.CompanySearchDocumentRepository
+import com.info.info_v1_backend.domain.company.data.entity.company.tag.BusinessArea
+import com.info.info_v1_backend.domain.company.data.entity.company.tag.BusinessAreaTagged
+import com.info.info_v1_backend.domain.company.data.repository.company.*
 import com.info.info_v1_backend.global.error.common.NoAuthenticationException
 import com.info.info_v1_backend.global.error.common.TokenNotFoundException
 import com.info.info_v1_backend.global.file.entity.File
@@ -30,6 +30,7 @@ import com.info.info_v1_backend.global.security.jwt.data.TokenResponse
 import com.info.info_v1_backend.global.security.jwt.exception.ExpiredTokenException
 import com.info.info_v1_backend.infra.amazon.s3.S3Util
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.scheduling.annotation.Async
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -50,6 +51,8 @@ class AuthServiceImpl(
     private val tokenProvider: TokenProvider,
     private val refreshTokenRepository: RefreshTokenRepository,
     private val companyLogoFileRepository: CompanyLogoFileRepository,
+    private val businessAreaTaggedRepository: BusinessAreaTaggedRepository,
+    private val businessAreaRepository: BusinessAreaRepository
 ): AuthService {
 
     override fun studentSignUp(req: StudentSignUpRequest) {
@@ -81,6 +84,7 @@ class AuthServiceImpl(
         } else throw CheckEmailCodeException(req.emailCheckCode)
     }
 
+    @Async
     override fun companySignup(req: CompanySignupRequest, emailCheckCode: String, companyIntroduction: CompanyIntroductionRequest) {
         if (checkEmail(req.companyContact.email, emailCheckCode)) {
 
@@ -97,46 +101,23 @@ class AuthServiceImpl(
 
             companyRepository.save(company)
 
-            val file = companyLogoFileRepository.save(
-                CompanyLogoFile(
-                    s3Util.uploadFile(companyIntroduction.companyLogo, "company/${company.id!!}", "companyLogo"),
-                    company
-                )
-            )
+            saveCompanyRelatedFileList(companyIntroduction, company)
 
-            println(file.toString())
 
-            company.companyIntroduction.registerCompanyLogoAndBusinessCertificate(
-                companyIntroduction.companyLogo.let {
-                    return@let file
-                },
-                companyIntroduction.businessRegisteredCertificate.let{
-                    return@let businessRegisteredCertificateFileRepository.save(
-                        BusinessRegisteredCertificateFile(
-                            s3Util.uploadFile(it, "company/${company.id!!}", "businessRegisteredCertificate"),
-                            company
-                        )
-                    )
-                }
-            )
-
-            companyIntroduction.companyIntroductionFile.map {
-                companyIntroductionFileRepository.save(
-                    CompanyIntroductionFile(
-                        s3Util.uploadFile(it, "company/${company.id!!}", "companyIntroduction"),
+            req.businessAreaList.map {
+                businessAreaTaggedRepository.save(
+                    BusinessAreaTagged(
+                        businessAreaRepository.findByIdOrNull(it)?: businessAreaRepository.save(
+                            BusinessArea(
+                                it
+                            )
+                        ),
                         company
                     )
                 )
             }
 
-            companyIntroduction.companyPhotoList.map {
-                companyPhotoFileRepository.save(
-                    CompanyPhotoFile(
-                        s3Util.uploadFile(it, "company/${company.id!!}", "companyPhoto"),
-                        company
-                    )
-                )
-            }
+
             companySearchDocumentRepository.save(
                 CompanySearchDocument(
                     company.name,
@@ -147,6 +128,44 @@ class AuthServiceImpl(
         } else throw CheckEmailCodeException(emailCheckCode)
     }
 
+    private fun saveCompanyRelatedFileList(companyIntroduction: CompanyIntroductionRequest, company: Company) {
+        company.companyIntroduction.registerCompanyLogoAndBusinessCertificate(
+            companyIntroduction.companyLogo.let {
+                return@let companyLogoFileRepository.save(
+                    CompanyLogoFile(
+                        s3Util.uploadFile(companyIntroduction.companyLogo, "company/${company.id!!}", "companyLogo"),
+                        company
+                    )
+                )
+            },
+            companyIntroduction.businessRegisteredCertificate.let{
+                return@let businessRegisteredCertificateFileRepository.save(
+                    BusinessRegisteredCertificateFile(
+                        s3Util.uploadFile(it, "company/${company.id!!}", "businessRegisteredCertificate"),
+                        company
+                    )
+                )
+            }
+        )
+
+        companyIntroduction.companyIntroductionFile.map {
+            companyIntroductionFileRepository.save(
+                CompanyIntroductionFile(
+                    s3Util.uploadFile(it, "company/${company.id!!}", "companyIntroduction"),
+                    company
+                )
+            )
+        }
+
+        companyIntroduction.companyPhotoList.map {
+            companyPhotoFileRepository.save(
+                CompanyPhotoFile(
+                    s3Util.uploadFile(it, "company/${company.id!!}", "companyPhoto"),
+                    company
+                )
+            )
+        }
+    }
 
     private fun checkEmail(email: String, authCode: String): Boolean {
         userRepository.findByEmail(email).orElse(null)?.let {

@@ -10,6 +10,7 @@ data class CompanySignupRequest(
     val companyNameRequest: CompanyNameRequest,
     val companyInformation: CompanyInformationRequest,
     val companyContact: CompanyContactRequest,
+    val businessAreaList: List<String>,
     @field:Size(
         max = 255,
         min = 10,

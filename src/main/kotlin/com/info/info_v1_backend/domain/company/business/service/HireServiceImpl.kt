@@ -18,7 +18,7 @@ import com.info.info_v1_backend.domain.company.data.entity.notice.file.Reporter
 import com.info.info_v1_backend.domain.company.data.repository.company.CompanyRepository
 import com.info.info_v1_backend.domain.company.data.repository.company.FieldTrainingRepository
 import com.info.info_v1_backend.domain.company.data.repository.company.HiredStudentRepository
-import com.info.info_v1_backend.domain.company.data.repository.company.ReporterFileRepository
+import com.info.info_v1_backend.domain.company.data.repository.notice.ReporterFileRepository
 import com.info.info_v1_backend.domain.company.data.repository.notice.ApplicantRepository
 import com.info.info_v1_backend.domain.company.data.repository.notice.NoticeRepository
 import com.info.info_v1_backend.domain.company.exception.*
@@ -26,7 +26,6 @@ import com.info.info_v1_backend.global.error.common.NoAuthenticationException
 import com.info.info_v1_backend.infra.amazon.s3.S3Util
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

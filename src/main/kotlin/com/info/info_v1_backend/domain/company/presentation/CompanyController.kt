@@ -37,13 +37,14 @@ class CompanyController(
     private val companyService: CompanyService,
 ) {
 
-    @PatchMapping("")
+    @PatchMapping("/{companyId}")
     @ResponseStatus(HttpStatus.OK)
     fun editCompany(
         @AuthenticationPrincipal user: User?,
         @RequestBody request: EditCompanyRequest,
+        @PathVariable companyId: Long
     ) {
-        companyService.editCompany(user?: throw TokenNotFoundException(), request)
+        companyService.editCompany(user?: throw TokenNotFoundException(), request, companyId)
     }
 
     @GetMapping("/list")

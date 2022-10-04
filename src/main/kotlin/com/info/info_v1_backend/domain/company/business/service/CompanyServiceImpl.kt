@@ -6,6 +6,7 @@ import com.info.info_v1_backend.domain.auth.data.entity.user.User
 import com.info.info_v1_backend.domain.auth.data.repository.user.UserRepository
 import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
 import com.info.info_v1_backend.domain.company.business.dto.request.company.EditCompanyRequest
+import com.info.info_v1_backend.domain.company.business.dto.response.company.BusinessAreaResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyWithIsWorkingResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MinimumCompanyResponse
@@ -18,10 +19,7 @@ import com.info.info_v1_backend.domain.company.data.entity.company.file.CompanyL
 import com.info.info_v1_backend.domain.company.data.entity.company.file.CompanyPhotoFile
 import com.info.info_v1_backend.domain.company.data.entity.company.work.field.FieldTraining
 import com.info.info_v1_backend.domain.company.data.entity.company.work.field.FieldTrainingIdClass
-import com.info.info_v1_backend.domain.company.data.repository.company.CompanyRepository
-import com.info.info_v1_backend.domain.company.data.repository.company.CompanySearchDocumentRepository
-import com.info.info_v1_backend.domain.company.data.repository.company.FieldTrainingRepository
-import com.info.info_v1_backend.domain.company.data.repository.company.HiredStudentRepository
+import com.info.info_v1_backend.domain.company.data.repository.company.*
 import com.info.info_v1_backend.domain.company.data.repository.notice.NoticeRepository
 import com.info.info_v1_backend.domain.company.data.repository.notice.NoticeSearchDocumentRepository
 import com.info.info_v1_backend.domain.company.exception.*
@@ -54,10 +52,11 @@ class CompanyServiceImpl(
     private val companyLogoFileRepository: FileRepository<CompanyLogoFile>,
     private val companyPhotoRepository: FileRepository<CompanyPhotoFile>,
     private val hiredStudentRepository: HiredStudentRepository,
-    private val noticeRepository: NoticeRepository
+    private val noticeRepository: NoticeRepository,
+    private val businessAreaRepository: BusinessAreaRepository
 ): CompanyService {
 
-    override fun editCompany(user: User, request: EditCompanyRequest) {
+    override fun editCompany(user: User, request: EditCompanyRequest, companyId: Long) {
 
         if (user is Company) {
             user.editCompany(
@@ -158,6 +157,12 @@ class CompanyServiceImpl(
             year.value,
         PageRequest.of(idx, size, Sort.by("created_at").descending())).map {
             it.toMinimumCompanyResponse()
+        }
+    }
+
+    override fun getBusinessArea(): List<BusinessAreaResponse> {
+        return businessAreaRepository.findAll().map {
+            it.toBusinessAreaResponse()
         }
     }
 

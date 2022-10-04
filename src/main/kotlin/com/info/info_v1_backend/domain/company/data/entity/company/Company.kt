@@ -189,4 +189,9 @@ class Company(
         }
     }
 
+    fun addBusinessAreaTagged(businessAreaTagged: BusinessAreaTagged) {
+        this.businessAreaTaggedList.add(businessAreaTagged)
+    }
+
+
 }

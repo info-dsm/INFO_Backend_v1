@@ -6,6 +6,7 @@ import com.info.info_v1_backend.domain.company.business.dto.response.notice.Recr
 import com.info.info_v1_backend.domain.company.business.dto.response.notice.TechnologyResponse
 import com.info.info_v1_backend.domain.company.data.entity.notice.Notice
 import com.info.info_v1_backend.domain.company.data.entity.notice.certificate.Certificate
+import com.info.info_v1_backend.domain.company.data.entity.notice.certificate.CertificateUsage
 import com.info.info_v1_backend.domain.company.data.entity.notice.classification.RecruitmentBigClassification
 import com.info.info_v1_backend.domain.company.data.entity.notice.classification.RecruitmentSmallClassification
 import com.info.info_v1_backend.domain.company.data.entity.notice.language.LanguageUsage
@@ -67,7 +68,7 @@ class RecruitmentBusiness(
         protected set
 
     @OneToMany
-    var needCertificateList: MutableList<Certificate> = ArrayList()
+    var needCertificateList: MutableList<CertificateUsage> = ArrayList()
         protected set
 
     @Column(name = "number_of_emplyee", nullable = false)
@@ -94,7 +95,7 @@ class RecruitmentBusiness(
                 )
             }.toSet(),
             this.needCertificateList.map {
-                 it.name
+                 it.certificate.name
             },
             this.numberOfEmplyee,
             this.gradeCutLine
