@@ -41,7 +41,8 @@ class CompanyController(
         @RequestBody request: EditCompanyRequest,
         @PathVariable companyId: Long
     ) {
-        companyService.editCompany(user?: throw TokenCanNotBeNullException(), request)
+        companyService.editCompany(user
+            ?: throw TokenCanNotBeNullException(), request, companyId)
     }
 
     @GetMapping("/list")
@@ -64,7 +65,8 @@ class CompanyController(
         @AuthenticationPrincipal user: User?,
         @RequestParam(required = true) id: Long
     ): List<MaximumCompanyWithIsWorkingResponse> {
-        return companyService.getEntireMaximumCompanyByUserId(user?: throw TokenCanNotBeNullException(), id)
+        return companyService.getEntireMaximumCompanyByUserId(user
+            ?: throw TokenCanNotBeNullException(), id)
     }
 
     @GetMapping("/search")
@@ -79,8 +81,7 @@ class CompanyController(
         @AuthenticationPrincipal user: User?,
         @PathVariable(required = true) companyId: Long
     ): FileResponse {
-        return companyService.getBusinessRegisteredCertificate(
-            user?: throw TokenCanNotBeNullException(),
+        return companyService.getBusinessRegisteredCertificate(user?: throw TokenCanNotBeNullException(),
             companyId
         ).toFileResponse()
     }
@@ -106,7 +107,8 @@ class CompanyController(
         @AuthenticationPrincipal user: User?, 
         @RequestPart certificate: MultipartFile
     ) {
-        companyService.changeBusinessRegisteredCertificate(user?: throw TokenCanNotBeNullException(), certificate)
+        companyService.changeBusinessRegisteredCertificate(user
+            ?: throw TokenCanNotBeNullException(), certificate)
     }
 
     @PutMapping("/introduction")
@@ -114,7 +116,8 @@ class CompanyController(
         @AuthenticationPrincipal user: User?, 
         @RequestPart introduction: MultipartFile
     ) {
-        companyService.addCompanyIntroductionFile(user?: throw TokenCanNotBeNullException(), introduction)
+        companyService.addCompanyIntroductionFile(user
+            ?: throw TokenCanNotBeNullException(), introduction)
     }
 
     @DeleteMapping("/introduction")
@@ -123,7 +126,8 @@ class CompanyController(
         @AuthenticationPrincipal user: User?,
         @RequestParam(required = true) fileId: Long
     ) {
-        companyService.removeCompanyIntroductionFile(user?: throw TokenCanNotBeNullException(), fileId)
+        companyService.removeCompanyIntroductionFile(user
+            ?: throw TokenCanNotBeNullException(), fileId)
     }
 
 
