@@ -23,6 +23,7 @@ enum class ErrorCode(
 
     //401
     TOKEN_NOT_FOUND("Token Not Found", HttpStatus.UNAUTHORIZED),
+    UN_AUTHORIZED("Un Authorized", HttpStatus.UNAUTHORIZED),
 
     //403
     NOT_HAVE_ACCESS_TO_THE_PROJECT("Not Have Access To The project", HttpStatus.FORBIDDEN),
