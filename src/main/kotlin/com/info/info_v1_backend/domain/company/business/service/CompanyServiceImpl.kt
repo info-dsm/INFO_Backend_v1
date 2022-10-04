@@ -177,10 +177,13 @@ class CompanyServiceImpl(
                         it1
                     )
                 }
-
                 user.companyIntroduction.changeBusinessRegisteredCertificate(
                     BusinessRegisteredCertificateFile(
-                        s3Util.uploadFile(multipartFile, "company/${user.id!!}", "business_registered_file"),
+                    s3Util.uploadFile(
+                        multipartFile,
+                        "company/${user.id!!}",
+                        "business_registered_file"
+                    ),
                         user
                     )
                 )
