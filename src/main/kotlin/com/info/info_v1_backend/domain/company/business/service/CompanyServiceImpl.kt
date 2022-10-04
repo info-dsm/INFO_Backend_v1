@@ -94,9 +94,9 @@ class CompanyServiceImpl(
     }
 
     override fun getMaximumCompany(id: Long): MaximumCompanyResponse {
-        return (companyRepository.findById(id).orElse(null)?: throw CompanyNotFoundException(id.toString()))
+        return (companyRepository.findByIdOrNull(id)
+            ?: throw CompanyNotFoundException(id.toString()))
             .toMaximumCompanyResponse()
-
     }
 
     override fun getEntireMaximumCompanyByUserId(user: User, id: Long): List<MaximumCompanyWithIsWorkingResponse> {
