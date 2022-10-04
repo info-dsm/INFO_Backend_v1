@@ -114,7 +114,7 @@ class CompanyServiceImpl(
         } else {
             val student = studentRepository.findByIdOrNull(id)
                 ?: throw UserNotFoundException(id.toString())
-            
+
             val result: MutableList<MaximumCompanyWithIsWorkingResponse> = ArrayList()
             hiredStudentRepository.findAllByStudent(student).map {
                 companyRepository.findAllByHiredStudentListContains(it).map {
@@ -128,7 +128,8 @@ class CompanyServiceImpl(
     }
 
     override fun searchCompany(query: String): List<MinimumCompanyResponse> {
-        val companySearchDocumentList = companySearchDocumentRepository.findByCompanyNameOrderByTextScoreDesc(query, PageRequest.of(0, 20))
+        val companySearchDocumentList = companySearchDocumentRepository
+            .findByCompanyNameOrderByTextScoreDesc(query, PageRequest.of(0, 20))
             .toList()
 
         val minimumCompanyResponseList: MutableList<MinimumCompanyResponse> = ArrayList()
