@@ -10,8 +10,6 @@ enum class ErrorCode(
     ALREADY_SAME_NAME_PROJECT_EXISTS("Already Same Name Project Exists.", HttpStatus.BAD_REQUEST),
     USER_ALREADY_EXISTS("User Already Exists", HttpStatus.BAD_REQUEST),
     INVALID_PARAMETER("Null or Invalid Parameter Value Inputted", HttpStatus.BAD_REQUEST),
-    INVALID_TOKEN("Invalid Token", HttpStatus.BAD_REQUEST),
-    EXPIRED_TOKEN("token Expired", HttpStatus.BAD_REQUEST),
     INCORRECT_PASSWORD("Incorrect Password", HttpStatus.BAD_REQUEST),
     EMAIL_ERROR("Email 전송 과정 중 에러가 발생했습니다.", HttpStatus.BAD_GATEWAY),
     INVALID_FILE_EXTENSION("Invalid File Extension", HttpStatus.BAD_REQUEST),
@@ -24,6 +22,8 @@ enum class ErrorCode(
     //401
     TOKEN_NOT_FOUND("Token Not Found", HttpStatus.UNAUTHORIZED),
     UN_AUTHORIZED("Un Authorized", HttpStatus.UNAUTHORIZED),
+    INVALID_TOKEN("Invalid Token", HttpStatus.UNAUTHORIZED),
+    EXPIRED_TOKEN("token Expired", HttpStatus.UNAUTHORIZED),
 
     //403
     NOT_HAVE_ACCESS_TO_THE_PROJECT("Not Have Access To The project", HttpStatus.FORBIDDEN),
