@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 import javax.validation.Valid
+import javax.validation.constraints.Email
+import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 
 @RestController
@@ -47,7 +49,8 @@ class AuthController(
     @PostMapping("/email/company")
     fun sendCompanyEmail(
         @Valid
-        @Pattern(regexp = "^[\\w-.]+@([\\w-]+\\.)+[\\w-]\$",message = "올바른 이메일 형식이 아닙니다.")
+        @NotNull
+        @Email(message = "올바른 이메일 형식이 아닙니다.")
         @RequestParam
         email: String
     ){
