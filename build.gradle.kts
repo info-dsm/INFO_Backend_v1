@@ -52,7 +52,7 @@ dependencies {
     //batch
     implementation("org.springframework.boot:spring-boot-starter-batch")
     //Mysql
-    runtimeOnly("mysql:mysql-connector-java")
+    runtimeOnly("mysql:mysql-connector-java:8.0.20")
 //    //Komoran
 //    implementation("com.github.shin285:KOMORAN:3.3.4")
     //Validation
