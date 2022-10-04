@@ -46,6 +46,8 @@ class AuthController(
 
     @PostMapping("/email/company")
     fun sendCompanyEmail(
+        @Valid
+        @Pattern(regexp = "^[\\w-.]+@([\\w-]+\\.)+[\\w-]\$",message = "올바른 이메일 형식이 아닙니다.")
         @RequestParam
         email: String
     ){
@@ -143,8 +145,9 @@ class AuthController(
 
     @PatchMapping("/email")
     fun changeEmail(
-            @RequestBody request: ChangeEmailRequest,
-            @AuthenticationPrincipal user: User?
+        @Valid
+        @RequestBody request: ChangeEmailRequest,
+        @AuthenticationPrincipal user: User?
     ){
         authService.changeEmail(user?: throw UserNotFoundException("No User Found"), request)
     }
