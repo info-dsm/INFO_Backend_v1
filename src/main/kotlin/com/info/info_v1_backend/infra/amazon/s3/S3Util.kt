@@ -45,7 +45,7 @@ class S3Util(
 
         val byteArrayInputStream = ByteArrayInputStream(bytes)
 
-        val fileName = "${s3Property.bucketName}/${rootPathName}/${middlePathName}/${file.originalFilename}/${UUID.randomUUID()}.$ext"
+        val fileName = "${s3Property.bucketName}/${rootPathName}/${middlePathName}/${file.originalFilename}"
 
         try {
             s3.putObject(PutObjectRequest(s3Property.bucketName, fileName, byteArrayInputStream, objectMetadata))
@@ -55,7 +55,8 @@ class S3Util(
         return FileDto(
             getFileUrl(fileName),
             fileType,
-            ext
+            ext,
+            file.originalFilename.toString()
         )
     }
 

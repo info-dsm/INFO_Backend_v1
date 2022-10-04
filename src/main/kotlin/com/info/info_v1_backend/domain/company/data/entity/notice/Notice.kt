@@ -171,6 +171,9 @@ class Notice(
     }
 
     fun editNotice(r: EditNoticeRequest) {
+        r.recruitmentBusiness?.let {
+            this.recruitmentBusiness!!.editRecruitmentBusiness(it)
+        }
         r.workTime?.let {
             this.workTime.editWorkTime(r.workTime)
         }

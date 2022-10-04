@@ -17,10 +17,13 @@ import com.info.info_v1_backend.domain.company.data.entity.company.file.Business
 import com.info.info_v1_backend.domain.company.data.entity.company.file.CompanyIntroductionFile
 import com.info.info_v1_backend.domain.company.data.entity.company.file.CompanyLogoFile
 import com.info.info_v1_backend.domain.company.data.entity.company.file.CompanyPhotoFile
+import com.info.info_v1_backend.domain.company.data.repository.company.CompanyLogoFileRepository
 import com.info.info_v1_backend.domain.company.data.repository.company.CompanyRepository
 import com.info.info_v1_backend.domain.company.data.repository.company.CompanySearchDocumentRepository
 import com.info.info_v1_backend.global.error.common.NoAuthenticationException
 import com.info.info_v1_backend.global.error.common.TokenNotFoundException
+import com.info.info_v1_backend.global.file.entity.File
+import com.info.info_v1_backend.global.file.entity.type.FileType
 import com.info.info_v1_backend.global.file.repository.FileRepository
 import com.info.info_v1_backend.global.security.jwt.TokenProvider
 import com.info.info_v1_backend.global.security.jwt.data.TokenResponse
@@ -30,6 +33,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.multipart.MultipartFile
 
 @Service
 @Transactional
@@ -45,7 +49,7 @@ class AuthServiceImpl(
     private val companyRepository: CompanyRepository,
     private val tokenProvider: TokenProvider,
     private val refreshTokenRepository: RefreshTokenRepository,
-    private val companyLogoFileRepository: FileRepository<CompanyLogoFile>
+    private val companyLogoFileRepository: CompanyLogoFileRepository,
 ): AuthService {
 
     override fun studentSignUp(req: StudentSignUpRequest) {
@@ -80,8 +84,7 @@ class AuthServiceImpl(
     override fun companySignup(req: CompanySignupRequest, emailCheckCode: String, companyIntroduction: CompanyIntroductionRequest) {
         if (checkEmail(req.companyContact.email, emailCheckCode)) {
 
-            val company = companyRepository.save(
-                Company(
+            val company = Company(
                     passwordEncoder.encode(req.password),
                     req.companyNameRequest,
                     req.companyInformation.toCompanyInformation(),
@@ -91,15 +94,21 @@ class AuthServiceImpl(
                     ),
                     req.isLeading
                 )
+
+            companyRepository.save(company)
+
+            val file = companyLogoFileRepository.save(
+                CompanyLogoFile(
+                    s3Util.uploadFile(companyIntroduction.companyLogo, "company/${company.id!!}", "companyLogo"),
+                    company
+                )
             )
+
+            println(file.toString())
+
             company.companyIntroduction.registerCompanyLogoAndBusinessCertificate(
                 companyIntroduction.companyLogo.let {
-                    return@let companyLogoFileRepository.save(
-                        CompanyLogoFile(
-                            s3Util.uploadFile(it, "company/${company.id!!}", "companyLogo"),
-                            company
-                        )
-                    )
+                    return@let file
                 },
                 companyIntroduction.businessRegisteredCertificate.let{
                     return@let businessRegisteredCertificateFileRepository.save(
@@ -137,6 +146,7 @@ class AuthServiceImpl(
 
         } else throw CheckEmailCodeException(emailCheckCode)
     }
+
 
     private fun checkEmail(email: String, authCode: String): Boolean {
         userRepository.findByEmail(email).orElse(null)?.let {

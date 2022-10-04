@@ -3,6 +3,7 @@ package com.info.info_v1_backend.domain.auth.business.dto.request
 import com.info.info_v1_backend.domain.company.business.dto.request.company.CompanyContactRequest
 import com.info.info_v1_backend.domain.company.business.dto.request.company.CompanyInformationRequest
 import com.info.info_v1_backend.domain.company.business.dto.request.company.CompanyNameRequest
+import com.info.info_v1_backend.domain.company.business.dto.response.company.BusinessAreaResponse
 import javax.validation.constraints.Size
 
 data class CompanySignupRequest(

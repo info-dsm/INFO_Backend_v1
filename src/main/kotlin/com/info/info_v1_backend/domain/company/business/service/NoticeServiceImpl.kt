@@ -15,6 +15,8 @@ import com.info.info_v1_backend.domain.company.data.entity.notice.classification
 import com.info.info_v1_backend.domain.company.data.entity.notice.classification.RecruitmentSmallClassification
 import com.info.info_v1_backend.domain.company.data.entity.notice.interview.InterviewProcess
 import com.info.info_v1_backend.domain.company.data.entity.notice.interview.InterviewProcessUsage
+import com.info.info_v1_backend.domain.company.data.entity.notice.language.Language
+import com.info.info_v1_backend.domain.company.data.entity.notice.language.LanguageUsage
 import com.info.info_v1_backend.domain.company.data.entity.notice.recruitment.RecruitmentBusiness
 import com.info.info_v1_backend.domain.company.data.repository.company.*
 import com.info.info_v1_backend.domain.company.data.repository.notice.*
@@ -43,8 +45,22 @@ class NoticeServiceImpl(
     private val s3Util: S3Util,
     private val formAttachmentRepository: FileRepository<FormAttachment>,
     private val certificateRepository: CertificateRepository,
-    private val certificateSearchDocumentRepository: CertificateSearchDocumentRepository
+    private val certificateSearchDocumentRepository: CertificateSearchDocumentRepository,
+    private val languageUsageRepository: LanguageUsageRepository,
+    private val languageRepository: LanguageRepository
 ): NoticeService {
+
+    override fun getBigClassificationList(): List<BigClassificationResponse> {
+        return bigClassificationRepository.findAll().map {
+            it.toBigClassificationResponse()
+        }
+    }
+
+    override fun getSmallClassificationList(): List<SmallClassificationResponse> {
+        return smallClassificationRepository.findAll().map {
+            it.toSmallClassification()
+        }
+    }
 
     override fun registerNotice(user: User, request: RegisterNoticeRequest, attachmentList: List<MultipartFile>) {
         if (user is Company) {
@@ -160,6 +176,89 @@ class NoticeServiceImpl(
             notice.editNotice(request)
 
         } else throw NoAuthenticationException(user.roleList.toString())
+    }
+
+    override fun changeBigClassification(user: User, name: String, noticeId: Long) {
+        if (user is Company) {
+            val bigClassification = bigClassificationRepository.findByIdOrNull(name) ?: bigClassificationRepository.save(
+                    RecruitmentBigClassification(
+                        name
+                    )
+                )
+            val notice = noticeRepository.findByIdAndCompanyAndIsApproveNot(noticeId, user, NoticeWaitingStatus.REJECT).orElse(null) ?: throw NoticeNotFoundException(noticeId.toString())
+            notice.recruitmentBusiness!!.changeBigClassification(bigClassification)
+        } else throw NoAuthenticationException(user.roleList.toString())
+    }
+
+    override fun changeSmallClassification(user: User, bigClassificationName: String, smallClassificationName: String, noticeId: Long) {
+        if (user is Company) {
+            val smallClassification = smallClassificationRepository.findByNameAndAndBigClassification(
+                smallClassificationName,
+                bigClassificationRepository.findByIdOrNull(bigClassificationName)?:
+                bigClassificationRepository.save(
+                    RecruitmentBigClassification(
+                        bigClassificationName
+                    )
+                )
+            ).orElse(null)?: smallClassificationRepository.save(
+                RecruitmentSmallClassification(
+                    smallClassificationName,
+                    bigClassificationRepository.findByIdOrNull(bigClassificationName)!!
+                )
+            )
+            val notice = noticeRepository.findByIdAndCompanyAndIsApproveNot(noticeId, user, NoticeWaitingStatus.REJECT)
+                .orElse(null)?: throw NoticeNotFoundException(noticeId.toString())
+            notice.recruitmentBusiness!!.changeSmallClassification(smallClassification)
+        } else throw NoAuthenticationException(user.roleList.toString())
+    }
+
+    override fun addLanguageSet(user: User, languageName: String, noticeId: Long) {
+        if (user is Company) {
+            val notice = noticeRepository.findByIdAndCompanyAndIsApproveNot(noticeId, user, NoticeWaitingStatus.REJECT)
+                .orElse(null)?: throw NoticeNotFoundException(noticeId.toString())
+            notice.recruitmentBusiness!!.languageUsageSet.add(
+                languageUsageRepository.findByLanguageAndRecruitmentBusiness(
+                    languageRepository.findByIdOrNull(languageName)?: languageRepository.save(
+                        Language(
+                            languageName
+                        )
+                    ),
+                    notice.recruitmentBusiness!!
+                ).orElse(null)?: languageUsageRepository.save(
+                    LanguageUsage(
+                        languageRepository.findByIdOrNull(languageName)?: languageRepository.save(
+                            Language(
+                                languageName
+                            )
+                        ),
+                        notice.recruitmentBusiness!!
+                    )
+                )
+            )
+
+        }
+
+    }
+
+    override fun removeLanguageSet(user: User, languageName: String, noticeId: Long) {
+        if (user is Company) {
+//            val notice = noticeRepository.findByIdOrNull(noticeId)?: throw NoticeNotFoundException(noticeId.toString())
+//            notice.recruitmentBusiness!!.languageUsageSet.remove(
+//                languageUsageRepository.findByLanguageAndRecruitmentBusiness(
+//                    languageRepository.findByIdOrNull(languageName)?: return,
+//                    notice.recruitmentBusiness!!
+//                )
+//            )
+
+        } else throw NoAuthenticationException(user.roleList.toString())
+    }
+
+    override fun addTechnologySet(user: User, technologyName: String, noticeId: Long) {
+        TODO("Not yet implemented")
+    }
+
+    override fun removeTechnologySet(user: User, technologyName: String, noticeId: Long) {
+        TODO("Not yet implemented")
     }
 
     override fun deleteNotice(user: User, noticeId: Long) {

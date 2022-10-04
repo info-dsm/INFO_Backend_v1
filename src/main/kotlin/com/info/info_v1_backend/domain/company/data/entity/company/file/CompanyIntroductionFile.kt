@@ -20,7 +20,8 @@ class CompanyIntroductionFile(
 ): File(
     dto.fileUrl,
     dto.fileType,
-    dto.extension
+    dto.extension,
+    dto.fileName
 ) {
 
     @ManyToOne

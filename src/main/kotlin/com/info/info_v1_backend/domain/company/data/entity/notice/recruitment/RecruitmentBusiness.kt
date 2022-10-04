@@ -1,7 +1,9 @@
 package com.info.info_v1_backend.domain.company.data.entity.notice.recruitment
 
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.edit.EditRecruitmentRequest
+import com.info.info_v1_backend.domain.company.business.dto.response.notice.LanguageResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.notice.RecruitmentBusinessResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.notice.TechnologyResponse
 import com.info.info_v1_backend.domain.company.data.entity.notice.Notice
 import com.info.info_v1_backend.domain.company.data.entity.notice.certificate.Certificate
 import com.info.info_v1_backend.domain.company.data.entity.notice.classification.RecruitmentBigClassification
@@ -9,6 +11,7 @@ import com.info.info_v1_backend.domain.company.data.entity.notice.classification
 import com.info.info_v1_backend.domain.company.data.entity.notice.language.LanguageUsage
 import com.info.info_v1_backend.domain.company.data.entity.notice.technology.TechnologyUsage
 import com.info.info_v1_backend.global.base.entity.BaseTimeEntity
+import org.apache.commons.lang3.mutable.Mutable
 import javax.persistence.*
 
 @Entity
@@ -56,11 +59,11 @@ class RecruitmentBusiness(
         protected set
 
     @OneToMany(mappedBy = "recruitmentBusiness")
-    var languageUsageSet: MutableList<LanguageUsage> = ArrayList()
+    var languageUsageSet: MutableSet<LanguageUsage> = HashSet()
         protected set
 
     @OneToMany(mappedBy = "recruitmentBusiness")
-    var technologyList: MutableList<TechnologyUsage> = ArrayList()
+    var technologySet: MutableSet<TechnologyUsage> = HashSet()
         protected set
 
     @OneToMany
@@ -79,16 +82,27 @@ class RecruitmentBusiness(
         return RecruitmentBusinessResponse(
             this.bigClassification.toBigClassificationResponse(),
             this.smallClassification.toSmallClassification(),
-            this.numberOfEmplyee,
             this.detailBusinessDescription,
+            this.languageUsageSet.map {
+                LanguageResponse(
+                    it.language.name
+                )
+            }.toSet(),
+            this.technologySet.map {
+                TechnologyResponse(
+                    it.technology.name
+                )
+            }.toSet(),
             this.needCertificateList.map {
                  it.name
             },
+            this.numberOfEmplyee,
             this.gradeCutLine
         )
     }
 
     fun editRecruitmentBusiness(r: EditRecruitmentRequest) {
+
         r.numberOfEmployee?.let {
             this.numberOfEmplyee = r.numberOfEmployee
         }
@@ -98,6 +112,15 @@ class RecruitmentBusiness(
         r.gradeCutLine?.let {
             this.gradeCutLine = r.gradeCutLine
         }
+    }
+
+    fun changeBigClassification(bigClassification: RecruitmentBigClassification) {
+        this.bigClassification = bigClassification
+    }
+
+    fun changeSmallClassification(smallClassification: RecruitmentSmallClassification) {
+        this.bigClassification = smallClassification.bigClassification
+        this.smallClassification = smallClassification
     }
 
 }

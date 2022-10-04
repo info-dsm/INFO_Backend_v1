@@ -7,8 +7,6 @@ spring:
     show-sql: false
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
 
-
-
   datasource:
     url: ${dbDefaultUrl}
     username: ${dbDefaultUsername}
@@ -72,4 +70,7 @@ mail:
         starttls:
           enable: true
 
+#logging:
+#  level:
+#    "org-hibernate": "debug"
 

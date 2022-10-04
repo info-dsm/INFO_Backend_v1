@@ -50,7 +50,8 @@ class BoardServiceImpl(
                                 0,
                                 "https://cdn.pixabay.com/photo/2017/02/13/01/26/the-question-mark-2061539_960_720.png",
                                 FileType.DOCS,
-                                "png"
+                                "png",
+                                "NotFound"
                             )
                     )
                 )
@@ -69,7 +70,8 @@ class BoardServiceImpl(
                                     0,
                                     "https://cdn.pixabay.com/photo/2017/02/13/01/26/the-question-mark-2061539_960_720.png",
                                     FileType.DOCS,
-                                    "png"
+                                    "png",
+                                    "NotFound"
                                 )
                         )
                     )

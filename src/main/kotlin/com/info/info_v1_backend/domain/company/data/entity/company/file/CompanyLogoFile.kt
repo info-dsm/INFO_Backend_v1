@@ -21,12 +21,18 @@ class CompanyLogoFile(
 ): File(
     dto.fileUrl,
     dto.fileType,
-    dto.extension
+    dto.extension,
+    dto.fileName
 ) {
 
     @OneToOne
-    @JoinColumn(name = "company_id")
+    @JoinColumn(name = "company_id", nullable = false)
     var company: Company = company
         protected set
+
+    override fun toString(): String {
+        return "url: ${this.fileUrl}, companyId: ${this.company.id!!}, fileType: ${this.fileContentType}, " +
+                "extension: ${this.extension}"
+    }
 
 }

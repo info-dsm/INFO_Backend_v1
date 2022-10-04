@@ -21,7 +21,8 @@ class FormAttachment(
 ): File(
     dto.fileUrl,
     dto.fileType,
-    dto.extension
+    dto.extension,
+    dto.fileName
 ) {
     @ManyToOne
     var notice: Notice = notice

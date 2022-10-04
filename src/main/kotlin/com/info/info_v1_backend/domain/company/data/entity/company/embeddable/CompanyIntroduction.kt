@@ -7,6 +7,7 @@ import com.info.info_v1_backend.domain.company.data.entity.company.file.CompanyL
 import com.info.info_v1_backend.domain.company.data.entity.company.file.CompanyPhotoFile
 import com.info.info_v1_backend.global.file.entity.File
 import javax.persistence.Embeddable
+import javax.persistence.JoinColumn
 import javax.persistence.OneToMany
 import javax.persistence.OneToOne
 
@@ -19,6 +20,7 @@ class CompanyIntroduction(
         protected set
 
     @OneToOne
+    @JoinColumn(nullable = true)
     var businessRegisteredCertificate: BusinessRegisteredCertificateFile? = null
         protected set
 
@@ -27,10 +29,11 @@ class CompanyIntroduction(
         protected set
 
     @OneToOne
+    @JoinColumn(nullable = true)
     var companyLogo: CompanyLogoFile? = null
         protected set
 
-    @OneToMany(mappedBy = "company")
+    @OneToMany
     var companyPhotoList: MutableList<CompanyPhotoFile> = ArrayList()
         protected set
 

@@ -14,12 +14,27 @@ import org.springframework.web.multipart.MultipartFile
 
 interface NoticeService {
 
+    fun getBigClassificationList(): List<BigClassificationResponse>
+    fun getSmallClassificationList(): List<SmallClassificationResponse>
+
     fun registerNotice(user: User, request: RegisterNoticeRequest, attachmentList: List<MultipartFile>)
+
     fun editNotice(user: User, request: EditNoticeRequest, noticeId: Long)
-    fun deleteNotice(user: User, noticeId: Long)
+
+    fun changeBigClassification(user: User, name: String, noticeId: Long)
+
+    fun changeSmallClassification(user: User, bigClassificationName: String, smallClassificationName: String, noticeId: Long)
+
+    fun addLanguageSet(user: User, languageName: String, noticeId: Long)
+    fun removeLanguageSet(user: User, languageName: String, noticeId: Long)
+
+    fun addTechnologySet(user: User, technologyName: String, noticeId: Long)
+    fun removeTechnologySet(user: User, technologyName: String, noticeId: Long)
 
     fun changeAttachment(user: User, attachmentList: List<MultipartFile>, noticeId: Long)
     fun changeInterviewProcess(user: User, interviewProcessMap: Map<Int, InterviewProcess>, noticeId: Long)
+
+    fun deleteNotice(user: User, noticeId: Long)
 
     fun approveNotice(user: User, noticeId: Long)
     fun rejectNotice(user: User, noticeId: Long)
