@@ -1,11 +1,11 @@
 package com.info.info_v1_backend.global.security.jwt
 
+import com.info.info_v1_backend.global.error.common.TokenCanNotBeNullException
 import com.info.info_v1_backend.global.security.jwt.auth.CustomAuthDetailsService
 import com.info.info_v1_backend.global.security.jwt.data.TokenResponse
 import com.info.info_v1_backend.global.security.jwt.env.JwtProperty
 import com.info.info_v1_backend.global.security.jwt.exception.ExpiredTokenException
 import com.info.info_v1_backend.global.security.jwt.exception.InvalidTokenException
-import com.info.info_v1_backend.global.security.jwt.exception.UnAuthorizedException
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.Jwts
@@ -54,7 +54,7 @@ class TokenProvider(
         val now = Date()
         if (now.after(Date(body.expiration.time))) throw ExpiredTokenException(token)
         return body.subject
-            ?: throw UnAuthorizedException(token)
+            ?: throw TokenCanNotBeNullException("Subject is Null")
     }
 
     fun isExpired(token: String): Boolean {
