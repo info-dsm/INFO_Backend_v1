@@ -87,7 +87,8 @@ class CompanyServiceImpl(
     }
 
     override fun getMinimumCompanyList(idx: Int, size: Int): Page<MinimumCompanyResponse> {
-        return companyRepository.findAll(PageRequest.of(idx, size, Sort.by("created_date").descending())).map {
+        return companyRepository.findAll(PageRequest.of(idx, size, Sort.by("created_date")
+            .descending())).map {
             it.toMinimumCompanyResponse()
         }
     }
