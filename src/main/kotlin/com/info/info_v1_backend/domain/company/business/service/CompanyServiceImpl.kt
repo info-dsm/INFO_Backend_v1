@@ -112,8 +112,9 @@ class CompanyServiceImpl(
             }
             return result
         } else {
-            val student = studentRepository.findById(id).orElse(null)?: throw UserNotFoundException(id.toString())
-
+            val student = studentRepository.findByIdOrNull(id)
+                ?: throw UserNotFoundException(id.toString())
+            
             val result: MutableList<MaximumCompanyWithIsWorkingResponse> = ArrayList()
             hiredStudentRepository.findAllByStudent(student).map {
                 companyRepository.findAllByHiredStudentListContains(it).map {
