@@ -1,8 +1,6 @@
 package com.info.info_v1_backend.domain.company.presentation
 
-import com.info.info_v1_backend.domain.auth.business.dto.response.MinimumStudent
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
-import com.info.info_v1_backend.domain.company.business.dto.request.notice.CloseNoticeRequest
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.edit.EditNoticeRequest
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.register.RegisterNoticeRequest
 import com.info.info_v1_backend.domain.company.business.dto.response.notice.MaximumNoticeWithoutPayResponse
@@ -10,8 +8,7 @@ import com.info.info_v1_backend.domain.company.business.dto.response.notice.Mini
 import com.info.info_v1_backend.domain.company.business.dto.response.notice.NoticeWithIsApproveResponse
 import com.info.info_v1_backend.domain.company.business.service.NoticeService
 import com.info.info_v1_backend.domain.company.data.entity.notice.interview.InterviewProcess
-import com.info.info_v1_backend.global.error.common.TokenNotFoundException
-import com.info.info_v1_backend.global.file.dto.FileDto
+import com.info.info_v1_backend.global.error.common.TokenCanNotBeNullException
 import com.info.info_v1_backend.global.file.dto.FileResponse
 import org.springframework.data.domain.Page
 import org.springframework.http.HttpStatus
@@ -20,7 +17,6 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
-import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -45,7 +41,7 @@ class NoticeController(
         @RequestPart request: RegisterNoticeRequest,
         @RequestPart attachment: List<MultipartFile>
     ) {
-        noticeService.registerNotice(user?: throw TokenNotFoundException(), request, attachment)
+        noticeService.registerNotice(user?: throw TokenCanNotBeNullException(), request, attachment)
     }
 
 
@@ -55,7 +51,7 @@ class NoticeController(
         @RequestPart attachment: List<MultipartFile>,
         @RequestParam(required = true) noticeId: Long
     ) {
-        noticeService.changeAttachment(user?: throw TokenNotFoundException(), attachment, noticeId)
+        noticeService.changeAttachment(user?: throw TokenCanNotBeNullException(), attachment, noticeId)
     }
 
     @PutMapping("/interview/process")
@@ -65,7 +61,7 @@ class NoticeController(
         @RequestParam(required = true) noticeId: Long
     ) {
         noticeService.changeInterviewProcess(
-            user?: throw TokenNotFoundException(),
+            user?: throw TokenCanNotBeNullException(),
             interviewProcessMap,
             noticeId
         )
@@ -80,7 +76,7 @@ class NoticeController(
         @RequestBody request: EditNoticeRequest,
         @RequestParam(required = true) noticeId: Long
     ) {
-        noticeService.editNotice(user?: throw TokenNotFoundException(), request, noticeId)
+        noticeService.editNotice(user?: throw TokenCanNotBeNullException(), request, noticeId)
     }
 
     @DeleteMapping
@@ -89,7 +85,7 @@ class NoticeController(
         @AuthenticationPrincipal user: User?,
         @RequestParam(required = true) noticeId: Long
     ) {
-        noticeService.deleteNotice(user?: throw TokenNotFoundException(), noticeId)
+        noticeService.deleteNotice(user?: throw TokenCanNotBeNullException(), noticeId)
     }
 
     @GetMapping("/me")
@@ -97,7 +93,7 @@ class NoticeController(
         @AuthenticationPrincipal user: User?
     ): List<NoticeWithIsApproveResponse> {
         return noticeService.getMyNoticeList(
-            user?: throw TokenNotFoundException()
+            user?: throw TokenCanNotBeNullException()
         )
     }
 
@@ -107,7 +103,7 @@ class NoticeController(
         @AuthenticationPrincipal user: User?,
         @RequestParam(required = true) noticeId: Long
     ) {
-        return noticeService.approveNotice(user?: throw TokenNotFoundException(), noticeId)
+        return noticeService.approveNotice(user?: throw TokenCanNotBeNullException(), noticeId)
     }
 
     @DeleteMapping("/approve")
@@ -116,7 +112,7 @@ class NoticeController(
         @AuthenticationPrincipal user: User?,
         @RequestParam(required = true) noticeId: Long
     ) {
-        return noticeService.rejectNotice(user?: throw TokenNotFoundException(), noticeId)
+        return noticeService.rejectNotice(user?: throw TokenCanNotBeNullException(), noticeId)
     }
 
 
@@ -127,7 +123,7 @@ class NoticeController(
         @RequestParam(defaultValue = "10") size: Int
     ): Page<MinimumNoticeResponse> {
         return noticeService.getWaitingNoticeList(
-            user?: throw TokenNotFoundException(),
+            user?: throw TokenCanNotBeNullException(),
             idx,
             size
         )
@@ -161,7 +157,7 @@ class NoticeController(
         @AuthenticationPrincipal user: User?,
         @RequestParam(required = true) noticeId: Long
     ): FileResponse {
-        return noticeService.printNotice(user?: throw TokenNotFoundException(), noticeId)
+        return noticeService.printNotice(user?: throw TokenCanNotBeNullException(), noticeId)
     }
 
 

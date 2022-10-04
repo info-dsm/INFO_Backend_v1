@@ -1,14 +1,12 @@
 package com.info.info_v1_backend.domain.company.presentation
 
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
-import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
 import com.info.info_v1_backend.domain.company.business.dto.request.company.EditCompanyRequest
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyWithIsWorkingResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MinimumCompanyResponse
 import com.info.info_v1_backend.domain.company.business.service.CompanyService
-import com.info.info_v1_backend.domain.company.data.entity.company.file.BusinessRegisteredCertificateFile
-import com.info.info_v1_backend.global.error.common.TokenNotFoundException
+import com.info.info_v1_backend.global.error.common.TokenCanNotBeNullException
 import com.info.info_v1_backend.global.file.dto.FileResponse
 import org.springframework.data.domain.Page
 import org.springframework.http.HttpStatus
@@ -27,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
-import java.time.LocalDate
 import java.time.Year
 
 @RestController
@@ -44,7 +41,7 @@ class CompanyController(
         @RequestBody request: EditCompanyRequest,
         @PathVariable companyId: Long
     ) {
-        companyService.editCompany(user?: throw TokenNotFoundException(), request, companyId)
+        companyService.editCompany(user?: throw TokenCanNotBeNullException(), request)
     }
 
     @GetMapping("/list")
@@ -67,7 +64,7 @@ class CompanyController(
         @AuthenticationPrincipal user: User?,
         @RequestParam(required = true) id: Long
     ): List<MaximumCompanyWithIsWorkingResponse> {
-        return companyService.getEntireMaximumCompanyByUserId(user?: throw TokenNotFoundException(), id)
+        return companyService.getEntireMaximumCompanyByUserId(user?: throw TokenCanNotBeNullException(), id)
     }
 
     @GetMapping("/search")
@@ -83,7 +80,7 @@ class CompanyController(
         @PathVariable(required = true) companyId: Long
     ): FileResponse {
         return companyService.getBusinessRegisteredCertificate(
-            user?: throw TokenNotFoundException(),
+            user?: throw TokenCanNotBeNullException(),
             companyId
         ).toFileResponse()
     }
@@ -96,7 +93,7 @@ class CompanyController(
         @RequestParam size: Int
     ): Page<MinimumCompanyResponse> {
         return companyService.getNoticeRegisteredCompanyListByYear(
-            user?: throw TokenNotFoundException(),
+            user?: throw TokenCanNotBeNullException(),
             year,
             idx,
             size
@@ -109,7 +106,7 @@ class CompanyController(
         @AuthenticationPrincipal user: User?, 
         @RequestPart certificate: MultipartFile
     ) {
-        companyService.changeBusinessRegisteredCertificate(user?: throw TokenNotFoundException(), certificate)
+        companyService.changeBusinessRegisteredCertificate(user?: throw TokenCanNotBeNullException(), certificate)
     }
 
     @PutMapping("/introduction")
@@ -117,7 +114,7 @@ class CompanyController(
         @AuthenticationPrincipal user: User?, 
         @RequestPart introduction: MultipartFile
     ) {
-        companyService.addCompanyIntroductionFile(user?: throw TokenNotFoundException(), introduction)
+        companyService.addCompanyIntroductionFile(user?: throw TokenCanNotBeNullException(), introduction)
     }
 
     @DeleteMapping("/introduction")
@@ -126,7 +123,7 @@ class CompanyController(
         @AuthenticationPrincipal user: User?,
         @RequestParam(required = true) fileId: Long
     ) {
-        companyService.removeCompanyIntroductionFile(user?: throw TokenNotFoundException(), fileId)
+        companyService.removeCompanyIntroductionFile(user?: throw TokenCanNotBeNullException(), fileId)
     }
 
 
@@ -137,7 +134,7 @@ class CompanyController(
         @RequestPart logo: MultipartFile
     ) {
         companyService.changeCompanyLogo(
-            user?: throw TokenNotFoundException(),
+            user?: throw TokenCanNotBeNullException(),
             logo
         )
     }
@@ -149,7 +146,7 @@ class CompanyController(
         @RequestPart photo: MultipartFile
     ) {
         companyService.addCompanyPhoto(
-            user?: throw TokenNotFoundException(),
+            user?: throw TokenCanNotBeNullException(),
             photo
         )
     }
@@ -161,7 +158,7 @@ class CompanyController(
         @RequestParam(required = true) fileId: Long
     ) {
         companyService.removeCompanyPhoto(
-            user?: throw TokenNotFoundException(),
+            user?: throw TokenCanNotBeNullException(),
             fileId
         )
     }
@@ -173,7 +170,7 @@ class CompanyController(
         @RequestParam(required = true) companyId: Long
     ) {
         companyService.makeAssociated(
-            user?: throw TokenNotFoundException(),
+            user?: throw TokenCanNotBeNullException(),
             companyId
         )
     }

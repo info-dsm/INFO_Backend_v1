@@ -1,6 +1,5 @@
 package com.info.info_v1_backend.global.security.jwt
 
-import com.info.info_v1_backend.global.error.common.TokenNotFoundException
 import com.info.info_v1_backend.global.security.jwt.auth.CustomAuthDetailsService
 import com.info.info_v1_backend.global.security.jwt.data.TokenResponse
 import com.info.info_v1_backend.global.security.jwt.env.JwtProperty

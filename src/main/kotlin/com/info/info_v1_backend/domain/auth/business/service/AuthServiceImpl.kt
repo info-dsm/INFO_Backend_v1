@@ -21,9 +21,7 @@ import com.info.info_v1_backend.domain.company.data.entity.company.tag.BusinessA
 import com.info.info_v1_backend.domain.company.data.entity.company.tag.BusinessAreaTagged
 import com.info.info_v1_backend.domain.company.data.repository.company.*
 import com.info.info_v1_backend.global.error.common.NoAuthenticationException
-import com.info.info_v1_backend.global.error.common.TokenNotFoundException
-import com.info.info_v1_backend.global.file.entity.File
-import com.info.info_v1_backend.global.file.entity.type.FileType
+import com.info.info_v1_backend.global.error.common.TokenCanNotBeNullException
 import com.info.info_v1_backend.global.file.repository.FileRepository
 import com.info.info_v1_backend.global.security.jwt.TokenProvider
 import com.info.info_v1_backend.global.security.jwt.data.TokenResponse
@@ -34,7 +32,6 @@ import org.springframework.scheduling.annotation.Async
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.web.multipart.MultipartFile
 
 @Service
 @Transactional
@@ -198,7 +195,7 @@ class AuthServiceImpl(
 
     override fun reissue(req: ReissueRequest): TokenResponse {
         val userId = tokenProvider.getSubjectWithExpiredCheck(req.accessToken)
-        val refreshToken = refreshTokenRepository.findByIdOrNull(userId)?: throw TokenNotFoundException()
+        val refreshToken = refreshTokenRepository.findByIdOrNull(userId)?: throw TokenCanNotBeNullException()
         if (refreshToken.token != req.refreshToken) throw ExpiredTokenException(req.refreshToken)
 
         val tokenResponse = tokenProvider.encode(userId.toString())

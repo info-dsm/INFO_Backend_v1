@@ -36,6 +36,7 @@ class AuthController(
 ) {
     @PostMapping("/email/school")
     fun sendSchoolEmail(
+        @Valid
         @RequestParam
         @Pattern(regexp = "[a-zA-Z\\d+_.]+@dsm\\.hs\\.kr$", message = "올바른 이메일 형식이 아닙니다.")
         email: String
@@ -53,7 +54,8 @@ class AuthController(
 
     @PostMapping("/signup/student")
     fun studentSignup(
-        @RequestBody @Valid
+        @Valid
+        @RequestBody
         request: StudentSignUpRequest
     ){
         authService.studentSignUp(request)
@@ -61,7 +63,8 @@ class AuthController(
 
     @PostMapping("/signup/teacher")
     fun teacherSignup(
-        @RequestBody @Valid
+        @Valid
+        @RequestBody
         request: TeacherSingUpRequest
     ){
         authService.teacherSignUp(request)
@@ -69,6 +72,7 @@ class AuthController(
 
     @PostMapping("/signup/company")
     fun companySignup(
+        @Valid
         @RequestPart request: CompanySignupRequest,
         @RequestParam emailCheckCode: String,
         @RequestPart businessRegisteredCertificate: MultipartFile,

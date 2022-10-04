@@ -20,7 +20,7 @@ enum class ErrorCode(
     IS_ALREADY_FIELD_TRAINING_STUDENT("Is already field training student", HttpStatus.BAD_REQUEST),
 
     //401
-    TOKEN_NOT_FOUND("Token Not Found", HttpStatus.UNAUTHORIZED),
+    TOKEN_IS_NULL("Token Can Not Be Null", HttpStatus.UNAUTHORIZED),
     UN_AUTHORIZED("Un Authorized", HttpStatus.UNAUTHORIZED),
     INVALID_TOKEN("Invalid Token", HttpStatus.UNAUTHORIZED),
     EXPIRED_TOKEN("token Expired", HttpStatus.UNAUTHORIZED),

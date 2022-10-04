@@ -7,7 +7,7 @@ import com.info.info_v1_backend.domain.company.business.dto.response.company.Fie
 import com.info.info_v1_backend.domain.company.business.dto.response.company.HiredStudentResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.notice.ApplicantResponse
 import com.info.info_v1_backend.domain.company.business.service.HireService
-import com.info.info_v1_backend.global.error.common.TokenNotFoundException
+import com.info.info_v1_backend.global.error.common.TokenCanNotBeNullException
 import org.springframework.data.domain.Page
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -33,7 +33,7 @@ class HireController(
         @RequestParam(defaultValue = "10") size: Int
     ): List<ApplicantResponse> {
         return hireService.getApplierList(
-            user?: throw TokenNotFoundException(),
+            user?: throw TokenCanNotBeNullException(),
             noticeId,
             idx,
             size
@@ -47,7 +47,7 @@ class HireController(
         @RequestPart(required = true) reporter: List<MultipartFile>
     ){
         return hireService.applyNotice(
-            user?: throw TokenNotFoundException(),
+            user?: throw TokenCanNotBeNullException(),
             noticeId,
             reporter
         )
@@ -62,7 +62,7 @@ class HireController(
         @PathVariable studentId: Long
     ) {
         return hireService.cancelApply(
-            user?: throw TokenNotFoundException(),
+            user?: throw TokenCanNotBeNullException(),
             noticeId,
             studentId
         )
@@ -75,7 +75,7 @@ class HireController(
         @RequestParam(required = true) companyId: Long
     ): List<FieldTrainingResponse> {
         return hireService.getFieldTrainingStudentList(
-            user?: throw TokenNotFoundException(),
+            user?: throw TokenCanNotBeNullException(),
             companyId
         )
     }
@@ -89,7 +89,7 @@ class HireController(
         @RequestBody request: CloseNoticeRequest
     ) {
         hireService.makeFieldTrainingAndCloseNotice(
-            user?: throw TokenNotFoundException(),
+            user?: throw TokenCanNotBeNullException(),
             request,
             noticeId
         )
@@ -103,7 +103,7 @@ class HireController(
         @PathVariable studentId: Long,
     ) {
         hireService.fireFieldTrainingStudent(
-            user?: throw TokenNotFoundException(),
+            user?: throw TokenCanNotBeNullException(),
             studentId,
             companyId
         )
@@ -117,7 +117,7 @@ class HireController(
         @PathVariable(required = true) companyId: Long
     ): List<HiredStudentResponse> {
         return hireService.getHiredStudentList(
-            user?: throw TokenNotFoundException(),
+            user?: throw TokenCanNotBeNullException(),
             companyId
         )
     }
@@ -131,7 +131,7 @@ class HireController(
         @RequestParam(required = true) startDate: LocalDate,
     ) {
         hireService.hireStudent(
-            user?: throw TokenNotFoundException(),
+            user?: throw TokenCanNotBeNullException(),
             studentId,
             companyId,
             startDate,
@@ -146,7 +146,7 @@ class HireController(
         @PathVariable companyId: Long,
     ) {
         hireService.fireStudent(
-            user?: throw TokenNotFoundException(),
+            user?: throw TokenCanNotBeNullException(),
             studentId,
             companyId
         )
@@ -160,7 +160,7 @@ class HireController(
         @RequestParam(defaultValue = "10") size: Int
     ): Page<FieldTrainingStudentWithHiredResponse> {
         return hireService.getFieldTrainingStudentWithHiredListInThisYear(
-            user?: throw TokenNotFoundException(),
+            user?: throw TokenCanNotBeNullException(),
             idx,
             size,
             year?:Year.now()
