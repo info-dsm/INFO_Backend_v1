@@ -152,8 +152,10 @@ class AuthServiceImpl(
         userRepository.findByEmail(email).orElse(null)?.let {
             throw UserAlreadyExists(email)
         }
-        if ((checkEmailCodeRepository.findById(email).orElse(null)
-                        ?: throw CheckEmailCodeException(email)).code == authCode) {
+
+        val checkEmail = checkEmailCodeRepository.findByIdOrNull(email)
+        if ((checkEmail?: throw CheckEmailCodeException(email)).code == authCode) {
+            checkEmailCodeRepository.delete(checkEmail)
             return true
         }
         return false
