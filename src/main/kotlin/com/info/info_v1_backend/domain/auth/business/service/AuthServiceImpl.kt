@@ -85,35 +85,30 @@ class AuthServiceImpl(
     override fun companySignup(req: CompanySignupRequest, emailCheckCode: String, companyIntroduction: CompanyIntroductionRequest) {
         if (checkEmail(req.companyContact.email, emailCheckCode)) {
 
-            val company = Company(
+            val company = companyRepository.save(
+                Company(
                     passwordEncoder.encode(req.password),
                     req.companyNameRequest,
                     req.companyInformation.toCompanyInformation(),
                     req.companyContact.toCompanyContact(),
-                    CompanyIntroduction(
-                        req.introduction
-                    ),
+                    CompanyIntroduction(req.introduction),
                     req.isLeading
                 )
-
-            companyRepository.save(company)
+            )
 
             saveCompanyRelatedFileList(companyIntroduction, company)
-
 
             req.businessAreaList.map {
                 businessAreaTaggedRepository.save(
                     BusinessAreaTagged(
-                        businessAreaRepository.findByIdOrNull(it)?: businessAreaRepository.save(
-                            BusinessArea(
-                                it
-                            )
+                        businessAreaRepository.findByIdOrNull(it)
+                            ?: businessAreaRepository.save(
+                            BusinessArea(it)
                         ),
                         company
                     )
                 )
             }
-
 
             companySearchDocumentRepository.save(
                 CompanySearchDocument(
@@ -121,7 +116,6 @@ class AuthServiceImpl(
                     company.id!!,
                 )
             )
-
         } else throw CheckEmailCodeException(emailCheckCode)
     }
 
