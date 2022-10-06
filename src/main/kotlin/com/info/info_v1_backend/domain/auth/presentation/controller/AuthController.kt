@@ -7,6 +7,8 @@ import com.info.info_v1_backend.domain.auth.business.service.EmailService
 import com.info.info_v1_backend.domain.auth.business.dto.response.UserInfoResponse
 import com.info.info_v1_backend.domain.auth.business.service.UserService
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
+import com.info.info_v1_backend.domain.auth.exception.CheckEmailCodeException
+import com.info.info_v1_backend.domain.auth.exception.CheckTeacherCodeException
 import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
 import com.info.info_v1_backend.domain.company.business.dto.request.company.CompanyIntroductionRequest
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
@@ -63,7 +65,9 @@ class AuthController(
         @RequestBody
         request: StudentSignUpRequest
     ){
-        authService.studentSignUp(request)
+        if (authService.checkEmail(request.email, request.emailCheckCode)) {
+            authService.studentSignUp(request)
+        } else throw CheckEmailCodeException(request.emailCheckCode)
     }
 
     @PostMapping("/signup/teacher")
@@ -72,7 +76,11 @@ class AuthController(
         @RequestBody
         request: TeacherSingUpRequest
     ){
-        authService.teacherSignUp(request)
+        if (authService.checkEmail(request.email, request.emailCheckCode)) {
+            if (authService.checkTeacherCode(request.teacherCheckCode)) {
+                authService.teacherSignUp(request)
+            } else throw CheckTeacherCodeException(request.teacherCheckCode)
+        } else throw CheckEmailCodeException(request.emailCheckCode)
     }
 
     @PostMapping("/signup/company")
@@ -85,16 +93,16 @@ class AuthController(
         @RequestPart companyLogo: MultipartFile,
         @RequestPart companyPhotoList: List<MultipartFile>
     ) {
-        authService.companySignup(
-            request,
-            emailCheckCode,
-            CompanyIntroductionRequest(
+        if (authService.checkEmail(request.companyContact.email, emailCheckCode)) {
+            authService.companySignup(
+                request,
+                emailCheckCode,
                 businessRegisteredCertificate,
                 companyIntroductionFile,
                 companyLogo,
                 companyPhotoList
             )
-        )
+        } else throw CheckEmailCodeException(emailCheckCode)
     }
 
 

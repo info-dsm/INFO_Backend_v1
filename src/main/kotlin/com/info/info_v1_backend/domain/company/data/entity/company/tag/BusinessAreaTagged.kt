@@ -23,12 +23,12 @@ class BusinessAreaTagged(
 
     @Id
     @ManyToOne
-    @JoinColumn(name = "business_tagged")
+    @JoinColumn(name = "business_area_id", nullable = false)
     var businessArea: BusinessArea = businessArea
 
     @Id
     @ManyToOne
-    @JoinColumn(name = "company")
+    @JoinColumn(name = "company_id", nullable = false)
     var company: Company = company
 
     override fun getId(): String? {

@@ -14,7 +14,7 @@ import java.util.*
 class AuditorAwareConfiguration: AuditorAware<Long> {
 
     override fun getCurrentAuditor(): Optional<Long> {
-        SecurityContextHolder.getContext().authentication.credentials?.let {
+        SecurityContextHolder.getContext().authentication?.credentials?.let {
             if (it == "") return Optional.empty()
             return Optional.of(it.toString().toLong())
         }?: return Optional.empty()

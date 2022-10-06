@@ -11,6 +11,7 @@ plugins {
 }
 
 apply(plugin = "kotlin-kapt")
+apply(plugin = "kotlin-jpa")
 
 group = "com.info"
 version = "0.0.1-SNAPSHOT"
@@ -61,6 +62,7 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE")
     //Security
     implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.security:spring-security-config:5.7.3")
     //Jwts
     implementation("io.jsonwebtoken:jjwt:0.9.1")
     //data jpa
@@ -81,7 +83,6 @@ dependencies {
     implementation("com.querydsl:querydsl-jpa:5.0.0")
     kapt("com.querydsl:querydsl-apt:5.0.0:jpa")
     kapt("org.springframework.boot:spring-boot-configuration-processor")
-
 
 }
 

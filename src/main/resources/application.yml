@@ -16,6 +16,7 @@ spring:
     job:
       enabled: false
 
+
   redis:
     host: ${redisHost}
     port: 6379

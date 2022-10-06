@@ -32,6 +32,7 @@ import org.springframework.scheduling.annotation.Async
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.multipart.MultipartFile
 
 @Service
 @Transactional
@@ -52,94 +53,94 @@ class AuthServiceImpl(
     private val businessAreaRepository: BusinessAreaRepository
 ): AuthService {
 
+    @Async
     override fun studentSignUp(req: StudentSignUpRequest) {
-        if (checkEmail(req.email, req.emailCheckCode)) {
-            val encPw = passwordEncoder.encode(req.password)
-            val user = Student(
-                    req.studentKey,
-                    req.name,
-                    req.email,
-                    encPw,
-                    creationList = null
-            )
-            userRepository.save(user)
-        } else throw CheckEmailCodeException(req.emailCheckCode)
-    }
+        val encPw = passwordEncoder.encode(req.password)
+        val user = Student(
+                req.studentKey,
+                req.name,
+                req.email,
+                encPw,
+                creationList = null
+        )
+        userRepository.save(user)
 
-    override fun teacherSignUp(req: TeacherSingUpRequest) {
-        if (checkEmail(req.email, req.emailCheckCode)) {
-            if (req.teacherCheckCode == "1111") {
-                val encPw = passwordEncoder.encode(req.password)
-
-                val user = Teacher(
-                        req.name,
-                        req.email,
-                        encPw
-                )
-                userRepository.save(user)
-            } else throw CheckTeacherCodeException(req.teacherCheckCode)
-        } else throw CheckEmailCodeException(req.emailCheckCode)
     }
 
     @Async
-    override fun companySignup(req: CompanySignupRequest, emailCheckCode: String, companyIntroduction: CompanyIntroductionRequest) {
-        if (checkEmail(req.companyContact.email, emailCheckCode)) {
+    override fun teacherSignUp(req: TeacherSingUpRequest) {
+        val encPw = passwordEncoder.encode(req.password)
 
-            val company = companyRepository.save(
-                Company(
-                    passwordEncoder.encode(req.password),
-                    req.companyNameRequest,
-                    req.companyInformation.toCompanyInformation(),
-                    req.companyContact.toCompanyContact(),
-                    CompanyIntroduction(req.introduction),
-                    req.isLeading
-                )
-            )
+        val user = Teacher(
+                req.name,
+                req.email,
+                encPw
+        )
+        userRepository.save(user)
 
-            saveCompanyRelatedFileList(companyIntroduction, company)
-
-            req.businessAreaList.map {
-                businessAreaTaggedRepository.save(
-                    BusinessAreaTagged(
-                        businessAreaRepository.findByIdOrNull(it)
-                            ?: businessAreaRepository.save(
-                            BusinessArea(it)
-                        ),
-                        company
-                    )
-                )
-            }
-
-            companySearchDocumentRepository.save(
-                CompanySearchDocument(
-                    company.name,
-                    company.id!!,
-                )
-            )
-        } else throw CheckEmailCodeException(emailCheckCode)
     }
 
-    private fun saveCompanyRelatedFileList(companyIntroduction: CompanyIntroductionRequest, company: Company) {
-        company.companyIntroduction.registerCompanyLogoAndBusinessCertificate(
-            companyIntroduction.companyLogo.let {
-                return@let companyLogoFileRepository.save(
-                    CompanyLogoFile(
-                        s3Util.uploadFile(companyIntroduction.companyLogo, "company/${company.id!!}", "companyLogo"),
-                        company
-                    )
-                )
-            },
-            companyIntroduction.businessRegisteredCertificate.let{
-                return@let businessRegisteredCertificateFileRepository.save(
-                    BusinessRegisteredCertificateFile(
-                        s3Util.uploadFile(it, "company/${company.id!!}", "businessRegisteredCertificate"),
-                        company
-                    )
-                )
-            }
+    override fun checkTeacherCode(code: String): Boolean {
+        return code == "1111"
+    }
+
+    @Async
+    override fun companySignup(req: CompanySignupRequest, emailCheckCode: String, businessRegisteredCertificate: MultipartFile, companyIntroductionFile: List<MultipartFile>, companyLogo: MultipartFile, companyPhotoList: List<MultipartFile>) {
+        val company = companyRepository.save(
+            Company(
+                passwordEncoder.encode(req.password),
+                req.companyNameRequest,
+                req.companyInformation.toCompanyInformation(),
+                req.companyContact.toCompanyContact(),
+                CompanyIntroduction(req.introduction),
+                req.isLeading
+            )
         )
 
-        companyIntroduction.companyIntroductionFile.map {
+        saveCompanyRelatedFileList(
+            businessRegisteredCertificate,
+            companyIntroductionFile,
+            companyLogo,
+            companyPhotoList,
+            company
+        )
+
+        req.businessAreaList.map {
+            businessAreaTaggedRepository.save(
+                BusinessAreaTagged(
+                    businessAreaRepository.findByIdOrNull(it)
+                        ?: businessAreaRepository.save(
+                        BusinessArea(it)
+                    ),
+                    company
+                )
+            )
+        }
+
+        companySearchDocumentRepository.save(
+            CompanySearchDocument(
+                company.name,
+                company.id!!,
+            )
+        )
+    }
+
+    private fun saveCompanyRelatedFileList(businessRegisteredCertificate: MultipartFile, companyIntroductionFile: List<MultipartFile>, companyLogo: MultipartFile, companyPhotoList: List<MultipartFile>, company: Company) {
+        company.companyIntroduction.registerCompanyLogoAndBusinessCertificate(
+            companyLogoFileRepository.save(
+                CompanyLogoFile(
+                    s3Util.uploadFile(companyLogo, "company/${company.id!!}", "companyLogo"),
+                    company
+                )
+            ),
+            businessRegisteredCertificateFileRepository.save(
+                BusinessRegisteredCertificateFile(
+                    s3Util.uploadFile(businessRegisteredCertificate, "company/${company.id!!}", "businessRegisteredCertificate"),
+                    company
+                )
+            )
+        )
+        companyIntroductionFile.map {
             companyIntroductionFileRepository.save(
                 CompanyIntroductionFile(
                     s3Util.uploadFile(it, "company/${company.id!!}", "companyIntroduction"),
@@ -147,8 +148,7 @@ class AuthServiceImpl(
                 )
             )
         }
-
-        companyIntroduction.companyPhotoList.map {
+        companyPhotoList.map {
             companyPhotoFileRepository.save(
                 CompanyPhotoFile(
                     s3Util.uploadFile(it, "company/${company.id!!}", "companyPhoto"),
@@ -158,7 +158,7 @@ class AuthServiceImpl(
         }
     }
 
-    private fun checkEmail(email: String, authCode: String): Boolean {
+    override fun checkEmail(email: String, authCode: String): Boolean {
         userRepository.findByEmail(email).orElse(null)?.let {
             throw UserAlreadyExists(email)
         }

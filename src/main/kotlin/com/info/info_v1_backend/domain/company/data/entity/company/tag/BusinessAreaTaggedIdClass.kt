@@ -1,10 +1,6 @@
 package com.info.info_v1_backend.domain.company.data.entity.company.tag
 
-class BusinessAreaTaggedIdClass(
-    businessAreaId: String,
-    companyId: Long
-): java.io.Serializable {
-    val businessAreaId = businessAreaId
-    val companyId = companyId
-
-}
+data class BusinessAreaTaggedIdClass(
+    var businessArea: String? = null,
+    var company: Long? = null
+): java.io.Serializable

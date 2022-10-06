@@ -12,8 +12,7 @@ import javax.persistence.Entity
 
 @Entity
 @DiscriminatorValue("teacher")
-@Where(clause = "user_is_delete = false")
-@SQLDelete(sql = "UPDATE `user` SET user_is_delete = true where id = ?")
+@OnDelete(action = OnDeleteAction.CASCADE)
 class Teacher(
     name: String,
     email: String,

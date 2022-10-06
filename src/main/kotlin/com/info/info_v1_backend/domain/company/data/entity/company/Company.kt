@@ -16,6 +16,8 @@ import com.info.info_v1_backend.domain.company.data.entity.company.work.hired.Hi
 import com.info.info_v1_backend.domain.company.data.entity.company.tag.BusinessAreaTagged
 import com.info.info_v1_backend.domain.company.data.entity.company.work.field.FieldTraining
 import com.info.info_v1_backend.domain.company.data.entity.notice.Notice
+import org.hibernate.annotations.OnDelete
+import org.hibernate.annotations.OnDeleteAction
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Where
 import java.time.LocalDate
@@ -25,8 +27,7 @@ import javax.persistence.*
 
 @Entity
 @DiscriminatorValue("company")
-@Where(clause = "user_is_delete = false")
-@SQLDelete(sql = "UPDATE `user` SET user_is_delete = true where id = ?")
+@OnDelete(action = OnDeleteAction.CASCADE)
 class Company(
     password: String,
     companyName: CompanyNameRequest,

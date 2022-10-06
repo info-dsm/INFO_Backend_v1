@@ -7,6 +7,7 @@ import com.info.info_v1_backend.domain.auth.data.repository.user.UserRepository
 import com.info.info_v1_backend.domain.auth.exception.UserAlreadyExists
 import com.info.info_v1_backend.infra.mail.MailUtil
 import org.apache.commons.lang3.RandomStringUtils
+import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 
 @Service
