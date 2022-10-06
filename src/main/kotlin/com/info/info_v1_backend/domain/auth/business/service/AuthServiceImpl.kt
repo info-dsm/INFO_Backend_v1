@@ -85,7 +85,14 @@ class AuthServiceImpl(
     }
 
     @Async
-    override fun companySignup(req: CompanySignupRequest, emailCheckCode: String, businessRegisteredCertificate: MultipartFile, companyIntroductionFile: List<MultipartFile>, companyLogo: MultipartFile, companyPhotoList: List<MultipartFile>) {
+    override fun companySignup(
+        req: CompanySignupRequest,
+        emailCheckCode: String,
+        businessRegisteredCertificate: MultipartFile,
+        companyIntroductionFile: List<MultipartFile>,
+        companyLogo: MultipartFile,
+        companyPhotoList: List<MultipartFile>
+    ) {
         val company = companyRepository.save(
             Company(
                 passwordEncoder.encode(req.password),
@@ -192,10 +199,10 @@ class AuthServiceImpl(
         val refreshToken = refreshTokenRepository.findByIdOrNull(userId)?: throw TokenCanNotBeNullException()
         if (refreshToken.token != req.refreshToken) throw ExpiredTokenException(req.refreshToken)
 
-        val tokenResponse = tokenProvider.encode(userId.toString())
-        val token = RefreshToken(userId.toString(), tokenResponse.refreshToken)
+        val tokenResponse = tokenProvider.encode(userId)
+        val token = RefreshToken(userId, tokenResponse.refreshToken)
 
-        refreshTokenRepository.findById(userId.toString()).map {
+        refreshTokenRepository.findById(userId).map {
             it.reset(token.token)
         }.orElse(null) ?: refreshTokenRepository.save(token)
         return tokenResponse
