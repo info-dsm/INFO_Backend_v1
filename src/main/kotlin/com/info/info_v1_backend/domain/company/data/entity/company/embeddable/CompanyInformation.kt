@@ -58,7 +58,7 @@ class CompanyInformation(
             this.representative,
             this.establishedAt,
             this.workerCount,
-            this.annualSales.toString()
+            this.annualSales
         )
     }
 
@@ -79,7 +79,7 @@ class CompanyInformation(
             this.workerCount = it
         }
         r.annualSales?.let {
-            this.annualSales = it.toLong()
+            this.annualSales = it
         }
 
     }

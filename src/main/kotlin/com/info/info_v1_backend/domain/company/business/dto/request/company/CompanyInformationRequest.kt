@@ -24,7 +24,7 @@ data class CompanyInformationRequest(
             this.representative,
             this.establishedAt,
             this.workerCount,
-            this.annualSales.toLong()
+            this.annualSales
         )
     }
 }
