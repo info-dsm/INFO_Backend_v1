@@ -225,32 +225,21 @@ class NoticeServiceImpl(
         } else throw NoAuthenticationException(user.roleList.toString())
     }
 
-    override fun changeBigClassification(user: User, name: String, noticeId: Long) {
+    override fun changeClassification(user: User, bigClassificationName: String, smallClassificationName: String, noticeId: Long) {
         if (user is Company) {
-            val bigClassification = bigClassificationRepository.findByIdOrNull(name) ?: bigClassificationRepository.save(
-                    RecruitmentBigClassification(
-                        name
-                    )
+            val bigClassification = bigClassificationRepository.findByIdOrNull(bigClassificationName)?:
+            bigClassificationRepository.save(
+                RecruitmentBigClassification(
+                    bigClassificationName
                 )
-            val notice = noticeRepository.findByIdAndCompanyAndIsApproveNot(noticeId, user, NoticeWaitingStatus.REJECT).orElse(null) ?: throw NoticeNotFoundException(noticeId.toString())
-            notice.recruitmentBusiness!!.changeBigClassification(bigClassification)
-        } else throw NoAuthenticationException(user.roleList.toString())
-    }
-
-    override fun changeSmallClassification(user: User, bigClassificationName: String, smallClassificationName: String, noticeId: Long) {
-        if (user is Company) {
+            )
             val smallClassification = smallClassificationRepository.findByNameAndAndBigClassification(
                 smallClassificationName,
-                bigClassificationRepository.findByIdOrNull(bigClassificationName)?:
-                bigClassificationRepository.save(
-                    RecruitmentBigClassification(
-                        bigClassificationName
-                    )
-                )
+                bigClassification
             ).orElse(null)?: smallClassificationRepository.save(
                 RecruitmentSmallClassification(
                     smallClassificationName,
-                    bigClassificationRepository.findByIdOrNull(bigClassificationName)!!
+                    bigClassification
                 )
             )
             val notice = noticeRepository.findByIdAndCompanyAndIsApproveNot(noticeId, user, NoticeWaitingStatus.REJECT)

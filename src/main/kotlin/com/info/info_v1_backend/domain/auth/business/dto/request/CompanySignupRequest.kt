@@ -5,6 +5,7 @@ import com.info.info_v1_backend.domain.company.business.dto.request.company.Comp
 import com.info.info_v1_backend.domain.company.business.dto.request.company.CompanyNameRequest
 import com.info.info_v1_backend.domain.company.business.dto.response.company.BusinessAreaResponse
 import javax.validation.Valid
+import javax.validation.constraints.NotNull
 import javax.validation.constraints.Size
 data class CompanySignupRequest(
     @field:Valid
@@ -13,6 +14,7 @@ data class CompanySignupRequest(
     val companyInformation: CompanyInformationRequest,
     @field:Valid
     val companyContact: CompanyContactRequest,
+    @field:NotNull
     val businessAreaList: List<String>,
     @field:Size(
         max = 255,

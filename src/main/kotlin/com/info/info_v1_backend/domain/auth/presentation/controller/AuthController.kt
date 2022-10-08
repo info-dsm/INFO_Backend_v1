@@ -36,24 +36,12 @@ import javax.validation.constraints.Pattern
 class AuthController(
     private val authService: AuthService,
     private val emailService: EmailService,
-    private val userService: UserService
 ) {
     @PostMapping("/email/school")
     fun sendSchoolEmail(
         @Valid
         @RequestParam
         @Pattern(regexp = "[a-zA-Z\\d+_.]+@dsm\\.hs\\.kr$", message = "올바른 이메일 형식이 아닙니다.")
-        email: String
-    ){
-        emailService.sendCodeToEmail(email)
-    }
-
-    @PostMapping("/email/company")
-    fun sendCompanyEmail(
-        @Valid
-        @NotNull
-        @Email(message = "올바른 이메일 형식이 아닙니다.")
-        @RequestParam
         email: String
     ){
         emailService.sendCodeToEmail(email)
@@ -83,27 +71,6 @@ class AuthController(
         } else throw CheckEmailCodeException(request.emailCheckCode)
     }
 
-    @PostMapping("/signup/company")
-    fun companySignup(
-        @Valid
-        @RequestPart request: CompanySignupRequest,
-        @RequestParam emailCheckCode: String,
-        @RequestPart businessRegisteredCertificate: MultipartFile,
-        @RequestPart companyIntroductionFile: List<MultipartFile>,
-        @RequestPart companyLogo: MultipartFile,
-        @RequestPart companyPhotoList: List<MultipartFile>
-    ) {
-        if (authService.checkEmail(request.companyContact.email, emailCheckCode)) {
-            authService.companySignup(
-                request,
-                emailCheckCode,
-                businessRegisteredCertificate,
-                companyIntroductionFile,
-                companyLogo,
-                companyPhotoList
-            )
-        } else throw CheckEmailCodeException(emailCheckCode)
-    }
 
 
     @PostMapping("/password/code")

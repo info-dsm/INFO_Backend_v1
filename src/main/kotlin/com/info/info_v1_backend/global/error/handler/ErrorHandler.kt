@@ -8,13 +8,14 @@ import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseBody
+import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.context.request.WebRequest
 import javax.validation.ConstraintViolationException
 import javax.validation.UnexpectedTypeException
 import javax.validation.ValidationException
 
 
-@ControllerAdvice
+@RestControllerAdvice
 class ErrorHandler {
 
 
@@ -29,7 +30,6 @@ class ErrorHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
-    @ResponseBody
     fun methodArgumentNotValidExceptionHandler(e: MethodArgumentNotValidException): ResponseEntity<*> {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
             ErrorResponse(
@@ -40,7 +40,7 @@ class ErrorHandler {
     }
 
     @ExceptionHandler(ValidationException::class)
-    protected fun validationExceptionHandler(
+    fun validationExceptionHandler(
         e: ConstraintViolationException,
         request: WebRequest?
     ): ResponseEntity<Any?>? {

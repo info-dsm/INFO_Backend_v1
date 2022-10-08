@@ -13,7 +13,7 @@ interface AuthService {
     fun teacherSignUp(req: TeacherSingUpRequest)
     fun checkTeacherCode(code: String): Boolean
 
-    fun companySignup(req: CompanySignupRequest, emailCheckCode: String, businessRegisteredCertificate: MultipartFile, companyIntroductionFile: List<MultipartFile>, companyLogo: MultipartFile, companyPhotoList: List<MultipartFile>)
+
 
     fun checkEmail(email: String, authCode: String): Boolean
 

@@ -1,11 +1,17 @@
 package com.info.info_v1_backend.domain.company.presentation
 
+import com.info.info_v1_backend.domain.auth.business.dto.request.CompanySignupRequest
+import com.info.info_v1_backend.domain.auth.business.service.AuthService
+import com.info.info_v1_backend.domain.auth.business.service.EmailService
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
+import com.info.info_v1_backend.domain.auth.exception.CheckEmailCodeException
 import com.info.info_v1_backend.domain.company.business.dto.request.company.EditCompanyRequest
+import com.info.info_v1_backend.domain.company.business.dto.response.company.BusinessAreaResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyWithIsWorkingResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MinimumCompanyResponse
 import com.info.info_v1_backend.domain.company.business.service.CompanyService
+import com.info.info_v1_backend.domain.company.data.entity.company.tag.BusinessArea
 import com.info.info_v1_backend.global.error.common.TokenCanNotBeNullException
 import com.info.info_v1_backend.global.file.dto.FileResponse
 import org.springframework.data.domain.Page
@@ -26,13 +32,52 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 import java.time.Year
+import javax.validation.Valid
+import javax.validation.constraints.Email
+import javax.validation.constraints.NotNull
 
 @RestController
 @RequestMapping("/api/info/v1/company")
 @Validated
 class CompanyController(
     private val companyService: CompanyService,
+    private val emailService: EmailService,
+    private val authService: AuthService
 ) {
+
+    @PostMapping("/email")
+    fun sendCompanyEmail(
+        @Valid
+        @NotNull
+        @Email(message = "올바른 이메일 형식이 아닙니다.")
+        @RequestParam
+        email: String
+    ){
+        emailService.sendCodeToEmail(email)
+    }
+
+    @PostMapping
+    fun registerCompany(
+        @Valid
+        @RequestPart request: CompanySignupRequest,
+        @RequestParam emailCheckCode: String,
+        @RequestPart businessRegisteredCertificate: MultipartFile,
+        @RequestPart companyIntroductionFile: List<MultipartFile>,
+        @RequestPart companyLogo: MultipartFile,
+        @RequestPart companyPhotoList: List<MultipartFile>
+    ) {
+        if (authService.checkEmail(request.companyContact.email, emailCheckCode)) {
+            companyService.registerCompany(
+                request,
+                emailCheckCode,
+                businessRegisteredCertificate,
+                companyIntroductionFile,
+                companyLogo,
+                companyPhotoList
+            )
+        } else throw CheckEmailCodeException(emailCheckCode)
+    }
+
 
     @PatchMapping("/{companyId}")
     @ResponseStatus(HttpStatus.OK)
@@ -44,6 +89,112 @@ class CompanyController(
         companyService.editCompany(user
             ?: throw TokenCanNotBeNullException(), request, companyId)
     }
+
+    @GetMapping("/business-area")
+    fun getBusinessAreaList(): List<BusinessAreaResponse> {
+        return companyService.getBusinessAreaList()
+    }
+
+    @PutMapping("/business-area/{businessAreaId}")
+    fun addBusinessArea(
+        @AuthenticationPrincipal user: User?,
+        @PathVariable businessAreaId: String
+    ) {
+        companyService.addBusinessArea(
+            user?: throw TokenCanNotBeNullException(),
+            businessAreaId
+        )
+    }
+
+    @DeleteMapping("/business-area/{businessAreaId}")
+    fun removeBusinessArea(
+        @AuthenticationPrincipal user: User?,
+        @PathVariable businessAreaId: String
+    ) {
+        companyService.removeBusinessArea(
+            user?: throw TokenCanNotBeNullException(),
+            businessAreaId
+        )
+    }
+
+
+
+    @PutMapping("/certificate")
+    fun changeBusinessRegisteredCertificate(
+        @AuthenticationPrincipal user: User?, 
+        @RequestPart certificate: MultipartFile
+    ) {
+        companyService.changeBusinessRegisteredCertificate(user
+            ?: throw TokenCanNotBeNullException(), certificate)
+    }
+
+    @PutMapping("/introduction")
+    fun addCompanyIntroductionFile(
+        @AuthenticationPrincipal user: User?, 
+        @RequestPart introduction: MultipartFile
+    ) {
+        companyService.addCompanyIntroductionFile(user
+            ?: throw TokenCanNotBeNullException(), introduction)
+    }
+
+    @DeleteMapping("/introduction")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun removeCompanyIntroductionFile(
+        @AuthenticationPrincipal user: User?,
+        @RequestParam(required = true) fileId: Long
+    ) {
+        companyService.removeCompanyIntroductionFile(user
+            ?: throw TokenCanNotBeNullException(), fileId)
+    }
+
+    @PutMapping("/logo")
+    fun changeCompanyLogo(
+        @AuthenticationPrincipal user: User?,
+        @RequestPart logo: MultipartFile
+    ) {
+        companyService.changeCompanyLogo(
+            user?: throw TokenCanNotBeNullException(),
+            logo
+        )
+    }
+
+    @PutMapping("/photo")
+    fun addCompanyPhoto(
+        @AuthenticationPrincipal user: User?,
+        @RequestPart photo: MultipartFile
+    ) {
+        companyService.addCompanyPhoto(
+            user?: throw TokenCanNotBeNullException(),
+            photo
+        )
+    }
+
+    @DeleteMapping("/photo")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun removeCompanyPhoto(
+        @AuthenticationPrincipal user: User?,
+        @RequestParam(required = true) fileId: Long
+    ) {
+        companyService.removeCompanyPhoto(
+            user?: throw TokenCanNotBeNullException(),
+            fileId
+        )
+    }
+
+
+
+    @PostMapping("/associate")
+    fun makeAssociated(
+        @AuthenticationPrincipal user: User?,
+        @RequestParam(required = true) companyId: Long
+    ) {
+        companyService.makeAssociated(
+            user?: throw TokenCanNotBeNullException(),
+            companyId
+        )
+    }
+
+
 
     @GetMapping("/list")
     fun getMinimumCompanyList(
@@ -101,83 +252,7 @@ class CompanyController(
         )
     }
 
-    
-    @PutMapping("/certificate")
-    fun changeBusinessRegisteredCertificate(
-        @AuthenticationPrincipal user: User?, 
-        @RequestPart certificate: MultipartFile
-    ) {
-        companyService.changeBusinessRegisteredCertificate(user
-            ?: throw TokenCanNotBeNullException(), certificate)
-    }
 
-    @PutMapping("/introduction")
-    fun addCompanyIntroductionFile(
-        @AuthenticationPrincipal user: User?, 
-        @RequestPart introduction: MultipartFile
-    ) {
-        companyService.addCompanyIntroductionFile(user
-            ?: throw TokenCanNotBeNullException(), introduction)
-    }
-
-    @DeleteMapping("/introduction")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun removeCompanyIntroductionFile(
-        @AuthenticationPrincipal user: User?,
-        @RequestParam(required = true) fileId: Long
-    ) {
-        companyService.removeCompanyIntroductionFile(user
-            ?: throw TokenCanNotBeNullException(), fileId)
-    }
-
-
-
-    @PutMapping("/logo")
-    fun changeCompanyLogo(
-        @AuthenticationPrincipal user: User?,
-        @RequestPart logo: MultipartFile
-    ) {
-        companyService.changeCompanyLogo(
-            user?: throw TokenCanNotBeNullException(),
-            logo
-        )
-    }
-
-
-    @PutMapping("/photo")
-    fun addCompanyPhoto(
-        @AuthenticationPrincipal user: User?,
-        @RequestPart photo: MultipartFile
-    ) {
-        companyService.addCompanyPhoto(
-            user?: throw TokenCanNotBeNullException(),
-            photo
-        )
-    }
-
-    @DeleteMapping("/photo")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun removeCompanyPhoto(
-        @AuthenticationPrincipal user: User?,
-        @RequestParam(required = true) fileId: Long
-    ) {
-        companyService.removeCompanyPhoto(
-            user?: throw TokenCanNotBeNullException(),
-            fileId
-        )
-    }
-
-
-    @PostMapping("/associate")
-    fun makeAssociated(
-        @AuthenticationPrincipal user: User?,
-        @RequestParam(required = true) companyId: Long
-    ) {
-        companyService.makeAssociated(
-            user?: throw TokenCanNotBeNullException(),
-            companyId
-        )
-    }
 
 
 
