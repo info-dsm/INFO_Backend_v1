@@ -1,4 +1,6 @@
 spring:
+  application:
+    name: "info-dsm-v1"
   jpa:
     database: mysql
     hibernate:
@@ -23,6 +25,22 @@ spring:
 
 server:
   port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - info
+          - health
+          - loggers
+          - mappings
+          - metrics
+          - shutdown
+          - prometheus
+#  metrics:
+#    tags:
+#      application: ${sprring.application.name}
 
 datasource:
   mongo:
