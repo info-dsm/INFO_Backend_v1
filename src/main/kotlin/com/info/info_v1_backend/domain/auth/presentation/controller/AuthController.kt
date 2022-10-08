@@ -72,7 +72,6 @@ class AuthController(
     }
 
 
-
     @PostMapping("/password/code")
     fun sendPasswordCode(
         @AuthenticationPrincipal user: User?
