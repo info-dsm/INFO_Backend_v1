@@ -370,7 +370,7 @@ class NoticeServiceImpl(
 
     override fun getWaitingNoticeList(user: User, idx: Int, size: Int): Page<MinimumNoticeResponse> {
         if (user is Teacher) {
-            return noticeRepository.findAllByIsApprove(NoticeWaitingStatus.WAITING, PageRequest.of(idx, size, Sort.by("created_at").descending())).map {
+            return noticeRepository.findAllByIsApprove(NoticeWaitingStatus.WAITING, PageRequest.of(idx, size, Sort.by("createdAt").descending())).map {
                 it.toMinimumNoticeResponse()
             }
         } else throw NoAuthenticationException(user.roleList.toString())
@@ -390,7 +390,7 @@ class NoticeServiceImpl(
     }
 
     override fun getMinimumNoticeList(idx: Int, size: Int): Page<MinimumNoticeResponse> {
-        return noticeRepository.findAllByIsApprove(NoticeWaitingStatus.APPROVE, PageRequest.of(idx, size, Sort.by("created_at").descending())).map {
+        return noticeRepository.findAllByIsApprove(NoticeWaitingStatus.APPROVE, PageRequest.of(idx, size, Sort.by("createdAt").descending())).map {
             it.toMinimumNoticeResponse()
         }
     }

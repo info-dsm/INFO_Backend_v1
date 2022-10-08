@@ -24,7 +24,7 @@ import javax.persistence.PersistenceContext
 @Service
 class UserServiceImpl(
     private val userRepository: UserRepository<User>,
-    private val studentRepository: UserRepository<Student>,
+    private val studentRepository: StudentRepository,
     private val fieldTrainingRepository: FieldTrainingRepository,
     private val hiredStudentRepository: HiredStudentRepository,
 ): UserService {
@@ -69,7 +69,7 @@ class UserServiceImpl(
 
     override fun getStudentList(user: User, idx: Int, size: Int): Page<MinimumStudent> {
         if (user is Student) throw NoAuthenticationException(user.roleList.toString())
-        return studentRepository.findAll(PageRequest.of(idx, size, Sort.by("created_at").descending()))
+        return studentRepository.findAll(PageRequest.of(idx, size, Sort.by("createdAt").descending()))
             .map {
                 it.toMinimumStudent()
             }

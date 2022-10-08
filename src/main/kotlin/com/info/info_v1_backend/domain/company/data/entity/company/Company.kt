@@ -150,7 +150,8 @@ class Company(
             },
             this.isLeading,
             this.isAssociated,
-            this.noticeList.last().createdAt!!.toLocalDate(),
+            this.noticeList.lastOrNull()
+                ?.createdAt?.toLocalDate(),
             this.hiredStudentList.map {
                 it.toHiredStudentResponse()
             }

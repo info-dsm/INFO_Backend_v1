@@ -10,8 +10,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.scheduling.annotation.EnableScheduling
 
 @SpringBootApplication(
-    excludeName = ["org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration"],
-    exclude = [BatchAutoConfiguration::class, JmxAutoConfiguration::class],
+//    excludeName = ["org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration"],
+//    exclude = [JmxAutoConfiguration::class],
 )
 @EnableScheduling
 @ConfigurationPropertiesScan

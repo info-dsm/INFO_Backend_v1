@@ -16,7 +16,7 @@ data class MaximumCompanyResponse(
     val commentList: List<CommentResponse>,
     val isLeading: Boolean,
     val isAssociated: Boolean,
-    val lastNoticeDate: LocalDate,
+    val lastNoticeDate: LocalDate?,
     val totalHiredStudentList: List<HiredStudentResponse>,
 
 )

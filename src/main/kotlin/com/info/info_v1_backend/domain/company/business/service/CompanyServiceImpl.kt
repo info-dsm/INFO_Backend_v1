@@ -3,6 +3,7 @@ package com.info.info_v1_backend.domain.company.business.service
 import com.info.info_v1_backend.domain.auth.data.entity.user.Student
 import com.info.info_v1_backend.domain.auth.data.entity.user.Teacher
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
+import com.info.info_v1_backend.domain.auth.data.repository.user.StudentRepository
 import com.info.info_v1_backend.domain.auth.data.repository.user.UserRepository
 import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
 import com.info.info_v1_backend.domain.company.business.dto.request.company.EditCompanyRequest
@@ -43,7 +44,7 @@ import javax.transaction.Transactional
 @Transactional
 class CompanyServiceImpl(
     private val companyRepository: CompanyRepository,
-    private val studentRepository: UserRepository<Student>,
+    private val studentRepository: StudentRepository,
     private val companySearchDocumentRepository: CompanySearchDocumentRepository,
     private val noticeSearchDocumentRepository: NoticeSearchDocumentRepository,
     private val s3Util: S3Util,
@@ -158,7 +159,7 @@ class CompanyServiceImpl(
     override fun getNoticeRegisteredCompanyListByYear(user: User, year: Year, idx: Int, size: Int): Page<MinimumCompanyResponse> {
         return companyRepository.findAllByNoticeRegisteredYearListContains(
             year.value,
-        PageRequest.of(idx, size, Sort.by("created_at").descending())).map {
+        PageRequest.of(idx, size, Sort.by("createdAt").descending())).map {
             it.toMinimumCompanyResponse()
         }
     }

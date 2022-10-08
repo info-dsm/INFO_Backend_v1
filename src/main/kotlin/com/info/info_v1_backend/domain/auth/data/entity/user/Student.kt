@@ -70,9 +70,9 @@ class Student(
             this.hiredStudentList.filter {
                 !it.isFire || !it.isDelete
             }.isNotEmpty(),
-            this.hiredStudentList.filter {
+            this.hiredStudentList.firstOrNull {
                 !it.isFire || !it.isDelete
-            }.firstOrNull()?.company?.toMinimumCompanyResponse()
+            }?.company?.toMinimumCompanyResponse()
         )
     }
 
