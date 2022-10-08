@@ -14,7 +14,7 @@ data class CompanyInformationRequest(
     @field:Max(100000)
     val workerCount: Int,
     @field:Pattern(regexp = "^\\d{1,20}\$")
-    val annualSales: Long
+    val annualSales: String
 
 ) {
     fun toCompanyInformation(): CompanyInformation {
@@ -24,7 +24,7 @@ data class CompanyInformationRequest(
             this.representative,
             this.establishedAt,
             this.workerCount,
-            this.annualSales
+            this.annualSales.toLong()
         )
     }
 }
