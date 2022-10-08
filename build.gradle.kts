@@ -53,11 +53,11 @@ dependencies {
     //batch
     implementation("org.springframework.boot:spring-boot-starter-batch")
     //Mysql
-    runtimeOnly("mysql:mysql-connector-java:8.0.20")
+    runtimeOnly("mysql:mysql-connector-java:8.0.30")
 //    //Komoran
 //    implementation("com.github.shin285:KOMORAN:3.3.4")
     //Validation
-    implementation("org.springframework.boot:spring-boot-starter-validation:2.7.3")
+    implementation("org.springframework.boot:spring-boot-starter-validation:2.7.4")
     //AWS
     implementation("org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE")
     //Security
@@ -79,6 +79,8 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-ui:1.6.11")
     //mongo
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
+//    implementation("org.mongodb:mongo-java-driver:3.12.11")
+
     //queryDSL
     implementation("com.querydsl:querydsl-jpa:5.0.0")
     kapt("com.querydsl:querydsl-apt:5.0.0:jpa")

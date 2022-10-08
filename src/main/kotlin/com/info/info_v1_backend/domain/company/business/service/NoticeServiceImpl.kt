@@ -388,15 +388,18 @@ class NoticeServiceImpl(
         return (noticeRepository.findByIdOrNull(id)?: throw NoticeNotFoundException(id.toString())).toMaximumNoticeWithoutPayResponse()
     }
 
-    override fun searchMinimumNoticeList(query: String): Page<MinimumNoticeResponse> {
-        val criteria = TextCriteria()
-        criteria.matchingAny(query)
-        
-        return noticeSearchDocumentRepository.findAllBy(criteria, PageRequest.of(0, 20)).map {
-                noticeSearchDocument ->
-            noticeRepository.findById(noticeSearchDocument.noticeId).orElse(null)?.let {
-                (it.toMinimumNoticeResponse())
+    override fun  searchMinimumNoticeList(query: String): Page<MinimumNoticeResponse>? {
+        try {
+            return noticeSearchDocumentRepository.findAllBy(
+                TextCriteria.forDefaultLanguage().matchingAny(query),
+                PageRequest.of(0, 20)
+            ).map { noticeSearchDocument ->
+                noticeRepository.findById(noticeSearchDocument.noticeId).orElse(null)?.let {
+                    (it.toMinimumNoticeResponse())
+                }
             }
+        } catch (e: java.lang.NullPointerException) {
+            return null
         }
     }
 

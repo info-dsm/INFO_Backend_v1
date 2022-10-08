@@ -123,7 +123,7 @@ class Company(
             this.companyInformation.annualSales,
             this.isLeading,
             this.isAssociated,
-            Year.of(this.noticeList.last().createdAt?.year ?: LocalDate.now().year),
+            this.noticeList.lastOrNull()?.createdAt?.year?. let {Year.of(it)},
             this.hiredStudentList.filter {
                 !it.isFire
             }.size,

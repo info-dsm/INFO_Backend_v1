@@ -275,7 +275,7 @@ class NoticeController(
     @GetMapping("/search")
     fun searchMinimumNotice(
         @RequestParam query: String
-    ): Page<MinimumNoticeResponse> {
+    ): Page<MinimumNoticeResponse>? {
         return noticeService.searchMinimumNoticeList(query)
     }
 

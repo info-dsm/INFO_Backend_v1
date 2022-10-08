@@ -223,7 +223,7 @@ class CompanyController(
     @GetMapping("/search")
     fun searchCompany(
         @RequestParam(required = true) query: String
-    ): List<MinimumCompanyResponse> {
+    ): Page<MinimumCompanyResponse>? {
         return companyService.searchCompany(query)
     }
 

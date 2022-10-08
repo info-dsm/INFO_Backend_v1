@@ -35,7 +35,7 @@ class SecurityConfiguration(
     @Throws(Exception::class)
     override fun configure(web: WebSecurity) {
         web.ignoring().antMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api-docs/**", "/api-docs.json"
-        , "/swagger-ui.html", "/dsql-api-docs/**"
+        , "/swagger-ui.html", "/dsql-api-docs/**",
         )
     }
 
@@ -53,13 +53,8 @@ class SecurityConfiguration(
             .and()
             .authorizeRequests()
             .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-            .antMatchers(
-                "/api/**").permitAll()
-            .antMatchers("/api/dsql/v1/news/img").authenticated()
-            .antMatchers("/api/dsql/v1/auth/reissue").authenticated()
-            .antMatchers("/api/dsql/v1/project/img").authenticated()
-            .antMatchers("/api/dsql/v1/project/dev").authenticated()
-            .antMatchers("/api/dsql/v1/project/url").authenticated()
+//            .antMatchers(
+//                "/api/**").anonymous()
             .anyRequest().permitAll()
             .and()
             .apply(FilterConfiguration(tokenProvider, customAuthDetailsService, objectMapper))

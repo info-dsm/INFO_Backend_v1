@@ -45,7 +45,7 @@ interface NoticeService {
     fun getMyNoticeList(user: User): List<NoticeWithIsApproveResponse>
     fun getMinimumNoticeList(idx: Int, size: Int): Page<MinimumNoticeResponse>
     fun getMaximumNotice(id: Long): MaximumNoticeWithoutPayResponse
-    fun searchMinimumNoticeList(query: String): Page<MinimumNoticeResponse>
+    fun searchMinimumNoticeList(query: String): Page<MinimumNoticeResponse>?
 
     fun printNotice(user: User, noticeId: Long): FileResponse
 

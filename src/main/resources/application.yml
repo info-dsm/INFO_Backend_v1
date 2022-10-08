@@ -91,5 +91,4 @@ mail:
 
 #logging:
 #  level:
-#    "org-hibernate": "debug"
-
+#    root: debug

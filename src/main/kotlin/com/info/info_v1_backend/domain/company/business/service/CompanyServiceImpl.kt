@@ -36,6 +36,7 @@ import com.info.info_v1_backend.infra.amazon.s3.S3Util
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
+import org.springframework.data.mongodb.core.query.TextCriteria
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -215,23 +216,20 @@ class CompanyServiceImpl(
         }
     }
 
-    override fun searchCompany(query: String): List<MinimumCompanyResponse> {
-        val companySearchDocumentList = companySearchDocumentRepository
-            .findByCompanyNameOrderByTextScoreDesc(query, PageRequest.of(0, 20))
-            .toList()
-
-        val minimumCompanyResponseList: MutableList<MinimumCompanyResponse> = ArrayList()
-        companySearchDocumentList.map {
-            companySearchDocument: CompanySearchDocument ->
-            companyRepository.findById(companySearchDocument.companyId).orElse(null)?. let{
-                company:Company ->
-                minimumCompanyResponseList.add(
-                    company.toMinimumCompanyResponse()
-                )
-            }
-
+    override fun searchCompany(query: String): Page<MinimumCompanyResponse>? {
+        try {
+            return companySearchDocumentRepository.findAllBy(
+                TextCriteria.forDefaultLanguage().matchingAny(query),
+                PageRequest.of(0, 20, Sort.by("createdAt"))
+            )
+                .map {
+                    companyRepository.findById(it.companyId).orElse(null)?.let {
+                        it.toMinimumCompanyResponse()
+                    }
+                }
+        } catch (e: java.lang.NullPointerException) {
+            return null
         }
-        return minimumCompanyResponseList
     }
 
     override fun getBusinessRegisteredCertificate(user: User, companyId: Long): BusinessRegisteredCertificateFile {
