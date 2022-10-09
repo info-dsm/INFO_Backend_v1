@@ -223,6 +223,8 @@ class CompanyController(
 
     @GetMapping("/search")
     fun searchCompany(
+        @Valid
+        @NotNull(message = "회사 이름을 입력해주세요")
         @RequestParam(required = true) query: String
     ): Page<MinimumCompanyResponse>? {
         return companyService.searchCompany(query)

@@ -251,12 +251,11 @@ class CompanyServiceImpl(
             companySearchDocumentRepository.findAllBy(
                 TextCriteria.forDefaultLanguage().matchingAny(query),
                 PageRequest.of(0, 20, Sort.by("createdAt"))
-            )
-                .map {
-                    companyRepository.findById(it.companyId).orElse(null)?.let {
-                        it.toMinimumCompanyResponse()
-                    }
+            ).map { it1 ->
+                companyRepository.findByIdOrNull(it1.companyId)?.let {
+                    it.toMinimumCompanyResponse()
                 }
+            }
         } catch(e: MongoQueryException) {
             return null
         } catch (e: UncategorizedMongoDbException) {
