@@ -32,7 +32,7 @@ class EmailServiceImpl(
     }
 
     override fun sendCodeToEmail(email: String) {
-        userRepository.findByEmail(email).orElse(null)?. let{
+        if(userRepository.existsByEmail(email)){
             throw UserAlreadyExists(email)
         }
         sendCode(email)
