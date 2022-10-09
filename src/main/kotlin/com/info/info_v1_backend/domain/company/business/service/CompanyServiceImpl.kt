@@ -412,6 +412,10 @@ class CompanyServiceImpl(
     override fun removeCompanyPhoto(user: User, fileId: Long) {
         if (user is Company) {
             user.let {
+                it.companyIntroduction.removeCompanyPhoto(
+                    companyPhotoFileRepository.findByIdOrNull(fileId)
+                        ?:throw FileNotFoundException(fileId.toString())
+                )
                 companyPhotoFileRepository.delete(
                     companyPhotoFileRepository.findByIdOrNull(fileId)
                         ?: throw FileNotFoundException(fileId.toString())
