@@ -113,46 +113,67 @@ class CompanyServiceImpl(
         )
     }
 
-    private fun saveCompanyRelatedFileList(businessRegisteredCertificate: MultipartFile, companyIntroductionFile: List<MultipartFile>, companyLogo: MultipartFile, companyPhotoList: List<MultipartFile>, company: Company) {
+    private fun saveCompanyRelatedFileList(
+        businessRegisteredCertificate: MultipartFile,
+        companyIntroductionFile: List<MultipartFile>,
+        companyLogo: MultipartFile,
+        companyPhotoList: List<MultipartFile>,
+        company: Company
+    ) {
         company.companyIntroduction.registerCompanyLogoAndBusinessCertificate(
             companyLogoFileRepository.save(
                 CompanyLogoFile(
-                    s3Util.uploadFile(companyLogo, "company/${company.id!!}", "companyLogo"),
+                    s3Util.uploadFile(
+                        companyLogo,
+                        "company/${company.id!!}",
+                        "companyLogo"
+                    ),
                     company
                 )
             ),
             businessRegisteredCertificateFileRepository.save(
                 BusinessRegisteredCertificateFile(
-                    s3Util.uploadFile(businessRegisteredCertificate, "company/${company.id!!}", "businessRegisteredCertificate"),
+                    s3Util.uploadFile(
+                        businessRegisteredCertificate,
+                        "company/${company.id!!}",
+                        "businessRegisteredCertificate"
+                    ),
                     company
                 )
             )
         )
         companyIntroductionFile.map {
-            company.companyIntroduction.addCompanyIntroductionFile(
-                companyIntroductionFileRepository.save(
-                    CompanyIntroductionFile(
-                        s3Util.uploadFile(it, "company/${company.id!!}", "companyIntroduction"),
-                        company
-                    )
+            companyIntroductionFileRepository.save(
+                CompanyIntroductionFile(
+                    s3Util.uploadFile(
+                        it,
+                        "company/${company.id!!}",
+                        "companyIntroduction"
+                    ),
+                    company
                 )
             )
         }
         companyPhotoList.map {
-            company.companyIntroduction.addCompanyPhoto(
-                companyPhotoFileRepository.save(
-                    CompanyPhotoFile(
-                        s3Util.uploadFile(it, "company/${company.id!!}", "companyPhoto"),
-                        company
-                    )
+            companyPhotoFileRepository.save(
+                CompanyPhotoFile(
+                    s3Util.uploadFile(
+                        it,
+                        "company/${company.id!!}",
+                        "companyPhoto"
+                    ),
+                    company
                 )
             )
         }
     }
 
 
-    override fun editCompany(user: User, request: EditCompanyRequest, companyId: Long) {
-
+    override fun editCompany(
+        user: User,
+        request: EditCompanyRequest,
+        companyId: Long
+    ) {
         if (user is Company) {
             user.editCompany(
                 request
@@ -223,8 +244,8 @@ class CompanyServiceImpl(
     }
 
     override fun searchCompany(query: String): Page<MinimumCompanyResponse>? {
-        try {
-            return companySearchDocumentRepository.findAllBy(
+        return try {
+            companySearchDocumentRepository.findAllBy(
                 TextCriteria.forDefaultLanguage().matchingAny(query),
                 PageRequest.of(0, 20, Sort.by("createdAt"))
             )
@@ -238,7 +259,7 @@ class CompanyServiceImpl(
         } catch (e: UncategorizedMongoDbException) {
             return null
         } catch (e: java.lang.NullPointerException) {
-            return null
+            null
         }
     }
 
@@ -251,7 +272,12 @@ class CompanyServiceImpl(
         }
     }
 
-    override fun getNoticeRegisteredCompanyListByYear(user: User, year: Year, idx: Int, size: Int): Page<MinimumCompanyResponse> {
+    override fun getNoticeRegisteredCompanyListByYear(
+        user: User,
+        year: Year,
+        idx: Int,
+        size: Int
+    ): Page<MinimumCompanyResponse> {
         return companyRepository.findAllByNoticeRegisteredYearListContains(
             year.value,
         PageRequest.of(idx, size, Sort.by("createdAt").descending())).map {
@@ -319,7 +345,11 @@ class CompanyServiceImpl(
             user.let {
                 user.companyIntroduction.addCompanyIntroduction(
                     CompanyIntroductionFile(
-                        s3Util.uploadFile(multipartFile, "company/${user.id!!}", "business_registered_file"),
+                        s3Util.uploadFile(
+                            multipartFile,
+                            "company/${user.id!!}",
+                            "business_registered_file"
+                        ),
                         user
                     )
                 )
@@ -331,7 +361,8 @@ class CompanyServiceImpl(
         if (user is Company) {
             user.let {
                 user.companyIntroduction.removeCompanyIntroduction(
-                    companyIntroductionFileRepository.findByIdOrNull(fileId)?: throw FileNotFoundException(fileId.toString())
+                    companyIntroductionFileRepository.findByIdOrNull(fileId)
+                        ?: throw FileNotFoundException(fileId.toString())
                 )
             }
         } else throw NoAuthenticationException(user.roleList.toString())
@@ -347,7 +378,11 @@ class CompanyServiceImpl(
                 }
                 user.companyIntroduction.changeCompanyLogo(
                     CompanyLogoFile(
-                        s3Util.uploadFile(multipartFile, "company/${user.id!!}", "company_introduction_file"),
+                        s3Util.uploadFile(
+                            multipartFile,
+                            "company/${user.id!!}",
+                            "company_introduction_file"
+                        ),
                         user
                     )
                 )
@@ -360,7 +395,11 @@ class CompanyServiceImpl(
             user.let {
                 user.companyIntroduction.addCompanyPhoto(
                     CompanyPhotoFile(
-                        s3Util.uploadFile(multipartFile, "company/${user.id!!}", "company_photo"),
+                        s3Util.uploadFile(
+                            multipartFile,
+                            "company/${user.id!!}",
+                            "company_photo"
+                        ),
                         user
                     )
                 )
@@ -372,11 +411,13 @@ class CompanyServiceImpl(
         if (user is Company) {
             user.let {
                 companyPhotoFileRepository.delete(
-                    companyPhotoFileRepository.findByIdOrNull(fileId)?: throw FileNotFoundException(fileId.toString())
+                    companyPhotoFileRepository.findByIdOrNull(fileId)
+                        ?: throw FileNotFoundException(fileId.toString())
                 )
 
                 user.companyIntroduction.removeCompanyPhoto(
-                    companyPhotoFileRepository.findByIdOrNull(fileId)?: throw FileNotFoundException(fileId.toString())
+                    companyPhotoFileRepository.findByIdOrNull(fileId)
+                        ?: throw FileNotFoundException(fileId.toString())
                 )
             }
         } else throw NoAuthenticationException(user.roleList.toString())
@@ -384,7 +425,8 @@ class CompanyServiceImpl(
 
     override fun makeAssociated(user: User, companyId: Long) {
         if (user is Teacher) {
-            (companyRepository.findByIdOrNull(companyId)?: throw CompanyNotFoundException(companyId.toString()))
+            (companyRepository.findByIdOrNull(companyId)
+                ?: throw CompanyNotFoundException(companyId.toString()))
                 .makeAssociated()
         } else throw NoAuthenticationException(user.roleList.toString())
     }

@@ -4,9 +4,13 @@ import com.info.info_v1_backend.domain.company.business.dto.request.company.Comp
 import com.info.info_v1_backend.domain.company.business.dto.request.company.CompanyInformationRequest
 import com.info.info_v1_backend.domain.company.business.dto.request.company.CompanyNameRequest
 import com.info.info_v1_backend.domain.company.business.dto.response.company.BusinessAreaResponse
+import org.springframework.validation.annotation.Validated
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
+import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
+
+@Validated
 data class CompanySignupRequest(
     @field:Valid
     val companyNameRequest: CompanyNameRequest,
@@ -23,6 +27,9 @@ data class CompanySignupRequest(
     )
     val introduction: String,
     val isLeading: Boolean,
+    @field:Valid
+    @field:Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d~!@#\$%^&*()+|=]{8,30}\$",
+        message = "비밀번호는 영소문자,대문자,숫자,특수문자 8~30자여야 합니다.")
     val password: String,
 
 )
