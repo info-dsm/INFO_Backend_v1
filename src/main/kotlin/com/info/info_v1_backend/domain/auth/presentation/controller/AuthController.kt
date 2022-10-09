@@ -83,6 +83,7 @@ class AuthController(
 
     @PostMapping("/password")
     fun changePassword(
+        @Valid
         @RequestBody request: EditPasswordRequest,
         @AuthenticationPrincipal user: User?
     ){
