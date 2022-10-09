@@ -64,7 +64,7 @@ class CompanyServiceImpl(
     private val businessAreaRepository: BusinessAreaRepository,
     private val passwordEncoder: PasswordEncoder,
     private val businessAreaTaggedRepository: BusinessAreaTaggedRepository,
-    private val companyPhotoFileRepository: CompanyPhotoFileRepository
+    private val companyPhotoFileRepository: FileRepository<CompanyPhotoFile>
 ): CompanyService {
 
     override fun registerCompany(
