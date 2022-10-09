@@ -71,14 +71,14 @@ class CompanyIntroduction(
 
     fun toCompanyIntroductionResponse(): CompanyIntroductionResponse {
         return CompanyIntroductionResponse(
-            this.introduction,
-            this.companyIntroductionFile.map {
+            introduction = this.introduction,
+            companyIntroductionFile = this.companyIntroductionFile.map {
                 it.toFileResponse()
-            },
-            this.companyLogo?.toFileResponse(),
-            this.companyPhotoList.map {
+            }.toList(),
+            companyLogo = this.companyLogo?.toFileResponse(),
+            companyPhotoList = this.companyPhotoList.map {
                 it.toFileResponse()
-            }
+            }.toList()
         )
     }
 

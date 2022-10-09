@@ -136,23 +136,23 @@ class Company(
 
     fun toMaximumCompanyResponse(): MaximumCompanyResponse {
         return MaximumCompanyResponse(
-            this.id!!,
-            this.companyNumber,
-            this.name,
-            this.companyInformation.toCompanyInformationRequest(),
-            this.companyContact.toCompanyContactRequest(),
-            this.businessAreaTaggedList.map {
+            companyId = this.id!!,
+            companyNumber = this.companyNumber,
+            companyName = this.name,
+            companyInformation = this.companyInformation.toCompanyInformationRequest(),
+            companyContact = this.companyContact.toCompanyContactRequest(),
+            businessAreaResponseList = this.businessAreaTaggedList.map {
                 it.businessArea.toBusinessAreaResponse()
             },
-            this.companyIntroduction.toCompanyIntroductionResponse(),
-            this.commentList.map {
+            companyIntroduction = this.companyIntroduction.toCompanyIntroductionResponse(),
+            commentList = this.commentList.map {
                 it.toCommentResponse()
             },
-            this.isLeading,
-            this.isAssociated,
-            this.noticeList.lastOrNull()
+            isLeading = this.isLeading,
+            isAssociated = this.isAssociated,
+            lastNoticeDate = this.noticeList.lastOrNull()
                 ?.createdAt?.toLocalDate(),
-            this.hiredStudentList.map {
+            totalHiredStudentList = this.hiredStudentList.map {
                 it.toHiredStudentResponse()
             }
         )
