@@ -8,6 +8,7 @@ import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Where
+import javax.persistence.CascadeType
 import javax.persistence.DiscriminatorValue
 import javax.persistence.Entity
 import javax.persistence.ManyToOne
@@ -25,7 +26,7 @@ class FormAttachment(
     dto.extension,
     dto.fileName
 ) {
-    @ManyToOne
+    @ManyToOne(cascade = [CascadeType.PERSIST])
     var notice: Notice = notice
         protected set
 }

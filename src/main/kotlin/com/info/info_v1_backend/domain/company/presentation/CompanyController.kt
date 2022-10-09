@@ -59,12 +59,12 @@ class CompanyController(
     @PostMapping
     fun registerCompany(
         @Valid
-        @RequestPart request: CompanySignupRequest,
+        @RequestPart(required = true) request: CompanySignupRequest,
         @RequestParam emailCheckCode: String,
-        @RequestPart businessRegisteredCertificate: MultipartFile,
-        @RequestPart companyIntroductionFile: List<MultipartFile>,
-        @RequestPart companyLogo: MultipartFile,
-        @RequestPart companyPhotoList: List<MultipartFile>
+        @RequestPart(required = true) businessRegisteredCertificate: MultipartFile,
+        @RequestPart(required = true) companyIntroductionFile: List<MultipartFile>,
+        @RequestPart(required = true) companyLogo: MultipartFile,
+        @RequestPart(required = true) companyPhotoList: List<MultipartFile>
     ) {
         if (authService.checkEmail(request.companyContact.email, emailCheckCode)) {
             companyService.registerCompany(
@@ -122,7 +122,7 @@ class CompanyController(
     @PutMapping("/certificate")
     fun changeBusinessRegisteredCertificate(
         @AuthenticationPrincipal user: User?, 
-        @RequestPart certificate: MultipartFile
+        @RequestPart(required = true) certificate: MultipartFile
     ) {
         companyService.changeBusinessRegisteredCertificate(user
             ?: throw TokenCanNotBeNullException(), certificate)
@@ -131,7 +131,7 @@ class CompanyController(
     @PutMapping("/introduction")
     fun addCompanyIntroductionFile(
         @AuthenticationPrincipal user: User?, 
-        @RequestPart introduction: MultipartFile
+        @RequestPart(required = true) introduction: MultipartFile
     ) {
         companyService.addCompanyIntroductionFile(user
             ?: throw TokenCanNotBeNullException(), introduction)
@@ -150,7 +150,7 @@ class CompanyController(
     @PutMapping("/logo")
     fun changeCompanyLogo(
         @AuthenticationPrincipal user: User?,
-        @RequestPart logo: MultipartFile
+        @RequestPart(required = true) logo: MultipartFile
     ) {
         companyService.changeCompanyLogo(
             user?: throw TokenCanNotBeNullException(),
@@ -161,7 +161,7 @@ class CompanyController(
     @PutMapping("/photo")
     fun addCompanyPhoto(
         @AuthenticationPrincipal user: User?,
-        @RequestPart photo: MultipartFile
+        @RequestPart(required = true) photo: MultipartFile
     ) {
         companyService.addCompanyPhoto(
             user?: throw TokenCanNotBeNullException(),

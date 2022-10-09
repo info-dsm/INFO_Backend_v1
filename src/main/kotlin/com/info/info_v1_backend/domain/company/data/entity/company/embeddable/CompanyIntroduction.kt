@@ -6,6 +6,7 @@ import com.info.info_v1_backend.domain.company.data.entity.company.file.CompanyI
 import com.info.info_v1_backend.domain.company.data.entity.company.file.CompanyLogoFile
 import com.info.info_v1_backend.domain.company.data.entity.company.file.CompanyPhotoFile
 import com.info.info_v1_backend.global.file.entity.File
+import javax.persistence.CascadeType
 import javax.persistence.Embeddable
 import javax.persistence.JoinColumn
 import javax.persistence.OneToMany
@@ -19,23 +20,24 @@ class CompanyIntroduction(
     var introduction: String = introduction
         protected set
 
-    @OneToOne
+    @OneToOne(cascade = [CascadeType.PERSIST])
     @JoinColumn(nullable = true)
     var businessRegisteredCertificate: BusinessRegisteredCertificateFile? = null
         protected set
 
-    @OneToMany
+    @OneToMany(cascade = [CascadeType.PERSIST])
     var companyIntroductionFile: MutableList<CompanyIntroductionFile> = ArrayList()
         protected set
 
-    @OneToOne
+    @OneToOne(cascade = [CascadeType.PERSIST])
     @JoinColumn(nullable = true)
     var companyLogo: CompanyLogoFile? = null
         protected set
 
-    @OneToMany
+    @OneToMany(cascade = [CascadeType.PERSIST])
     var companyPhotoList: MutableList<CompanyPhotoFile> = ArrayList()
         protected set
+
 
     fun addCompanyIntroductionFile(file: CompanyIntroductionFile) {
         this.companyIntroductionFile.add(file)

@@ -11,11 +11,7 @@ import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Where
-import javax.persistence.DiscriminatorValue
-import javax.persistence.Entity
-import javax.persistence.JoinColumn
-import javax.persistence.JoinColumns
-import javax.persistence.ManyToOne
+import javax.persistence.*
 
 
 @Entity
@@ -30,7 +26,7 @@ class Reporter(
     dto.extension,
     dto.fileName
 ) {
-    @ManyToOne
+    @ManyToOne(cascade = [CascadeType.PERSIST])
     @JoinColumns(
         JoinColumn(name = "student_id"),
         JoinColumn(name = "notice_id")

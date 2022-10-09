@@ -9,6 +9,7 @@ import com.info.info_v1_backend.domain.company.business.dto.response.company.Max
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MinimumCompanyResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.notice.MinimumNoticeResponse
 import com.info.info_v1_backend.domain.company.data.entity.company.file.BusinessRegisteredCertificateFile
+import com.info.info_v1_backend.global.file.entity.File
 import org.springframework.data.domain.Page
 import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDate
@@ -33,6 +34,7 @@ interface CompanyService {
 
     fun addCompanyPhoto(user: User, multipartFile: MultipartFile)
     fun removeCompanyPhoto(user: User, fileId: Long)
+
 
     fun makeAssociated(user: User, companyId: Long)
 

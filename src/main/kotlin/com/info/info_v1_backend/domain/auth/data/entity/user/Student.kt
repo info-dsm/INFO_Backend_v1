@@ -24,6 +24,7 @@ class Student(
     email: String,
     password: String,
     creationList: MutableList<Creation>?,
+    githubLink: String
 ): User(
     name,
     email,
@@ -49,6 +50,10 @@ class Student(
     var applicantList: MutableList<Applicant> = ArrayList()
         protected set
 
+    @Column(name = "github_link", nullable = false)
+    var githubLink: String = githubLink
+        protected set
+
     fun toMinimumStudent(): MinimumStudent {
         return MinimumStudent(
                 this.name,
@@ -65,14 +70,12 @@ class Student(
             this.email,
             this.studentKey,
             this.fieldTrainingList.filter {
-                !it.isDelete || !it.isLinked
-            }.isNotEmpty(),
+                !it.isLinked
+            }.isNotEmpty() ||
             this.hiredStudentList.filter {
-                !it.isFire || !it.isDelete
+                !it.isFire
             }.isNotEmpty(),
-            this.hiredStudentList.firstOrNull {
-                !it.isFire || !it.isDelete
-            }?.company?.toMinimumCompanyResponse()
+            this.githubLink
         )
     }
 

@@ -57,11 +57,12 @@ class AuthServiceImpl(
     override fun studentSignUp(req: StudentSignUpRequest) {
         val encPw = passwordEncoder.encode(req.password)
         val user = Student(
-                req.studentKey,
-                req.name,
-                req.email,
-                encPw,
-                creationList = null
+            req.studentKey,
+            req.name,
+            req.email,
+            encPw,
+            creationList = null,
+            req.githubLink
         )
         userRepository.save(user)
 

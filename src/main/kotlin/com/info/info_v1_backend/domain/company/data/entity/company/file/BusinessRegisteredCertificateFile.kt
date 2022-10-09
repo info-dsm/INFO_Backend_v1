@@ -23,7 +23,7 @@ class BusinessRegisteredCertificateFile(
     dto.fileName
 ){
 
-    @OneToOne
+    @OneToOne(cascade = [CascadeType.PERSIST])
     @JoinColumn(name = "company_id")
     var company: Company = company
         protected set

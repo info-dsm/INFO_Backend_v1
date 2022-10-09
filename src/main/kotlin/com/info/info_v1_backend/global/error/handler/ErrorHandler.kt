@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.context.request.WebRequest
+import org.springframework.web.multipart.MaxUploadSizeExceededException
 import javax.validation.ConstraintViolationException
 import javax.validation.UnexpectedTypeException
 import javax.validation.ValidationException
@@ -48,6 +49,18 @@ class ErrorHandler {
             ErrorResponse(
                 e.message.toString(),
                 e.stackTrace.toString()
+            )
+        )
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException::class)
+    fun maxUploadSizeExceededException(
+        e: MaxUploadSizeExceededException
+    ): ResponseEntity<*> {
+        return ResponseEntity.badRequest().body(
+            ErrorResponse(
+                e.message.toString(),
+                e.cause.toString()
             )
         )
     }

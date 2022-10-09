@@ -7,10 +7,7 @@ import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Where
-import javax.persistence.DiscriminatorValue
-import javax.persistence.Entity
-import javax.persistence.JoinColumn
-import javax.persistence.ManyToOne
+import javax.persistence.*
 
 
 @Entity
@@ -26,7 +23,7 @@ class CompanyPhotoFile(
     dto.fileName
 ) {
 
-    @ManyToOne
+    @ManyToOne(cascade = [CascadeType.PERSIST])
     @JoinColumn(name = "company_id")
     var company: Company = company
         protected set

@@ -7,6 +7,7 @@ import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Where
+import javax.persistence.CascadeType
 import javax.persistence.DiscriminatorValue
 import javax.persistence.Entity
 import javax.persistence.JoinColumn
@@ -26,7 +27,7 @@ class CompanyLogoFile(
     dto.fileName
 ) {
 
-    @OneToOne
+    @OneToOne(cascade = [CascadeType.PERSIST])
     @JoinColumn(name = "company_id", nullable = false)
     var company: Company = company
         protected set

@@ -29,6 +29,7 @@ import com.info.info_v1_backend.domain.company.data.repository.notice.NoticeRepo
 import com.info.info_v1_backend.domain.company.data.repository.notice.NoticeSearchDocumentRepository
 import com.info.info_v1_backend.domain.company.exception.*
 import com.info.info_v1_backend.global.error.common.NoAuthenticationException
+import com.info.info_v1_backend.global.file.entity.File
 import com.info.info_v1_backend.global.file.exception.FileNotFoundException
 import com.info.info_v1_backend.global.file.repository.FileRepository
 import com.info.info_v1_backend.global.util.user.CurrentUtil
@@ -143,14 +144,16 @@ class CompanyServiceImpl(
             )
         )
         companyIntroductionFile.map {
-            companyIntroductionFileRepository.save(
-                CompanyIntroductionFile(
-                    s3Util.uploadFile(
-                        it,
-                        "company/${company.id!!}",
-                        "companyIntroduction"
-                    ),
-                    company
+            company.companyIntroduction.addCompanyIntroductionFile(
+                companyIntroductionFileRepository.save(
+                    CompanyIntroductionFile(
+                        s3Util.uploadFile(
+                            it,
+                            "company/${company.id!!}",
+                            "companyIntroduction"
+                        ),
+                        company
+                    )
                 )
             )
         }
@@ -372,16 +375,14 @@ class CompanyServiceImpl(
         if (user is Company) {
             user.let {
                 user.companyIntroduction.companyLogo?.let { it1 ->
-                    companyLogoFileRepository.delete(
-                        it1
-                    )
+                    companyLogoFileRepository.delete(it1)
                 }
                 user.companyIntroduction.changeCompanyLogo(
                     CompanyLogoFile(
                         s3Util.uploadFile(
                             multipartFile,
                             "company/${user.id!!}",
-                            "company_introduction_file"
+                            "company_logo_file"
                         ),
                         user
                     )
@@ -389,6 +390,7 @@ class CompanyServiceImpl(
             }
         } else throw NoAuthenticationException(user.roleList.toString())
     }
+
 
     override fun addCompanyPhoto(user: User, multipartFile: MultipartFile) {
         if (user is Company) {

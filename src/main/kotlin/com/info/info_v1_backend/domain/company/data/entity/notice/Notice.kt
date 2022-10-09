@@ -47,7 +47,7 @@ class Notice(
     )
     val id: Long? = null
 
-    @ManyToOne(cascade = [CascadeType.REMOVE])
+    @ManyToOne(cascade = [CascadeType.PERSIST])
     @JoinColumn(name = "company_id", nullable = false)
     val company: Company = company
 
@@ -97,7 +97,7 @@ class Notice(
     @Column(name = "is_personal_contact", nullable = false)
     var isPersonalContact: Boolean = isPersonalContact
 
-    @OneToMany(mappedBy = "notice")
+    @OneToMany(cascade = [CascadeType.PERSIST])
     var formAttachmentList: MutableList<FormAttachment> = ArrayList()
         protected set
 
@@ -110,7 +110,7 @@ class Notice(
     var isApprove: NoticeWaitingStatus = NoticeWaitingStatus.WAITING
         protected set
 
-    @OneToMany(mappedBy = "notice")
+    @OneToMany(mappedBy = "notice", cascade = [javax.persistence.CascadeType.PERSIST])
     var applicantList: MutableList<Applicant> = ArrayList()
         protected set
 

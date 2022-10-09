@@ -38,8 +38,8 @@ class NoticeController(
     @ResponseStatus(HttpStatus.CREATED)
     fun registerNotice(
         @AuthenticationPrincipal user: User?,
-        @RequestPart request: RegisterNoticeRequest,
-        @RequestPart attachment: List<MultipartFile>
+        @RequestPart(required = true) request: RegisterNoticeRequest,
+        @RequestPart(required = true) attachment: List<MultipartFile>
     ) {
         noticeService.registerNotice(user?: throw TokenCanNotBeNullException(), request, attachment)
     }
@@ -151,7 +151,7 @@ class NoticeController(
     @PutMapping("/attachment")
     fun changeAttachment(
         @AuthenticationPrincipal user: User?,
-        @RequestPart attachment: List<MultipartFile>,
+        @RequestPart(required = true) attachment: List<MultipartFile>,
         @RequestParam(required = true) noticeId: Long
     ) {
         noticeService.changeAttachment(user?: throw TokenCanNotBeNullException(), attachment, noticeId)
