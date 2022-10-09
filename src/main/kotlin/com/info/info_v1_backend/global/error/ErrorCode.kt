@@ -18,6 +18,7 @@ enum class ErrorCode(
     CONTACTOR_MUST_LEAVE_LEAST_AT_ONE_ON_COMPANY("Contactor Must leave least at one on company", HttpStatus.BAD_REQUEST),
     IS_NOT_FIELD_TRAINING_STUDENT("Is not fieldtraining student", HttpStatus.BAD_REQUEST),
     IS_ALREADY_FIELD_TRAINING_STUDENT("Is already field training student", HttpStatus.BAD_REQUEST),
+    FILE_SHOULD_BE_IMAGE_TYPE("File should be image type", HttpStatus.BAD_REQUEST),
 
     //401
     TOKEN_IS_NULL("Token Can Not Be Null", HttpStatus.UNAUTHORIZED),

@@ -400,7 +400,7 @@ class CompanyServiceImpl(
                         s3Util.uploadFile(
                             multipartFile,
                             "company/${user.id!!}",
-                            "company_photo"
+                            "company_photo_file"
                         ),
                         user
                     )
@@ -413,11 +413,6 @@ class CompanyServiceImpl(
         if (user is Company) {
             user.let {
                 companyPhotoFileRepository.delete(
-                    companyPhotoFileRepository.findByIdOrNull(fileId)
-                        ?: throw FileNotFoundException(fileId.toString())
-                )
-
-                user.companyIntroduction.removeCompanyPhoto(
                     companyPhotoFileRepository.findByIdOrNull(fileId)
                         ?: throw FileNotFoundException(fileId.toString())
                 )
