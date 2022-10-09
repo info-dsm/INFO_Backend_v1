@@ -83,6 +83,7 @@ class CompanyController(
     @ResponseStatus(HttpStatus.OK)
     fun editCompany(
         @AuthenticationPrincipal user: User?,
+        @Valid
         @RequestBody request: EditCompanyRequest,
         @PathVariable companyId: Long
     ) {
