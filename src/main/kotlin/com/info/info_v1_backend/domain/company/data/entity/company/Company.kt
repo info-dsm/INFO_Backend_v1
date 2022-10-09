@@ -95,9 +95,6 @@ class Company(
     var isAssociated: Boolean = false
         protected set
 
-    @Column(name = "company_is_delete", nullable = false)
-    var isDelete: Boolean = false
-        protected set
 
     fun updateLastNoticeYear() {
         if (!this.noticeRegisteredYearList.contains(

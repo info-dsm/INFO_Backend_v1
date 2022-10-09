@@ -37,6 +37,10 @@ class CompanyIntroduction(
     var companyPhotoList: MutableList<CompanyPhotoFile> = ArrayList()
         protected set
 
+    fun addCompanyIntroductionFile(file: CompanyIntroductionFile) {
+        this.companyIntroductionFile.add(file)
+    }
+
 
     fun registerCompanyLogoAndBusinessCertificate(logo: CompanyLogoFile, businessRegisteredCertificate: BusinessRegisteredCertificateFile) {
         this.companyLogo = logo

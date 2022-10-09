@@ -33,9 +33,11 @@ import com.info.info_v1_backend.global.file.exception.FileNotFoundException
 import com.info.info_v1_backend.global.file.repository.FileRepository
 import com.info.info_v1_backend.global.util.user.CurrentUtil
 import com.info.info_v1_backend.infra.amazon.s3.S3Util
+import com.mongodb.MongoQueryException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
+import org.springframework.data.mongodb.UncategorizedMongoDbException
 import org.springframework.data.mongodb.core.query.TextCriteria
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -127,18 +129,22 @@ class CompanyServiceImpl(
             )
         )
         companyIntroductionFile.map {
-            companyIntroductionFileRepository.save(
-                CompanyIntroductionFile(
-                    s3Util.uploadFile(it, "company/${company.id!!}", "companyIntroduction"),
-                    company
+            company.companyIntroduction.addCompanyIntroductionFile(
+                companyIntroductionFileRepository.save(
+                    CompanyIntroductionFile(
+                        s3Util.uploadFile(it, "company/${company.id!!}", "companyIntroduction"),
+                        company
+                    )
                 )
             )
         }
         companyPhotoList.map {
-            companyPhotoFileRepository.save(
-                CompanyPhotoFile(
-                    s3Util.uploadFile(it, "company/${company.id!!}", "companyPhoto"),
-                    company
+            company.companyIntroduction.addCompanyPhoto(
+                companyPhotoFileRepository.save(
+                    CompanyPhotoFile(
+                        s3Util.uploadFile(it, "company/${company.id!!}", "companyPhoto"),
+                        company
+                    )
                 )
             )
         }
@@ -176,7 +182,7 @@ class CompanyServiceImpl(
     }
 
     override fun getMinimumCompanyList(idx: Int, size: Int): Page<MinimumCompanyResponse> {
-        return companyRepository.findAll(PageRequest.of(idx, size, Sort.by("created_date")
+        return companyRepository.findAll(PageRequest.of(idx, size, Sort.by("createdAt")
             .descending())).map {
             it.toMinimumCompanyResponse()
         }
@@ -227,6 +233,10 @@ class CompanyServiceImpl(
                         it.toMinimumCompanyResponse()
                     }
                 }
+        } catch(e: MongoQueryException) {
+            return null
+        } catch (e: UncategorizedMongoDbException) {
+            return null
         } catch (e: java.lang.NullPointerException) {
             return null
         }
@@ -301,8 +311,7 @@ class CompanyServiceImpl(
                     )
                 )
             }
-        }
-        throw NoAuthenticationException(user.roleList.toString())
+        } else throw NoAuthenticationException(user.roleList.toString())
     }
 
     override fun addCompanyIntroductionFile(user: User, multipartFile: MultipartFile) {
@@ -315,8 +324,7 @@ class CompanyServiceImpl(
                     )
                 )
             }
-        }
-        throw NoAuthenticationException(user.roleList.toString())
+        } else throw NoAuthenticationException(user.roleList.toString())
     }
 
     override fun removeCompanyIntroductionFile(user: User, fileId: Long) {
@@ -326,8 +334,7 @@ class CompanyServiceImpl(
                     companyIntroductionFileRepository.findByIdOrNull(fileId)?: throw FileNotFoundException(fileId.toString())
                 )
             }
-        }
-        throw NoAuthenticationException(user.roleList.toString())
+        } else throw NoAuthenticationException(user.roleList.toString())
     }
 
     override fun changeCompanyLogo(user: User, multipartFile: MultipartFile) {
@@ -345,8 +352,7 @@ class CompanyServiceImpl(
                     )
                 )
             }
-        }
-        throw NoAuthenticationException(user.roleList.toString())
+        } else throw NoAuthenticationException(user.roleList.toString())
     }
 
     override fun addCompanyPhoto(user: User, multipartFile: MultipartFile) {
@@ -359,8 +365,7 @@ class CompanyServiceImpl(
                     )
                 )
             }
-        }
-        throw NoAuthenticationException(user.roleList.toString())
+        } else throw NoAuthenticationException(user.roleList.toString())
     }
 
     override fun removeCompanyPhoto(user: User, fileId: Long) {
@@ -374,16 +379,14 @@ class CompanyServiceImpl(
                     companyPhotoFileRepository.findByIdOrNull(fileId)?: throw FileNotFoundException(fileId.toString())
                 )
             }
-        }
-        throw NoAuthenticationException(user.roleList.toString())
+        } else throw NoAuthenticationException(user.roleList.toString())
     }
 
     override fun makeAssociated(user: User, companyId: Long) {
         if (user is Teacher) {
             (companyRepository.findByIdOrNull(companyId)?: throw CompanyNotFoundException(companyId.toString()))
                 .makeAssociated()
-        }
-        throw NoAuthenticationException(user.roleList.toString())
+        } else throw NoAuthenticationException(user.roleList.toString())
     }
 
 

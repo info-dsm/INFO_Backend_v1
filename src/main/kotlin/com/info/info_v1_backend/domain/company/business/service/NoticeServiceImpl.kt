@@ -31,9 +31,11 @@ import com.info.info_v1_backend.global.error.common.NoAuthenticationException
 import com.info.info_v1_backend.global.file.dto.FileResponse
 import com.info.info_v1_backend.global.file.repository.FileRepository
 import com.info.info_v1_backend.infra.amazon.s3.S3Util
+import com.mongodb.MongoQueryException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
+import org.springframework.data.mongodb.UncategorizedMongoDbException
 import org.springframework.data.mongodb.core.query.TextCriteria
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -398,6 +400,10 @@ class NoticeServiceImpl(
                     (it.toMinimumNoticeResponse())
                 }
             }
+        } catch (e: UncategorizedMongoDbException) {
+            return null
+        } catch(e: MongoQueryException){
+            return null
         } catch (e: java.lang.NullPointerException) {
             return null
         }
