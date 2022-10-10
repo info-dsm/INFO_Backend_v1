@@ -28,6 +28,7 @@ import com.info.info_v1_backend.domain.company.data.repository.company.*
 import com.info.info_v1_backend.domain.company.data.repository.notice.NoticeRepository
 import com.info.info_v1_backend.domain.company.data.repository.notice.NoticeSearchDocumentRepository
 import com.info.info_v1_backend.domain.company.exception.*
+import com.info.info_v1_backend.global.error.common.ForbiddenException
 import com.info.info_v1_backend.global.error.common.NoAuthenticationException
 import com.info.info_v1_backend.global.file.entity.File
 import com.info.info_v1_backend.global.file.exception.FileNotFoundException
@@ -362,10 +363,16 @@ class CompanyServiceImpl(
     override fun removeCompanyIntroductionFile(user: User, fileId: Long) {
         if (user is Company) {
             user.let {
-                user.companyIntroduction.removeCompanyIntroduction(
-                    companyIntroductionFileRepository.findByIdOrNull(fileId)
-                        ?: throw FileNotFoundException(fileId.toString())
-                )
+
+                val file = companyIntroductionFileRepository.findByIdOrNull(fileId)
+                    ?: throw FileNotFoundException(fileId.toString())
+
+                if(file.company == it){
+                    it.companyIntroduction.removeCompanyIntroduction(
+                        file
+                    )
+                } else throw ForbiddenException("$it")
+
             }
         } else throw NoAuthenticationException(user.roleList.toString())
     }
@@ -411,10 +418,16 @@ class CompanyServiceImpl(
     override fun removeCompanyPhoto(user: User, fileId: Long) {
         if (user is Company) {
             user.let {
-                it.companyIntroduction.removeCompanyPhoto(
-                    companyPhotoFileRepository.findByIdOrNull(fileId)
-                        ?:throw FileNotFoundException(fileId.toString())
-                )
+
+                val file = companyPhotoFileRepository.findByIdOrNull(fileId)
+                    ?:throw FileNotFoundException(fileId.toString())
+
+                if(file.company == it){
+                    it.companyIntroduction.removeCompanyPhoto(
+                        file
+                    )
+                } else throw  ForbiddenException("$it")
+
                 companyPhotoFileRepository.delete(
                     companyPhotoFileRepository.findByIdOrNull(fileId)
                         ?: throw FileNotFoundException(fileId.toString())
