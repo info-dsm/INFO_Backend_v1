@@ -253,9 +253,8 @@ class CompanyServiceImpl(
                 TextCriteria.forDefaultLanguage().matchingAny(query),
                 PageRequest.of(0, 20, Sort.by("createdAt"))
             ).map { it1 ->
-                companyRepository.findByIdOrNull(it1.companyId)?.let {
-                    it.toMinimumCompanyResponse()
-                }
+                companyRepository.findByIdOrNull(it1.companyId)
+                    ?.toMinimumCompanyResponse()
             }
         } catch(e: MongoQueryException) {
             return null
@@ -313,11 +312,15 @@ class CompanyServiceImpl(
 
     override fun removeBusinessArea(user: User, businessAreaId: String) {
         if (user is Company) {
-            businessAreaTaggedRepository.delete(
-                user.businessAreaTaggedList.firstOrNull {
-                    it.businessArea.id == businessAreaId
-                }?: return
-            )
+
+            val area = user.businessAreaTaggedList.firstOrNull {
+                it.businessArea.id == businessAreaId
+            }?: return
+
+            if(area.company == user){
+                businessAreaTaggedRepository.delete(area)
+            }else throw ForbiddenException("${user}가 ${area.company}에 권한없음")
+
         } else throw NoAuthenticationException(user.roleList.toString())
     }
 
@@ -361,20 +364,16 @@ class CompanyServiceImpl(
     }
 
     override fun removeCompanyIntroductionFile(user: User, fileId: Long) {
-        if (user is Company) {
-            user.let {
 
-                val file = companyIntroductionFileRepository.findByIdOrNull(fileId)
-                    ?: throw FileNotFoundException(fileId.toString())
+        val file = companyIntroductionFileRepository.findByIdOrNull(fileId)
+            ?: throw FileNotFoundException(fileId.toString())
 
-                if(file.company == it){
-                    it.companyIntroduction.removeCompanyIntroduction(
-                        file
-                    )
-                } else throw ForbiddenException("$it")
+        if (user is Company && file.company == user) {
 
-            }
-        } else throw NoAuthenticationException(user.roleList.toString())
+            user.companyIntroduction
+                .removeCompanyIntroduction(file)
+
+        } else throw ForbiddenException("${user}가 ${file.company}에 접근권한 없음")
     }
 
     override fun changeCompanyLogo(user: User, multipartFile: MultipartFile) {
@@ -416,24 +415,19 @@ class CompanyServiceImpl(
     }
 
     override fun removeCompanyPhoto(user: User, fileId: Long) {
-        if (user is Company) {
+        val file = companyPhotoFileRepository.findByIdOrNull(fileId)
+            ?:throw FileNotFoundException(fileId.toString())
+        if (user is Company && file.company == user) {
             user.let {
-
-                val file = companyPhotoFileRepository.findByIdOrNull(fileId)
-                    ?:throw FileNotFoundException(fileId.toString())
-
-                if(file.company == it){
-                    it.companyIntroduction.removeCompanyPhoto(
-                        file
-                    )
-                } else throw  ForbiddenException("$it")
-
+                it.companyIntroduction.removeCompanyPhoto(
+                    file
+                )
                 companyPhotoFileRepository.delete(
                     companyPhotoFileRepository.findByIdOrNull(fileId)
                         ?: throw FileNotFoundException(fileId.toString())
                 )
             }
-        } else throw NoAuthenticationException(user.roleList.toString())
+        } else throw ForbiddenException("${user}가 ${file.company}에 접근권한 없음")
     }
 
     override fun makeAssociated(user: User, companyId: Long) {
