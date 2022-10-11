@@ -28,7 +28,7 @@ data class CompanySignupRequest(
     val introduction: String,
     val isLeading: Boolean,
     @field:Valid
-    @field:Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d~!@#\$%^&*()+|=]{8,30}\$",
+    @field:Pattern(regexp = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@\$%^&*-]).{8,30}\$",
         message = "비밀번호는 영소문자,대문자,숫자,특수문자 8~30자여야 합니다.")
     val password: String,
 
