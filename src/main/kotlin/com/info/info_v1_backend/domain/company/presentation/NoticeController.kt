@@ -101,7 +101,7 @@ class NoticeController(
     }
 
     @DeleteMapping("/{noticeId}/language/{languageId}")
-    fun removeLanguageSet(
+    fun removeLanguage(
         @AuthenticationPrincipal user: User?,
         @PathVariable languageName: String,
         @PathVariable noticeId: Long
@@ -120,8 +120,8 @@ class NoticeController(
         return noticeService.getTechnologyList()
     }
 
-    @PutMapping("/{noticeId}/language/{technologyId}")
-    fun addTechnologySet(
+    @PutMapping("/{noticeId}/technology/{technologyId}")
+    fun addTechnology(
         @AuthenticationPrincipal user: User?,
         @PathVariable technologyId: String,
         @PathVariable noticeId: Long

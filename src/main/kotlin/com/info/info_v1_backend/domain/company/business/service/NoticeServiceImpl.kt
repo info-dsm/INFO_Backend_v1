@@ -26,6 +26,7 @@ import com.info.info_v1_backend.domain.company.data.entity.notice.technology.Tec
 import com.info.info_v1_backend.domain.company.data.entity.notice.technology.TechnologyUsageIdClass
 import com.info.info_v1_backend.domain.company.data.repository.company.*
 import com.info.info_v1_backend.domain.company.data.repository.notice.*
+import com.info.info_v1_backend.domain.company.exception.AlreadyExistsException
 import com.info.info_v1_backend.domain.company.exception.NoticeNotFoundException
 import com.info.info_v1_backend.global.error.common.NoAuthenticationException
 import com.info.info_v1_backend.global.file.dto.FileDto
@@ -46,6 +47,8 @@ import org.springframework.web.multipart.MultipartFile
 import java.util.Random
 import java.util.UUID
 import javax.transaction.Transactional
+import kotlin.random.nextLong
+import kotlin.random.nextULong
 
 @Service
 @Transactional
@@ -82,7 +85,7 @@ class NoticeServiceImpl(
 
             val notice = noticeRepository.save(
                 Notice(
-                    kotlin.random.Random.nextLong(),
+                    kotlin.random.Random.nextLong(100000000, 999999999),
                     user,
                     request.workTime.toWorkTime(),
                     request.pay.toPay(),
@@ -130,6 +133,7 @@ class NoticeServiceImpl(
             )
 
 
+
             attachmentList.map {
                 notice.addAttachment(
                     FormAttachment(
@@ -140,11 +144,44 @@ class NoticeServiceImpl(
             }
 
             request.recruitmentRequest.needCertificateList.map {
-                certificateRepository.save(
-                    certificateRepository.findByIdOrNull(it)
-                        ?: Certificate(
-                            it,
-                        )
+                certificateUsageRepository.save(
+                    CertificateUsage(
+                        certificateRepository.save(
+                            certificateRepository.findByIdOrNull(it)
+                                ?: Certificate(
+                                    it,
+                                )
+                        ),
+                        notice.recruitmentBusiness!!
+                    )
+                )
+            }
+
+            request.recruitmentRequest.languageList.map {
+                languageUsageRepository.save(
+                    LanguageUsage(
+                        languageRepository.save(
+                            languageRepository.findByIdOrNull(it)
+                                ?: Language(
+                                    it
+                                )
+                        ),
+                        notice.recruitmentBusiness!!
+                    )
+                )
+            }
+
+            request.recruitmentRequest.technologyList.map {
+                technologyUsageRepository.save(
+                    TechnologyUsage(
+                        technologyRepository.save(
+                            technologyRepository.findByIdOrNull(it)
+                                ?: Technology(
+                                    it
+                                )
+                        ),
+                        notice.recruitmentBusiness!!
+                    )
                 )
             }
 
@@ -194,6 +231,10 @@ class NoticeServiceImpl(
     override fun addCertificate(user: User, certificateName: String, noticeId: Long) {
         if (user is Company) {
             val notice = noticeRepository.findByIdOrNull(noticeId)?: throw NoticeNotFoundException(noticeId.toString())
+            if (notice.recruitmentBusiness!!.needCertificateList.filter {
+                it.certificate.name == certificateName
+                }.isNotEmpty()) throw AlreadyExistsException(certificateName)
+
             certificateUsageRepository.save(
                 CertificateUsage(
                     certificateRepository.findByIdOrNull(certificateName)?:
@@ -212,16 +253,7 @@ class NoticeServiceImpl(
     override fun removeCertificate(user: User, certificateName: String, noticeId: Long) {
         if (user is Company) {
             val notice = noticeRepository.findByIdOrNull(noticeId)?: throw NoticeNotFoundException(noticeId.toString())
-
-            certificateUsageRepository.delete(
-                certificateUsageRepository.findByIdOrNull(
-                    CertificateUsageIdClass(
-                        "",
-                        notice.recruitmentBusiness!!.id!!
-                    )
-                )?: return
-            )
-
+            notice.recruitmentBusiness!!.removeNeedCertificate(certificateName)
         } else throw NoAuthenticationException(user.roleList.toString())
     }
 
@@ -266,25 +298,21 @@ class NoticeServiceImpl(
         if (user is Company) {
             val notice = noticeRepository.findByIdAndCompanyAndIsApproveNot(noticeId, user, NoticeWaitingStatus.REJECT)
                 .orElse(null)?: throw NoticeNotFoundException(noticeId.toString())
-            notice.recruitmentBusiness!!.languageUsageSet.add(
-                languageUsageRepository.findByLanguageAndRecruitmentBusiness(
+
+            if (notice.recruitmentBusiness!!.languageUsageList.filter {
+                it.language.name == languageName
+            }.isNotEmpty()) throw AlreadyExistsException(languageName)
+            languageUsageRepository.save(
+                LanguageUsage(
                     languageRepository.findByIdOrNull(languageName)?: languageRepository.save(
                         Language(
                             languageName
                         )
                     ),
                     notice.recruitmentBusiness!!
-                ).orElse(null)?: languageUsageRepository.save(
-                    LanguageUsage(
-                        languageRepository.findByIdOrNull(languageName)?: languageRepository.save(
-                            Language(
-                                languageName
-                            )
-                        ),
-                        notice.recruitmentBusiness!!
-                    )
                 )
             )
+
 
         }
 
@@ -292,15 +320,9 @@ class NoticeServiceImpl(
 
     override fun removeLanguageSet(user: User, languageName: String, noticeId: Long) {
         if (user is Company) {
-            languageUsageRepository.delete(
-                languageUsageRepository.findByIdOrNull(
-                    LanguageUsageIdClass(
-                        languageName,
-                        (noticeRepository.findByIdAndCompanyAndIsApproveNot(noticeId, user, NoticeWaitingStatus.REJECT)
-                            .orElse(null)?: return).recruitmentBusiness!!.id!!
-                    )
-                )?: return
-            )
+            val notice = noticeRepository.findByIdAndCompanyAndIsApproveNot(noticeId, user, NoticeWaitingStatus.REJECT)
+                .orElse(null)?: throw NoticeNotFoundException(noticeId.toString())
+            notice.recruitmentBusiness!!.removeLanguage(languageName)
 
         } else throw NoAuthenticationException(user.roleList.toString())
     }
@@ -313,6 +335,11 @@ class NoticeServiceImpl(
 
     override fun addTechnologySet(user: User, technologyName: String, noticeId: Long) {
         if (user is Company) {
+            val notice = (noticeRepository.findByIdAndCompanyAndIsApproveNot(noticeId, user, NoticeWaitingStatus.REJECT)
+                .orElse(null)?: throw NoticeNotFoundException(noticeId.toString()))
+            if (notice.recruitmentBusiness!!.technologyList.filter {
+                it.technology.name == technologyName
+            }.isNotEmpty()) throw AlreadyExistsException(technologyName)
             technologyUsageRepository.save(
                 TechnologyUsage(
                     technologyRepository.findByIdOrNull(
@@ -322,9 +349,7 @@ class NoticeServiceImpl(
                             technologyName
                         )
                     ),
-                    (noticeRepository.findByIdAndCompanyAndIsApproveNot(noticeId, user, NoticeWaitingStatus.REJECT)
-                        .orElse(null)?: throw NoticeNotFoundException(noticeId.toString()))
-                        .recruitmentBusiness!!
+                    notice.recruitmentBusiness!!
                 )
             )
         } else throw NoAuthenticationException(user.roleList.toString())
@@ -332,15 +357,9 @@ class NoticeServiceImpl(
 
     override fun removeTechnologySet(user: User, technologyName: String, noticeId: Long) {
         if (user is Company) {
-            technologyUsageRepository.delete(
-                technologyUsageRepository.findByIdOrNull(
-                    TechnologyUsageIdClass(
-                        technologyName,
-                        user.id!!
-                    )
-                )?: return
-            )
-
+            val notice = noticeRepository.findByIdAndCompanyAndIsApproveNot(noticeId, user, NoticeWaitingStatus.REJECT)
+                .orElse(null)?: throw NoticeNotFoundException(noticeId.toString())
+            notice.recruitmentBusiness!!.removeTechnology(technologyName)
         } else throw NoAuthenticationException(user.roleList.toString())
     }
 

@@ -59,15 +59,15 @@ class RecruitmentBusiness(
     var detailBusinessDescription: String? = detailBusinessDescription
         protected set
 
-    @OneToMany(mappedBy = "recruitmentBusiness")
-    var languageUsageSet: MutableSet<LanguageUsage> = HashSet()
+    @OneToMany(mappedBy = "recruitmentBusiness", orphanRemoval = true)
+    var languageUsageList: MutableSet<LanguageUsage> = HashSet()
         protected set
 
-    @OneToMany(mappedBy = "recruitmentBusiness")
-    var technologySet: MutableSet<TechnologyUsage> = HashSet()
+    @OneToMany(mappedBy = "recruitmentBusiness", orphanRemoval = true)
+    var technologyList: MutableSet<TechnologyUsage> = HashSet()
         protected set
 
-    @OneToMany
+    @OneToMany(orphanRemoval = true)
     var needCertificateList: MutableList<CertificateUsage> = ArrayList()
         protected set
 
@@ -84,12 +84,12 @@ class RecruitmentBusiness(
             this.bigClassification.toBigClassificationResponse(),
             this.smallClassification.toSmallClassification(),
             this.detailBusinessDescription,
-            this.languageUsageSet.map {
+            this.languageUsageList.map {
                 LanguageResponse(
                     it.language.name
                 )
             }.toSet(),
-            this.technologySet.map {
+            this.technologyList.map {
                 TechnologyResponse(
                     it.technology.name
                 )
@@ -122,6 +122,30 @@ class RecruitmentBusiness(
     fun changeSmallClassification(smallClassification: RecruitmentSmallClassification) {
         this.bigClassification = smallClassification.bigClassification
         this.smallClassification = smallClassification
+    }
+
+    fun removeNeedCertificate(certificateName: String) {
+        this.needCertificateList.filter {
+            it.certificate.name == certificateName
+        }.map {
+            this.needCertificateList.remove(it)
+        }
+    }
+
+    fun removeTechnology(technologyName: String) {
+        this.technologyList.filter {
+            it.technology.name == technologyName
+        }.map {
+            this.technologyList.remove(it)
+        }
+    }
+
+    fun removeLanguage(languageName: String) {
+        this.languageUsageList.filter {
+            it.language.name == languageName
+        }.map {
+            this.languageUsageList.remove(it)
+        }
     }
 
 }

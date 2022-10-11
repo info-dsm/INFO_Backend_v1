@@ -2,6 +2,8 @@ package com.info.info_v1_backend.domain.company.data.entity.notice.interview
 
 import javax.persistence.Column
 import javax.persistence.Embeddable
+import javax.persistence.EnumType
+import javax.persistence.Enumerated
 
 @Embeddable
 class InterviewProcessUsage(
@@ -14,6 +16,7 @@ class InterviewProcessUsage(
         protected set
 
     @Column(name = "interview_process", nullable = false)
+    @Enumerated(value = EnumType.STRING)
     var interviewProcess = interviewProcess
         protected set
 
