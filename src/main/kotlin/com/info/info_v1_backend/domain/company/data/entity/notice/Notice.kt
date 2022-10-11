@@ -1,26 +1,34 @@
 package com.info.info_v1_backend.domain.company.data.entity.notice
 
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.edit.EditNoticeRequest
-import com.info.info_v1_backend.domain.company.business.dto.response.notice.*
+import com.info.info_v1_backend.domain.company.business.dto.response.notice.MaximumNoticeWithPayResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.notice.MaximumNoticeWithoutPayResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.notice.MinimumNoticeResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.notice.NoticeWithIsApproveResponse
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
 import com.info.info_v1_backend.domain.company.data.entity.notice.applicant.Applicant
 import com.info.info_v1_backend.domain.company.data.entity.notice.embeddable.*
 import com.info.info_v1_backend.domain.company.data.entity.notice.file.FormAttachment
-import com.info.info_v1_backend.domain.company.data.entity.notice.file.Reporter
 import com.info.info_v1_backend.domain.company.data.entity.notice.interview.InterviewProcess
 import com.info.info_v1_backend.domain.company.data.entity.notice.interview.InterviewProcessUsage
 import com.info.info_v1_backend.domain.company.data.entity.notice.recruitment.RecruitmentBusiness
 import com.info.info_v1_backend.global.base.entity.BaseAuthorEntity
-import org.hibernate.annotations.SQLDelete
-import org.hibernate.annotations.Where
+import com.info.info_v1_backend.global.base.entity.BaseTimeEntity
+import org.hibernate.annotations.*
+import java.util.*
 import javax.persistence.*
+import javax.persistence.CascadeType
+import javax.persistence.Entity
+import javax.persistence.Table
+import kotlin.collections.ArrayList
 
 
-@Entity
-@Table(name = "notice")
 @SQLDelete(sql = "UPDATE `notice` SET notice_is_delete = true WHERE id = ?")
 @Where(clause = "notice_is_delete = false")
+@Entity
+@Table(name = "notice")
 class Notice(
+    id: Long,
     company: Company,
 //    recruitmentBusinessList: MutableList<RecruitmentBusiness>,
     workTime: WorkTime,
@@ -40,12 +48,11 @@ class Notice(
     isPersonalContact: Boolean,
 
 
-    ): BaseAuthorEntity() {
+): BaseTimeEntity() {
+
     @Id
-    @GeneratedValue(
-        strategy = GenerationType.IDENTITY,
-    )
-    val id: Long? = null
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long = id
 
     @ManyToOne(cascade = [CascadeType.PERSIST])
     @JoinColumn(name = "company_id", nullable = false)
@@ -53,7 +60,7 @@ class Notice(
 
 
     @OneToOne
-    @JoinColumn(name = "recruitment_business_id", nullable = false)
+    @JoinColumn(name = "recruitment_business_id", nullable = true)
     var recruitmentBusiness: RecruitmentBusiness? = null
         protected set
 
@@ -110,7 +117,7 @@ class Notice(
     var isApprove: NoticeWaitingStatus = NoticeWaitingStatus.WAITING
         protected set
 
-    @OneToMany(mappedBy = "notice", cascade = [javax.persistence.CascadeType.PERSIST])
+    @OneToMany(mappedBy = "notice", cascade = [CascadeType.PERSIST])
     var applicantList: MutableList<Applicant> = ArrayList()
         protected set
 

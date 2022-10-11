@@ -5,14 +5,12 @@ import com.info.info_v1_backend.domain.auth.data.entity.user.Student
 import com.info.info_v1_backend.domain.auth.data.entity.user.Teacher
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
 import com.info.info_v1_backend.domain.auth.data.repository.user.StudentRepository
-import com.info.info_v1_backend.domain.auth.data.repository.user.UserRepository
 import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
 import com.info.info_v1_backend.domain.company.business.dto.request.company.EditCompanyRequest
 import com.info.info_v1_backend.domain.company.business.dto.response.company.BusinessAreaResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyWithIsWorkingResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MinimumCompanyResponse
-import com.info.info_v1_backend.domain.company.business.dto.response.notice.MinimumNoticeResponse
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
 import com.info.info_v1_backend.domain.company.data.entity.company.CompanySearchDocument
 import com.info.info_v1_backend.domain.company.data.entity.company.embeddable.CompanyIntroduction
@@ -22,18 +20,13 @@ import com.info.info_v1_backend.domain.company.data.entity.company.file.CompanyL
 import com.info.info_v1_backend.domain.company.data.entity.company.file.CompanyPhotoFile
 import com.info.info_v1_backend.domain.company.data.entity.company.tag.BusinessArea
 import com.info.info_v1_backend.domain.company.data.entity.company.tag.BusinessAreaTagged
-import com.info.info_v1_backend.domain.company.data.entity.company.work.field.FieldTraining
-import com.info.info_v1_backend.domain.company.data.entity.company.work.field.FieldTrainingIdClass
 import com.info.info_v1_backend.domain.company.data.repository.company.*
-import com.info.info_v1_backend.domain.company.data.repository.notice.NoticeRepository
 import com.info.info_v1_backend.domain.company.data.repository.notice.NoticeSearchDocumentRepository
 import com.info.info_v1_backend.domain.company.exception.*
 import com.info.info_v1_backend.global.error.common.ForbiddenException
 import com.info.info_v1_backend.global.error.common.NoAuthenticationException
-import com.info.info_v1_backend.global.file.entity.File
 import com.info.info_v1_backend.global.file.exception.FileNotFoundException
 import com.info.info_v1_backend.global.file.repository.FileRepository
-import com.info.info_v1_backend.global.util.user.CurrentUtil
 import com.info.info_v1_backend.infra.amazon.s3.S3Util
 import com.mongodb.MongoQueryException
 import org.springframework.data.domain.Page
@@ -45,8 +38,6 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
-import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.Year
 import javax.transaction.Transactional
 

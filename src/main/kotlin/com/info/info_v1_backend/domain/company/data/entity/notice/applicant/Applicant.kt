@@ -22,12 +22,12 @@ class Applicant(
 ): BaseTimeEntity(), Persistable<String>, java.io.Serializable {
 
     @Id
-    @ManyToOne(cascade = [CascadeType.PERSIST])
+    @ManyToOne(cascade = [CascadeType.REMOVE])
     @JoinColumn(name = "student_id")
     val student: Student = student
 
     @Id
-    @ManyToOne(cascade = [CascadeType.PERSIST])
+    @ManyToOne(cascade = [CascadeType.REMOVE])
     @JoinColumn(name = "notice_id")
     val notice: Notice = notice
 

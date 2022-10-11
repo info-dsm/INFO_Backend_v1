@@ -28,7 +28,10 @@ import com.info.info_v1_backend.domain.company.data.repository.company.*
 import com.info.info_v1_backend.domain.company.data.repository.notice.*
 import com.info.info_v1_backend.domain.company.exception.NoticeNotFoundException
 import com.info.info_v1_backend.global.error.common.NoAuthenticationException
+import com.info.info_v1_backend.global.file.dto.FileDto
 import com.info.info_v1_backend.global.file.dto.FileResponse
+import com.info.info_v1_backend.global.file.entity.File
+import com.info.info_v1_backend.global.file.entity.type.FileType
 import com.info.info_v1_backend.global.file.repository.FileRepository
 import com.info.info_v1_backend.infra.amazon.s3.S3Util
 import com.mongodb.MongoQueryException
@@ -40,6 +43,8 @@ import org.springframework.data.mongodb.core.query.TextCriteria
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
+import java.util.Random
+import java.util.UUID
 import javax.transaction.Transactional
 
 @Service
@@ -57,7 +62,7 @@ class NoticeServiceImpl(
     private val languageRepository: LanguageRepository,
     private val technologyRepository: TechnologyRepository,
     private val technologyUsageRepository: TechnologyUsageRepository,
-    private val certificateUsageRepository: CertificateUsageRepository
+    private val certificateUsageRepository: CertificateUsageRepository,
 ): NoticeService {
 
     override fun getBigClassificationList(): List<BigClassificationResponse> {
@@ -77,6 +82,7 @@ class NoticeServiceImpl(
 
             val notice = noticeRepository.save(
                 Notice(
+                    kotlin.random.Random.nextLong(),
                     user,
                     request.workTime.toWorkTime(),
                     request.pay.toPay(),
@@ -150,7 +156,7 @@ class NoticeServiceImpl(
             val notice = user.noticeList.first {
                 it.id == noticeId
             }
-
+            
             attachmentList.map {
                 formAttachmentRepository.save(
                     FormAttachment(

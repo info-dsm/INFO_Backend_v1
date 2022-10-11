@@ -65,8 +65,8 @@ dependencies {
     implementation("org.springframework.security:spring-security-config:5.7.3")
     //Jwts
     implementation("io.jsonwebtoken:jjwt:0.9.1")
-    //data jpa
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa:2.7.4")
     //Jackson
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     //mailing

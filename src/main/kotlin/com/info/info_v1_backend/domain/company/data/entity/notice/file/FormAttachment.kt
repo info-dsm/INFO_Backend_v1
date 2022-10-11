@@ -11,6 +11,7 @@ import org.hibernate.annotations.Where
 import javax.persistence.CascadeType
 import javax.persistence.DiscriminatorValue
 import javax.persistence.Entity
+import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
 
 
@@ -26,7 +27,8 @@ class FormAttachment(
     dto.extension,
     dto.fileName
 ) {
-    @ManyToOne(cascade = [CascadeType.PERSIST])
+    @ManyToOne(cascade = [CascadeType.REMOVE])
+    @JoinColumn(name = "notice_id", nullable = false)
     var notice: Notice = notice
         protected set
 }
