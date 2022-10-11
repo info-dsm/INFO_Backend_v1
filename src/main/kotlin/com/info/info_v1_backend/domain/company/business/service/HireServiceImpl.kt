@@ -79,7 +79,7 @@ class HireServiceImpl(
             ).map {
                 it.toApplicantResponse()
             }
-        } else throw NoAuthenticationException(noticeId.toString())
+        } else throw NoAuthenticationException(user.roleList.toString())
     }
 
     override fun cancelApply(user: User, noticeId: Long, studentId: Long) {

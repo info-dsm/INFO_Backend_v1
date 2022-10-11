@@ -373,7 +373,7 @@ class NoticeServiceImpl(
         if (user is Teacher) {
             val notice = noticeRepository.findByIdOrNull(noticeId)?: throw NoticeNotFoundException(noticeId.toString())
             notice.approveNotice()
-        } else throw NoAuthenticationException(noticeId.toString())
+        } else throw NoAuthenticationException(user.roleList.toString())
     }
 
     override fun rejectNotice(user: User, noticeId: Long) {
@@ -381,7 +381,7 @@ class NoticeServiceImpl(
             noticeRepository.delete(
                 noticeRepository.findByIdOrNull(noticeId)?: throw NoticeNotFoundException(noticeId.toString())
             )
-        } else throw NoAuthenticationException(noticeId.toString())
+        } else throw NoAuthenticationException(user.roleList.toString())
     }
 
     override fun getWaitingNoticeList(user: User, idx: Int, size: Int): Page<MinimumNoticeResponse> {

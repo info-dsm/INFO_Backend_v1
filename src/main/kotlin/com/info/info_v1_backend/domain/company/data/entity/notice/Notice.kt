@@ -21,6 +21,7 @@ import javax.persistence.CascadeType
 import javax.persistence.Entity
 import javax.persistence.Table
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 
 @SQLDelete(sql = "UPDATE `notice` SET notice_is_delete = true WHERE id = ?")
@@ -163,7 +164,7 @@ class Notice(
             this.welfare.toWelfare(),
             this.noticeOpenPeriod.toNoticeOpenPeriod(),
             this.interviewProcessList.map {
-                it.interviewProcess
+                return@map mapOf(Pair(it.sequence, it.interviewProcess.meaning))
             },
             this.needDocuments,
             this.otherFeatures,
@@ -210,32 +211,14 @@ class Notice(
     fun toNoticeWithIsApproveResponse(): NoticeWithIsApproveResponse {
         return NoticeWithIsApproveResponse(
             this.toMaximumNoticeWithPayResponse(),
-            this.isApprove == NoticeWaitingStatus.APPROVE
+            NoticeWaitingStatus.APPROVE
         )
     }
 
     fun toMaximumNoticeWithPayResponse(): MaximumNoticeWithPayResponse {
         return MaximumNoticeWithPayResponse(
-            this.id!!,
-            this.company.toMaximumCompanyResponse(),
-            this.recruitmentBusiness!!.toRecruitmentBusinessResponse(),
-            this.pay.toPayRequest(),
-            this.workTime.toWorkTimeRequest(),
-            this.mealSupport.toMealSupportRequest(),
-            this.welfare.toWelfare(),
-            this.noticeOpenPeriod.toNoticeOpenPeriod(),
-            this.interviewProcessList.map {
-                it.interviewProcess
-            },
-            this.needDocuments,
-            this.otherFeatures,
-            this.workPlace.toWorkPlaceRequest(),
-            this.formAttachmentList.map {
-                it.toFileResponse()
-            },
-            this.applicantList.filter {
-                !it.isDelete
-            }.size
+            this.toMaximumNoticeWithoutPayResponse(),
+            this.pay.toPayRequest()
         )
     }
 

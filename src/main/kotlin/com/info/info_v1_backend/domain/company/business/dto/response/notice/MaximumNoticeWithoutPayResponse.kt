@@ -9,14 +9,13 @@ data class MaximumNoticeWithoutPayResponse(
     val noticeId: Long,
     val company: MaximumCompanyResponse,
     val recruitmentBusinessResponse: RecruitmentBusinessResponse,
-
     val workTime: WorkTimeRequest,
 
     val mealSupport: MealSupportRequest,
 
     val welfare: WelfareRequest,
     val noticeOpenPeriod: NoticeOpenPeriodRequest,
-    val interviewProcessList: List<InterviewProcess>,
+    val interviewProcessList: List<Map<Int, String>>,
     val needDocuments: String?,
     val otherFeatures: String?,
     val workPlace: WorkPlaceRequest,

@@ -104,7 +104,16 @@ class AuthServiceImpl(
         val user = userRepository.findByEmail(req.email)
                 .orElse(null) ?: throw UserNotFoundException(req.email)
         if (passwordEncoder.matches(req.password, user.password)) {
-            return tokenProvider.encode(user.id.toString())
+            val response = tokenProvider.encode(user.id.toString())
+            refreshTokenRepository.save(
+            refreshTokenRepository.findByIdOrNull(user.id.toString())
+                ?.reset(response.refreshToken)
+                ?: RefreshToken(
+                        user.id.toString(),
+                        response.refreshToken
+                    )
+            )
+            return response
         } else throw IncorrectPassword(req.password)
     }
 
@@ -124,9 +133,12 @@ class AuthServiceImpl(
         val tokenResponse = tokenProvider.encode(userId)
         val token = RefreshToken(userId, tokenResponse.refreshToken)
 
-        refreshTokenRepository.findById(userId).map {
-            it.reset(token.token)
-        }.orElse(null) ?: refreshTokenRepository.save(token)
+        refreshTokenRepository.save(
+            refreshTokenRepository.findById(userId).map {
+                it.reset(token.token)
+            }.orElse(null) ?: (token)
+        ).token
+
         return tokenResponse
     }
 

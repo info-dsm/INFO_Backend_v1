@@ -20,8 +20,9 @@ class RefreshToken(
     var ttl: Long = 604800
         protected set
 
-    fun reset(token: String){
+    fun reset(token: String): RefreshToken{
         this.token = token
         this.ttl = 604800
+        return this
     }
 }
