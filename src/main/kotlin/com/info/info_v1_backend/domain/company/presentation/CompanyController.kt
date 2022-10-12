@@ -11,7 +11,6 @@ import com.info.info_v1_backend.domain.company.business.dto.response.company.Max
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyWithIsWorkingResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MinimumCompanyResponse
 import com.info.info_v1_backend.domain.company.business.service.CompanyService
-import com.info.info_v1_backend.domain.company.data.entity.company.tag.BusinessArea
 import com.info.info_v1_backend.global.error.common.TokenCanNotBeNullException
 import com.info.info_v1_backend.global.file.dto.FileResponse
 import org.springframework.data.domain.Page
@@ -53,7 +52,7 @@ class CompanyController(
         @RequestParam
         email: String
     ){
-        emailService.sendCodeToEmail(email)
+        emailService.sendCodeToCompanyEmail(email)
     }
 
     @PostMapping
@@ -66,7 +65,7 @@ class CompanyController(
         @RequestPart(required = true) companyLogo: MultipartFile,
         @RequestPart(required = true) companyPhotoList: List<MultipartFile>
     ) {
-        if (authService.checkEmail(request.companyContact.email, emailCheckCode)) {
+        if (authService.checkCompanyEmail(request.companyContact.email, emailCheckCode)) {
             companyService.registerCompany(
                 request,
                 emailCheckCode,

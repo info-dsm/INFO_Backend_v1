@@ -5,7 +5,9 @@ import com.info.info_v1_backend.domain.auth.data.entity.token.RefreshToken
 import com.info.info_v1_backend.domain.auth.data.entity.user.Student
 import com.info.info_v1_backend.domain.auth.data.entity.user.Teacher
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
+import com.info.info_v1_backend.domain.auth.data.repository.token.CheckCompanyEmailCodeRepository
 import com.info.info_v1_backend.domain.auth.data.repository.token.CheckEmailCodeRepository
+import com.info.info_v1_backend.domain.auth.data.repository.token.CheckSchoolEmailCodeRepository
 import com.info.info_v1_backend.domain.auth.data.repository.token.RefreshTokenRepository
 import com.info.info_v1_backend.domain.auth.data.repository.user.UserRepository
 import com.info.info_v1_backend.domain.auth.exception.*
@@ -40,17 +42,10 @@ class AuthServiceImpl(
     private val passwordEncoder: PasswordEncoder,
     private val checkEmailCodeRepository: CheckEmailCodeRepository,
     private val userRepository: UserRepository<User>,
-    private val s3Util: S3Util,
-    private val companySearchDocumentRepository: CompanySearchDocumentRepository,
-    private val businessRegisteredCertificateFileRepository: FileRepository<BusinessRegisteredCertificateFile>,
-    private val companyIntroductionFileRepository: FileRepository<CompanyIntroductionFile>,
-    private val companyPhotoFileRepository: FileRepository<CompanyPhotoFile>,
-    private val companyRepository: CompanyRepository,
     private val tokenProvider: TokenProvider,
     private val refreshTokenRepository: RefreshTokenRepository,
-    private val companyLogoFileRepository: CompanyLogoFileRepository,
-    private val businessAreaTaggedRepository: BusinessAreaTaggedRepository,
-    private val businessAreaRepository: BusinessAreaRepository
+    private val checkSchoolEmailCodeRepository: CheckSchoolEmailCodeRepository,
+    private val checkCompanyEmailCodeRepository: CheckCompanyEmailCodeRepository,
 ): AuthService {
 
     @Async
@@ -87,14 +82,23 @@ class AuthServiceImpl(
 
 
 
-    override fun checkEmail(email: String, authCode: String): Boolean {
-        userRepository.findByEmail(email).orElse(null)?.let {
-            throw UserAlreadyExists(email)
-        }
+    override fun checkSchoolEmail(email: String, authCode: String): Boolean {
+        userRepository.findByEmail(email).orElse(null)?.let { throw UserAlreadyExists(email) }
 
-        val checkEmail = checkEmailCodeRepository.findByIdOrNull(email)
+        val checkEmail = checkSchoolEmailCodeRepository.findByIdOrNull(email)
         if ((checkEmail?: throw CheckEmailCodeException(email)).code == authCode) {
-            checkEmailCodeRepository.delete(checkEmail)
+            checkSchoolEmailCodeRepository.delete(checkEmail)
+            return true
+        }
+        return false
+    }
+
+    override fun checkCompanyEmail(email: String, authCode: String): Boolean {
+        userRepository.findByEmail(email).orElse(null)?.let { throw UserAlreadyExists(email) }
+
+        val checkEmail = checkCompanyEmailCodeRepository.findByIdOrNull(email)
+        if ((checkEmail?: throw CheckEmailCodeException(email)).code == authCode) {
+            checkCompanyEmailCodeRepository.delete(checkEmail)
             return true
         }
         return false

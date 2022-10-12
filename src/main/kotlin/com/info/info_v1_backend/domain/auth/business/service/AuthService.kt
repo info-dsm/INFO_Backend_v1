@@ -2,9 +2,7 @@ package com.info.info_v1_backend.domain.auth.business.service
 
 import com.info.info_v1_backend.domain.auth.business.dto.request.*
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
-import com.info.info_v1_backend.domain.company.business.dto.request.company.CompanyIntroductionRequest
 import com.info.info_v1_backend.global.security.jwt.data.TokenResponse
-import org.springframework.web.multipart.MultipartFile
 
 
 interface AuthService {
@@ -15,7 +13,8 @@ interface AuthService {
 
 
 
-    fun checkEmail(email: String, authCode: String): Boolean
+    fun checkSchoolEmail(email: String, authCode: String): Boolean
+    fun checkCompanyEmail(email: String, authCode: String): Boolean
 
     fun changePassword(user: User, req: EditPasswordRequest)
 
