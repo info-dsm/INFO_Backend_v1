@@ -5,6 +5,8 @@ import com.info.info_v1_backend.domain.auth.data.entity.user.Student
 import com.info.info_v1_backend.domain.auth.data.entity.user.Teacher
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
 import com.info.info_v1_backend.domain.auth.data.repository.user.StudentRepository
+import com.info.info_v1_backend.domain.auth.data.repository.user.UserRepository
+import com.info.info_v1_backend.domain.auth.exception.IsNotStudentException
 import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
 import com.info.info_v1_backend.domain.company.business.dto.request.company.EditCompanyRequest
 import com.info.info_v1_backend.domain.company.business.dto.response.company.BusinessAreaResponse
@@ -46,6 +48,7 @@ import javax.transaction.Transactional
 class CompanyServiceImpl(
     private val companyRepository: CompanyRepository,
     private val studentRepository: StudentRepository,
+    private val userRepository: UserRepository<User>,
     private val companySearchDocumentRepository: CompanySearchDocumentRepository,
     private val noticeSearchDocumentRepository: NoticeSearchDocumentRepository,
     private val s3Util: S3Util,
@@ -211,7 +214,9 @@ class CompanyServiceImpl(
     }
 
     override fun getEntireMaximumCompanyByUserId(user: User, id: Long): List<MaximumCompanyWithIsWorkingResponse> {
-        if (user is Student) {
+        if (user is Company) {
+            throw NoAuthenticationException(user.roleList.toString())
+        }else if (user is Student) {
             if (user.id != id) throw NoAuthenticationException(user.roleList.toString())
             val result: MutableList<MaximumCompanyWithIsWorkingResponse> = ArrayList()
             hiredStudentRepository.findAllByStudent(user).map {
@@ -223,9 +228,10 @@ class CompanyServiceImpl(
             }
             return result
         } else {
-            val student = studentRepository.findByIdOrNull(id)
+            val student = userRepository.findByIdOrNull(id)
                 ?: throw UserNotFoundException(id.toString())
-
+            if (student is Company || student is Teacher) throw IsNotStudentException("${student.id}, ${student.roleList.toString()}")
+            else if (student is Student ) {
             val result: MutableList<MaximumCompanyWithIsWorkingResponse> = ArrayList()
             hiredStudentRepository.findAllByStudent(student).map {
                 companyRepository.findAllByHiredStudentListContains(it).map {
@@ -235,6 +241,8 @@ class CompanyServiceImpl(
                 }
             }
             return result
+            }
+            throw NoAuthenticationException(user.roleList.toString())
         }
     }
 
@@ -257,9 +265,12 @@ class CompanyServiceImpl(
     }
 
     override fun getBusinessRegisteredCertificate(user: User, companyId: Long): BusinessRegisteredCertificateFile {
-        if (user is Student) throw NoAuthenticationException(user.roleList.toString())
-        else if (user is Company) return user.companyIntroduction.businessRegisteredCertificate!!
-        else {
+        if (user is Student) {
+            throw NoAuthenticationException(user.roleList.toString())
+        } else if (user is Company) {
+            if (user.id != companyId) throw NoAuthenticationException("You are not $companyId, you're id is ${user.id}")
+            return user.companyIntroduction.businessRegisteredCertificate!!
+        } else {
             return companyRepository.findByIdOrNull(companyId)?. let {
                 return it.companyIntroduction.getBusinessRegisteredCertificateResponse()
             }?: throw CompanyNotFoundException(companyId.toString())

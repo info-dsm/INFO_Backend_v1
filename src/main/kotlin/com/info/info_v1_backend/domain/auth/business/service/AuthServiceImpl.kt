@@ -83,8 +83,7 @@ class AuthServiceImpl(
 
 
     override fun checkSchoolEmail(email: String, authCode: String): Boolean {
-        userRepository.findByEmail(email).orElse(null)?.let { throw UserAlreadyExists(email) }
-
+        checkExistsEmail(email)
         val checkEmail = checkSchoolEmailCodeRepository.findByIdOrNull(email)
         if ((checkEmail?: throw CheckEmailCodeException(email)).code == authCode) {
             checkSchoolEmailCodeRepository.delete(checkEmail)
@@ -94,8 +93,7 @@ class AuthServiceImpl(
     }
 
     override fun checkCompanyEmail(email: String, authCode: String): Boolean {
-        userRepository.findByEmail(email).orElse(null)?.let { throw UserAlreadyExists(email) }
-
+        checkExistsEmail(email)
         val checkEmail = checkCompanyEmailCodeRepository.findByIdOrNull(email)
         if ((checkEmail?: throw CheckEmailCodeException(email)).code == authCode) {
             checkCompanyEmailCodeRepository.delete(checkEmail)
@@ -149,6 +147,7 @@ class AuthServiceImpl(
 
 
     override fun changeEmail(user: User, request: ChangeEmailRequest) {
+        checkExistsEmail(request.email)
         when(user){
             is Student -> throw NoAuthenticationException(user.roleList.toString())
 
@@ -163,4 +162,12 @@ class AuthServiceImpl(
             } else throw IncorrectPassword(request.password)
         }
     }
+
+    private fun checkExistsEmail(email: String) {
+        userRepository.findByEmail(email).orElse(null)?.let {
+            throw UserAlreadyExists(email)
+        }
+    }
+
+
 }

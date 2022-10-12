@@ -31,7 +31,7 @@ enum class ErrorCode(
     //403
     NOT_HAVE_ACCESS_TO_THE_PROJECT("Not Have Access To The project", HttpStatus.FORBIDDEN),
     FORBIDDEN("권한이 없습니다", HttpStatus.FORBIDDEN),
-    IS_NOT_STUDENT("You are not student", HttpStatus.FORBIDDEN),
+    IS_NOT_STUDENT("Is not student", HttpStatus.FORBIDDEN),
     NO_AUTHENTICATION("you have No Authentication", HttpStatus.FORBIDDEN),
 
     //404
