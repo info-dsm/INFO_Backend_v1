@@ -24,7 +24,7 @@ class Student(
     email: String,
     password: String,
     creationList: MutableList<Creation>?,
-    githubLink: String
+    githubLink: String?
 ): User(
     name,
     email,
@@ -51,7 +51,7 @@ class Student(
         protected set
 
     @Column(name = "github_link", nullable = false)
-    var githubLink: String = githubLink
+    var githubLink: String? = githubLink
         protected set
 
     fun toMinimumStudent(): MinimumStudent {

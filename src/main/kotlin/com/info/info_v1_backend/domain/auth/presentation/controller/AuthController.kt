@@ -12,9 +12,11 @@ import com.info.info_v1_backend.domain.auth.exception.CheckTeacherCodeException
 import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
 import com.info.info_v1_backend.domain.company.business.dto.request.company.CompanyIntroductionRequest
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
+import com.info.info_v1_backend.global.error.common.TokenCanNotBeNullException
 import com.info.info_v1_backend.global.security.jwt.data.TokenResponse
 import com.info.info_v1_backend.global.util.user.CurrentUtil
 import org.springframework.data.domain.Page
+import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.PatchMapping
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RequestPart
+import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 import javax.validation.Valid
@@ -38,6 +41,7 @@ class AuthController(
     private val emailService: EmailService,
 ) {
     @PostMapping("/email/school")
+    @ResponseStatus(HttpStatus.CREATED)
     fun sendSchoolEmail(
         @Valid
         @RequestParam
@@ -48,6 +52,7 @@ class AuthController(
     }
 
     @PostMapping("/signup/student")
+    @ResponseStatus(HttpStatus.CREATED)
     fun studentSignup(
         @Valid
         @RequestBody
@@ -59,6 +64,7 @@ class AuthController(
     }
 
     @PostMapping("/signup/teacher")
+    @ResponseStatus(HttpStatus.CREATED)
     fun teacherSignup(
         @Valid
         @RequestBody
@@ -73,6 +79,7 @@ class AuthController(
 
 
     @PostMapping("/password/code")
+    @ResponseStatus(HttpStatus.CREATED)
     fun sendPasswordCode(
         @AuthenticationPrincipal user: User?
     ){
@@ -95,6 +102,7 @@ class AuthController(
 
 
     @PostMapping("/login")
+    @ResponseStatus(HttpStatus.CREATED)
     fun login(
         @RequestBody
         request: LoginRequest
@@ -104,6 +112,7 @@ class AuthController(
 
 
     @PostMapping("/reissue")
+    @ResponseStatus(HttpStatus.CREATED)
     fun reissue(
         @RequestBody
         request: ReissueRequest
@@ -127,6 +136,6 @@ class AuthController(
         @RequestBody request: ChangeEmailRequest,
         @AuthenticationPrincipal user: User?
     ){
-        authService.changeEmail(user?: throw UserNotFoundException("No User Found"), request)
+        authService.changeEmail(user?: throw TokenCanNotBeNullException(), request)
     }
 }

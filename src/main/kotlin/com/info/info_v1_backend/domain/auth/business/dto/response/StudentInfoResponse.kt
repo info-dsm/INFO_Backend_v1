@@ -7,5 +7,5 @@ data class StudentInfoResponse(
     override val email: String,
     val studentKey: String,
     val isWorking: Boolean,
-    val githubLink: String
+    val githubLink: String?
 ) : UserInfoResponse()
