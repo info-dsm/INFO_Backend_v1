@@ -127,7 +127,7 @@ class AuthController(
         @Email
         email: String
     ){
-        if(user !is Student){
+        if((user?: throw TokenCanNotBeNullException()) !is Student){
         emailService.sendChangeEmailCodeToEmail(email)
         } else throw NoAuthenticationException(user.roleList.toString())
     }
