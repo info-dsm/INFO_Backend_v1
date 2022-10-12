@@ -4,4 +4,5 @@ interface EmailService {
     fun sendCodeToSchoolEmail(email: String)
     fun sendCodeToCompanyEmail(email: String)
     fun sendPasswordCodeToEmail(email: String)
+    fun sendChangeEmailCodeToEmail(email: String)
 }

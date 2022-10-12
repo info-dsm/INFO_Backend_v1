@@ -1,14 +1,12 @@
 package com.info.info_v1_backend.domain.auth.business.service
 
 import com.info.info_v1_backend.domain.auth.business.dto.request.*
+import com.info.info_v1_backend.domain.auth.data.entity.token.CheckEmailCode
 import com.info.info_v1_backend.domain.auth.data.entity.token.RefreshToken
 import com.info.info_v1_backend.domain.auth.data.entity.user.Student
 import com.info.info_v1_backend.domain.auth.data.entity.user.Teacher
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
-import com.info.info_v1_backend.domain.auth.data.repository.token.CheckCompanyEmailCodeRepository
-import com.info.info_v1_backend.domain.auth.data.repository.token.CheckEmailCodeRepository
-import com.info.info_v1_backend.domain.auth.data.repository.token.CheckSchoolEmailCodeRepository
-import com.info.info_v1_backend.domain.auth.data.repository.token.RefreshTokenRepository
+import com.info.info_v1_backend.domain.auth.data.repository.token.*
 import com.info.info_v1_backend.domain.auth.data.repository.user.UserRepository
 import com.info.info_v1_backend.domain.auth.exception.*
 import com.info.info_v1_backend.domain.company.business.dto.request.company.CompanyIntroductionRequest
@@ -46,6 +44,7 @@ class AuthServiceImpl(
     private val refreshTokenRepository: RefreshTokenRepository,
     private val checkSchoolEmailCodeRepository: CheckSchoolEmailCodeRepository,
     private val checkCompanyEmailCodeRepository: CheckCompanyEmailCodeRepository,
+    private val checkPasswordCodeRepository: CheckPasswordCodeRepository,
 ): AuthService {
 
     @Async
@@ -120,10 +119,11 @@ class AuthServiceImpl(
     }
 
     override fun changePassword(user: User, req: EditPasswordRequest) {
-        if ((checkEmailCodeRepository.findById(user.email).orElse(null)
-                        ?: throw CheckEmailCodeException(user.email)).code == req.code) {
+        val passwordCode = checkPasswordCodeRepository.findByIdOrNull(user.email)
+        if ((passwordCode?: throw CheckEmailCodeException(user.email)).code == req.code) {
             val encPw = passwordEncoder.encode(req.password)
             user.editPassword(encPw)
+            checkPasswordCodeRepository.delete(passwordCode)
         } else throw CheckPasswordCodeException(req.code)
     }
 
@@ -148,18 +148,28 @@ class AuthServiceImpl(
 
     override fun changeEmail(user: User, request: ChangeEmailRequest) {
         checkExistsEmail(request.email)
-        when(user){
+        val changeEmailCode = checkEmailCodeRepository.findByIdOrNull(request.email)
+
+        when(user) {
             is Student -> throw NoAuthenticationException(user.roleList.toString())
 
-            is Teacher -> if(request.email.endsWith("@dsm.hs.kr")){
-                if (passwordEncoder.matches(request.password, user.password)) {
-                    user.changeEmail(request.email)
-                } else throw IncorrectPassword(request.password)
-            } else throw IncorrectEmail(request.email)
+            is Teacher ->
+                if ((changeEmailCode ?: throw CheckEmailCodeException(request.email)).code == request.code) {
+                    if (request.email.endsWith("@dsm.hs.kr")) {
+                        if (passwordEncoder.matches(request.password, user.password)) {
+                            user.changeEmail(request.email)
+                            checkEmailCodeRepository.delete(changeEmailCode)
+                        } else throw IncorrectPassword(request.password)
+                    } else throw IncorrectEmail(request.email)
+                } else throw CheckEmailCodeException(request.code)
 
-            is Company -> if (passwordEncoder.matches(request.password, user.password)) {
-                user.changeEmail(request.email)
-            } else throw IncorrectPassword(request.password)
+            is Company ->
+                if ((changeEmailCode ?: throw CheckEmailCodeException(request.email)).code == request.code) {
+                    if (passwordEncoder.matches(request.password, user.password)) {
+                        user.changeEmail(request.email)
+                        checkEmailCodeRepository.delete(changeEmailCode)
+                    } else throw IncorrectPassword(request.password)
+                } else throw CheckEmailCodeException(request.code)
         }
     }
 

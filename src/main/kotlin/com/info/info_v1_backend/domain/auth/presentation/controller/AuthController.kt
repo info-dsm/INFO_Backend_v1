@@ -3,10 +3,12 @@ package com.info.info_v1_backend.domain.auth.presentation.controller
 import com.info.info_v1_backend.domain.auth.business.dto.request.*
 import com.info.info_v1_backend.domain.auth.business.service.AuthService
 import com.info.info_v1_backend.domain.auth.business.service.EmailService
+import com.info.info_v1_backend.domain.auth.data.entity.user.Student
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
 import com.info.info_v1_backend.domain.auth.exception.CheckEmailCodeException
 import com.info.info_v1_backend.domain.auth.exception.CheckTeacherCodeException
 import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
+import com.info.info_v1_backend.global.error.common.NoAuthenticationException
 import com.info.info_v1_backend.global.error.common.TokenCanNotBeNullException
 import com.info.info_v1_backend.global.security.jwt.data.TokenResponse
 import org.springframework.http.HttpStatus
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import javax.validation.Valid
+import javax.validation.constraints.Email
 import javax.validation.constraints.Pattern
 
 @RestController
@@ -116,8 +119,18 @@ class AuthController(
 //        authService.deleteMe(user?: throw UserNotFoundException(""))
 //    }
 
-
-
+    @PostMapping("/email")
+    fun sendChangeEmail(
+        @AuthenticationPrincipal
+        user: User?,
+        @RequestParam
+        @Email
+        email: String
+    ){
+        if(user !is Student){
+        emailService.sendChangeEmailCodeToEmail(email)
+        } else throw NoAuthenticationException(user.roleList.toString())
+    }
 
     @PatchMapping("/email")
     fun changeEmail(
