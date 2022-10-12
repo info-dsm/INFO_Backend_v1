@@ -153,16 +153,19 @@ class CompanyServiceImpl(
             )
         }
         companyPhotoList.map {
-            companyPhotoFileRepository.save(
-                CompanyPhotoFile(
-                    s3Util.uploadFile(
-                        it,
-                        "company/${company.id!!}",
-                        "companyPhoto"
-                    ),
-                    company
+            company.companyIntroduction.addCompanyPhoto(
+                companyPhotoFileRepository.save(
+                    CompanyPhotoFile(
+                        s3Util.uploadFile(
+                            it,
+                            "company/${company.id!!}",
+                            "companyPhoto"
+                        ),
+                        company
+                    )
                 )
             )
+
         }
     }
 
