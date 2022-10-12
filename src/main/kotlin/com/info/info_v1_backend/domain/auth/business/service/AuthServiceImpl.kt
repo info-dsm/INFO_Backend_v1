@@ -145,10 +145,18 @@ class AuthServiceImpl(
 
 
     override fun changeEmail(user: User, request: ChangeEmailRequest) {
-        if (user !is Student) {
-            if (passwordEncoder.matches(request.password, user.password)) {
+        when(user){
+            is Student -> throw NoAuthenticationException(user.roleList.toString())
+
+            is Teacher -> if(request.email.endsWith("@dsm.hs.kr")){
+                if (passwordEncoder.matches(request.password, user.password)) {
+                    user.changeEmail(request.email)
+                } else throw IncorrectPassword(request.password)
+            } else throw IncorrectEmail(request.email)
+
+            is Company -> if (passwordEncoder.matches(request.password, user.password)) {
                 user.changeEmail(request.email)
             } else throw IncorrectPassword(request.password)
-        } else throw NoAuthenticationException(user.roleList.toString())
+        }
     }
 }
