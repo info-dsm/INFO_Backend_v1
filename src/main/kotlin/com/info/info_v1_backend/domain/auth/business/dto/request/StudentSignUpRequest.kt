@@ -22,6 +22,5 @@ data class StudentSignUpRequest(
     @field:Size(min = 2, max = 4, message="2 ~ 4글자이여야 합니다.")
     val name: String,
 
-    @field:NotNull
-    val githubLink: String
+    val githubLink: String?
 )

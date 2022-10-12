@@ -258,6 +258,7 @@ class CompanyServiceImpl(
 
     override fun getBusinessRegisteredCertificate(user: User, companyId: Long): BusinessRegisteredCertificateFile {
         if (user is Student) throw NoAuthenticationException(user.roleList.toString())
+        else if (user is Company) return user.companyIntroduction.businessRegisteredCertificate!!
         else {
             return companyRepository.findByIdOrNull(companyId)?. let {
                 return it.companyIntroduction.getBusinessRegisteredCertificateResponse()
