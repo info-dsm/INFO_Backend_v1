@@ -1,18 +1,17 @@
 package com.info.info_v1_backend.domain.company.data.entity.notice.recruitment
 
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.edit.EditRecruitmentRequest
+import com.info.info_v1_backend.domain.company.business.dto.response.notice.CertificateResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.notice.LanguageResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.notice.RecruitmentBusinessResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.notice.TechnologyResponse
 import com.info.info_v1_backend.domain.company.data.entity.notice.Notice
-import com.info.info_v1_backend.domain.company.data.entity.notice.certificate.Certificate
 import com.info.info_v1_backend.domain.company.data.entity.notice.certificate.CertificateUsage
 import com.info.info_v1_backend.domain.company.data.entity.notice.classification.RecruitmentBigClassification
 import com.info.info_v1_backend.domain.company.data.entity.notice.classification.RecruitmentSmallClassification
 import com.info.info_v1_backend.domain.company.data.entity.notice.language.LanguageUsage
 import com.info.info_v1_backend.domain.company.data.entity.notice.technology.TechnologyUsage
 import com.info.info_v1_backend.global.base.entity.BaseTimeEntity
-import org.apache.commons.lang3.mutable.Mutable
 import javax.persistence.*
 
 @Entity
@@ -67,8 +66,8 @@ class RecruitmentBusiness(
     var technologyList: MutableSet<TechnologyUsage> = HashSet()
         protected set
 
-    @OneToMany(orphanRemoval = true)
-    var needCertificateList: MutableList<CertificateUsage> = ArrayList()
+    @OneToMany(mappedBy = "recruitmentBusiness", orphanRemoval = true)
+    var needCertificateList: MutableSet<CertificateUsage> = HashSet()
         protected set
 
     @Column(name = "number_of_emplyee", nullable = false)
@@ -95,8 +94,10 @@ class RecruitmentBusiness(
                 )
             }.toSet(),
             this.needCertificateList.map {
-                 it.certificate.name
-            },
+                CertificateResponse(
+                    it.certificate.name
+                )
+            }.toSet(),
             this.numberOfEmplyee,
             this.gradeCutLine
         )

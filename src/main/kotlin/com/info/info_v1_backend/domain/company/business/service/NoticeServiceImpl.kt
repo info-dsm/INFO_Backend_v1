@@ -26,6 +26,7 @@ import com.info.info_v1_backend.domain.company.data.entity.notice.technology.Tec
 import com.info.info_v1_backend.domain.company.data.entity.notice.technology.TechnologyUsageIdClass
 import com.info.info_v1_backend.domain.company.data.repository.company.*
 import com.info.info_v1_backend.domain.company.data.repository.notice.*
+import com.info.info_v1_backend.domain.company.exception.AlreadyApproveNotice
 import com.info.info_v1_backend.domain.company.exception.AlreadyExistsException
 import com.info.info_v1_backend.domain.company.exception.NoticeNotFoundException
 import com.info.info_v1_backend.global.error.common.NoAuthenticationException
@@ -377,10 +378,13 @@ class NoticeServiceImpl(
     }
 
     override fun rejectNotice(user: User, noticeId: Long) {
+        val notice = noticeRepository.findByIdOrNull(noticeId) ?: throw NoticeNotFoundException(noticeId.toString())
         if (user is Teacher) {
-            noticeRepository.delete(
-                noticeRepository.findByIdOrNull(noticeId)?: throw NoticeNotFoundException(noticeId.toString())
-            )
+            if (notice.isApprove == NoticeWaitingStatus.WAITING) {
+                noticeRepository.delete(
+                    notice
+                )
+            } else throw AlreadyApproveNotice(noticeId.toString())
         } else throw NoAuthenticationException(user.roleList.toString())
     }
 

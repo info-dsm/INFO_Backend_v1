@@ -7,7 +7,7 @@ data class RecruitmentBusinessResponse(
     val detailBusinessDescription: String?,
     val languageSet: Set<LanguageResponse>,
     val technologySet: Set<TechnologyResponse>,
-    val certificateList: List<String>,
+    val certificateList: Set<CertificateResponse>,
     val numberOfEmployee: Int,
     val gradeCutLine: Int?
 )

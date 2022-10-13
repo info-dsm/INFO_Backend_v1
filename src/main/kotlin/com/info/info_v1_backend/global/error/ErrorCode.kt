@@ -21,6 +21,7 @@ enum class ErrorCode(
     FILE_SHOULD_BE_IMAGE_TYPE("File should be image type", HttpStatus.BAD_REQUEST),
     ALREAD_EXISTS("Already Exists", HttpStatus.BAD_REQUEST),
     INCORRECT_EMAIL("Incorrect Email", HttpStatus.BAD_REQUEST),
+    ALREADY_APPROVE_NOTICE("Already Approve Notice", HttpStatus.BAD_REQUEST),
 
     //401
     TOKEN_IS_NULL("Token Can Not Be Null", HttpStatus.UNAUTHORIZED),
