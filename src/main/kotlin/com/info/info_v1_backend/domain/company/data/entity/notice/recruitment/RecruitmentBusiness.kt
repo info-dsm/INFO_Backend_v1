@@ -97,7 +97,7 @@ class RecruitmentBusiness(
                 CertificateResponse(
                     it.certificate.name
                 )
-            }.toSet(),
+            }.toList(),
             this.numberOfEmplyee,
             this.gradeCutLine
         )
