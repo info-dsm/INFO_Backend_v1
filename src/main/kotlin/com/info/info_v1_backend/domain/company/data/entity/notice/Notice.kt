@@ -14,12 +14,17 @@ import com.info.info_v1_backend.domain.company.data.entity.notice.interview.Inte
 import com.info.info_v1_backend.domain.company.data.entity.notice.recruitment.RecruitmentBusiness
 import com.info.info_v1_backend.global.base.entity.BaseAuthorEntity
 import com.info.info_v1_backend.global.base.entity.BaseTimeEntity
+import com.info.info_v1_backend.global.error.common.InvalidParameterException
 import org.hibernate.annotations.*
+import org.springframework.http.HttpStatus
+import java.time.DateTimeException
+import java.time.LocalDate
 import java.util.*
 import javax.persistence.*
 import javax.persistence.CascadeType
 import javax.persistence.Entity
 import javax.persistence.Table
+import javax.validation.ValidationException
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
@@ -124,6 +129,7 @@ class Notice(
 
     init {
         this.company.updateLastNoticeYear()
+        if (LocalDate.now().isAfter(noticeOpenPeriod.startDate)) throw InvalidParameterException("notice open period: start date must after then now.")
     }
 
 
