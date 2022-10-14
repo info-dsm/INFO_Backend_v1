@@ -376,12 +376,17 @@ class CompanyServiceImpl(
 
         if (user is Company && file.company == user) {
 
-            user.companyIntroduction
-                .removeCompanyIntroduction(file)
+            user.let {
+                it.companyIntroduction.removeCompanyIntroduction(
+                    file
+                )
+                companyIntroductionFileRepository.delete(
+                    file
+                )
+            }
 
         } else throw ForbiddenException("${user}가 ${file.company}에 접근권한 없음")
     }
-
     override fun changeCompanyLogo(user: User, multipartFile: MultipartFile) {
         if (user is Company) {
             user.let {
@@ -429,8 +434,7 @@ class CompanyServiceImpl(
                     file
                 )
                 companyPhotoFileRepository.delete(
-                    companyPhotoFileRepository.findByIdOrNull(fileId)
-                        ?: throw FileNotFoundException(fileId.toString())
+                    file
                 )
             }
         } else throw ForbiddenException("${user}가 ${file.company}에 접근권한 없음")
