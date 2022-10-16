@@ -7,7 +7,6 @@ import com.info.info_v1_backend.domain.company.business.dto.request.company.Edit
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyWithIsWorkingResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MinimumCompanyResponse
-import com.info.info_v1_backend.domain.company.business.dto.response.notice.NoticeWithIsApproveResponse
 import com.info.info_v1_backend.domain.company.data.entity.comment.Comment
 import com.info.info_v1_backend.domain.company.data.entity.company.embeddable.CompanyContact
 import com.info.info_v1_backend.domain.company.data.entity.company.embeddable.CompanyInformation
@@ -35,7 +34,7 @@ class Company(
     companyContact: CompanyContact,
     companyIntroduction: CompanyIntroduction,
     isLeading: Boolean,
-
+    passwordHint: String
 ): User(
     companyName.companyName,
     companyContact.email,
@@ -95,6 +94,12 @@ class Company(
     var isAssociated: Boolean = false
         protected set
 
+    var passwordHint: String = passwordHint
+        protected set
+
+    fun changePasswordHint(hint: String) {
+        this.passwordHint = hint
+    }
 
     fun updateLastNoticeYear() {
         if (!this.noticeRegisteredYearList.contains(

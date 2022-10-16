@@ -15,7 +15,7 @@ data class RegisterNoticeRequest(
     @field:Valid
     val welfare: WelfareRequest,
     val noticeOpenPeriod: NoticeOpenPeriodRequest,
-    val interviewProcessMap: Map<Int, InterviewProcess>,
+    val interviewProcessList: List<InterviewProcess>,
     val needDocuments: String?,
     val otherFeatures: String?,
     val workPlace: WorkPlaceRequest,

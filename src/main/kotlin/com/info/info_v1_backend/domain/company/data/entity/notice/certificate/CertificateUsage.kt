@@ -32,6 +32,7 @@ class CertificateUsage(
     val recruitmentBusiness: RecruitmentBusiness = recruitmentBusiness
 
 
+
     override fun getId(): String? {
         return this.id
     }

@@ -10,6 +10,7 @@ import com.info.info_v1_backend.domain.company.data.entity.notice.certificate.Ce
 import com.info.info_v1_backend.domain.company.data.entity.notice.classification.RecruitmentBigClassification
 import com.info.info_v1_backend.domain.company.data.entity.notice.classification.RecruitmentSmallClassification
 import com.info.info_v1_backend.domain.company.data.entity.notice.language.LanguageUsage
+import com.info.info_v1_backend.domain.company.data.entity.notice.technology.Technology
 import com.info.info_v1_backend.domain.company.data.entity.notice.technology.TechnologyUsage
 import com.info.info_v1_backend.global.base.entity.BaseTimeEntity
 import javax.persistence.*
@@ -66,7 +67,7 @@ class RecruitmentBusiness(
     var technologyList: MutableSet<TechnologyUsage> = HashSet()
         protected set
 
-    @OneToMany(mappedBy = "recruitmentBusiness", orphanRemoval = true)
+    @OneToMany(mappedBy = "recruitmentBusiness", orphanRemoval = true, cascade = [CascadeType.REMOVE])
     var needCertificateList: MutableSet<CertificateUsage> = HashSet()
         protected set
 
@@ -78,10 +79,26 @@ class RecruitmentBusiness(
     var gradeCutLine: Int? = gradeCutLine
         protected set
 
+    fun addNeedCertificate(certificate: CertificateUsage) {
+        this.needCertificateList.add(certificate)
+    }
+
+    fun addLanguage(language: LanguageUsage) {
+        this.languageUsageList.add(language)
+    }
+
+    fun addTechnology(technology: TechnologyUsage) {
+        this.technologyList.add(technology)
+    }
+
+//    fun changeClassification(big: RecruitmentBigClassification, small: RecruitmentSmallClassification) {
+//        this.bigClassification = big
+//        this.smallClassification = small
+//    }
+
     fun toRecruitmentBusinessResponse(): RecruitmentBusinessResponse {
         return RecruitmentBusinessResponse(
-            this.bigClassification.toBigClassificationResponse(),
-            this.smallClassification.toSmallClassification(),
+            this.smallClassification.toClassificationResponse(),
             this.detailBusinessDescription,
             this.languageUsageList.map {
                 LanguageResponse(
@@ -123,30 +140,6 @@ class RecruitmentBusiness(
     fun changeSmallClassification(smallClassification: RecruitmentSmallClassification) {
         this.bigClassification = smallClassification.bigClassification
         this.smallClassification = smallClassification
-    }
-
-    fun removeNeedCertificate(certificateName: String) {
-        this.needCertificateList.filter {
-            it.certificate.name == certificateName
-        }.map {
-            this.needCertificateList.remove(it)
-        }
-    }
-
-    fun removeTechnology(technologyName: String) {
-        this.technologyList.filter {
-            it.technology.name == technologyName
-        }.map {
-            this.technologyList.remove(it)
-        }
-    }
-
-    fun removeLanguage(languageName: String) {
-        this.languageUsageList.filter {
-            it.language.name == languageName
-        }.map {
-            this.languageUsageList.remove(it)
-        }
     }
 
 }

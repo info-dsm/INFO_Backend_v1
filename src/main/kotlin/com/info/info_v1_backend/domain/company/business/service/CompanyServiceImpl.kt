@@ -61,6 +61,21 @@ class CompanyServiceImpl(
     private val businessAreaTaggedRepository: BusinessAreaTaggedRepository,
     private val companyPhotoFileRepository: FileRepository<CompanyPhotoFile>
 ): CompanyService {
+    override fun checkCompanyNumber(companyNumber: String) {
+        if (!companyRepository.existsByCompanyNumber(companyNumber)) throw UserNotFoundException(companyNumber)
+    }
+
+    override fun getPasswordHint(companyNumber: String): String {
+        return (companyRepository.findByCompanyNumber(companyNumber)
+            .orElse(null)?: throw CompanyNotFoundException(companyNumber))
+            .passwordHint
+    }
+
+    override fun changePasswordHint(user: User, newHint: String) {
+        if (user is Company) {
+            user.changePasswordHint(newHint)
+        } else throw NoAuthenticationException(user.roleList.toString())
+    }
 
     override fun registerCompany(
         req: CompanySignupRequest,
@@ -68,7 +83,8 @@ class CompanyServiceImpl(
         businessRegisteredCertificate: MultipartFile,
         companyIntroductionFile: List<MultipartFile>,
         companyLogo: MultipartFile,
-        companyPhotoList: List<MultipartFile>
+        companyPhotoList: List<MultipartFile>,
+        passwordHint: String
     ) {
         val company = companyRepository.save(
             Company(
@@ -77,7 +93,8 @@ class CompanyServiceImpl(
                 req.companyInformation.toCompanyInformation(),
                 req.companyContact.toCompanyContact(),
                 CompanyIntroduction(req.introduction),
-                req.isLeading
+                req.isLeading,
+                passwordHint
             )
         )
 

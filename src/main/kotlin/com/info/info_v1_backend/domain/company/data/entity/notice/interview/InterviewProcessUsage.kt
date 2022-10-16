@@ -24,4 +24,10 @@ class InterviewProcessUsage(
         this.interviewProcess = interviewProcess
     }
 
+    fun pullSequence(sequence: Int) {
+        if (this.sequence > sequence) {
+            this.sequence = this.sequence - 1
+        }
+    }
+
 }

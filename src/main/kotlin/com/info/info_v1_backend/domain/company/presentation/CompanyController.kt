@@ -56,6 +56,32 @@ class CompanyController(
         emailService.sendCodeToCompanyEmail(email)
     }
 
+    @GetMapping("/companyNumber")
+    fun checkCompanyNumber(
+        @RequestParam(required = true) number: String
+    ) {
+        companyService.checkCompanyNumber(number)
+    }
+
+    @GetMapping("/hint")
+    fun getPasswordHint(
+        @RequestParam(required = true) companyNumber: String
+    ): String {
+        return companyService.getPasswordHint(companyNumber)
+    }
+
+    @PatchMapping("/hint")
+    fun changePasswordHint(
+        @AuthenticationPrincipal user: User?,
+        @RequestParam(required = true) newHint: String
+    ) {
+        return companyService.changePasswordHint(
+            user?: throw TokenCanNotBeNullException(),
+            newHint
+        )
+    }
+
+
     @PostMapping
     fun registerCompany(
         @Valid
@@ -64,7 +90,8 @@ class CompanyController(
         @RequestPart(required = true) businessRegisteredCertificate: MultipartFile,
         @RequestPart(required = true) companyIntroductionFile: List<MultipartFile>,
         @RequestPart(required = true) companyLogo: MultipartFile,
-        @RequestPart(required = true) companyPhotoList: List<MultipartFile>
+        @RequestPart(required = true) companyPhotoList: List<MultipartFile>,
+        @RequestParam(required = true) passwordHint: String
     ) {
         if (authService.checkCompanyEmail(request.companyContact.email, emailCheckCode)) {
             companyService.registerCompany(
@@ -73,7 +100,8 @@ class CompanyController(
                 businessRegisteredCertificate,
                 companyIntroductionFile,
                 companyLogo,
-                companyPhotoList
+                companyPhotoList,
+                passwordHint
             )
         } else throw CheckEmailCodeException(emailCheckCode)
     }

@@ -4,14 +4,16 @@ import com.info.info_v1_backend.domain.company.business.dto.request.notice.edit.
 import com.info.info_v1_backend.domain.company.business.dto.response.notice.MaximumNoticeWithPayResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.notice.MaximumNoticeWithoutPayResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.notice.MinimumNoticeResponse
-import com.info.info_v1_backend.domain.company.business.dto.response.notice.NoticeWithIsApproveResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.notice.NoticeWithApproveStatusResponse
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
 import com.info.info_v1_backend.domain.company.data.entity.notice.applicant.Applicant
+import com.info.info_v1_backend.domain.company.data.entity.notice.certificate.Certificate
 import com.info.info_v1_backend.domain.company.data.entity.notice.embeddable.*
 import com.info.info_v1_backend.domain.company.data.entity.notice.file.FormAttachment
 import com.info.info_v1_backend.domain.company.data.entity.notice.interview.InterviewProcess
 import com.info.info_v1_backend.domain.company.data.entity.notice.interview.InterviewProcessUsage
 import com.info.info_v1_backend.domain.company.data.entity.notice.recruitment.RecruitmentBusiness
+import com.info.info_v1_backend.domain.company.data.entity.notice.technology.Technology
 import com.info.info_v1_backend.global.base.entity.BaseAuthorEntity
 import com.info.info_v1_backend.global.base.entity.BaseTimeEntity
 import com.info.info_v1_backend.global.error.common.InvalidParameterException
@@ -44,8 +46,6 @@ class Notice(
     welfare: Welfare,
 
     noticeOpenPeriod: NoticeOpenPeriod,
-
-    interviewProcessList: List<InterviewProcessUsage>,
 
     needDocuments: String?,
 
@@ -92,7 +92,7 @@ class Notice(
 
 
     @ElementCollection
-    var interviewProcessList: MutableList<InterviewProcessUsage> = interviewProcessList as MutableList<InterviewProcessUsage>
+    var interviewProcessList: MutableList<InterviewProcessUsage> = kotlin.collections.ArrayList()
         protected set
 
     @Column(name = "need_documents", nullable = true)
@@ -110,7 +110,7 @@ class Notice(
     @Column(name = "is_personal_contact", nullable = false)
     var isPersonalContact: Boolean = isPersonalContact
 
-    @OneToMany(cascade = [CascadeType.PERSIST])
+    @OneToMany(cascade = [CascadeType.REMOVE], orphanRemoval = true)
     var formAttachmentList: MutableList<FormAttachment> = ArrayList()
         protected set
 
@@ -120,7 +120,7 @@ class Notice(
         protected set
 
     @Column(name = "notice_is_approve", nullable = false)
-    var isApprove: NoticeWaitingStatus = NoticeWaitingStatus.WAITING
+    var approveStatus: NoticeWaitingStatus = NoticeWaitingStatus.WAITING
         protected set
 
     @OneToMany(mappedBy = "notice", cascade = [CascadeType.PERSIST])
@@ -141,17 +141,53 @@ class Notice(
         this.recruitmentBusiness = recruitmentBusiness
     }
 
+    fun addInterviewProcessAll(interviewProcessList: List<InterviewProcess>) {
+        interviewProcessList.map {
+            this.interviewProcessList.add(
+                InterviewProcessUsage(
+                    interviewProcessList.indexOf(it) + 1,
+                    it
+                )
+            )
+        }
+
+    }
+
     fun changeInterviewProcess(key: Int, interviewProcess: InterviewProcess) {
-        this.interviewProcessList.first { it.sequence == key }.changeInterviewProcess(interviewProcess)
+        this.interviewProcessList.firstOrNull { it.sequence == key }
+            ?.changeInterviewProcess(interviewProcess)
+            ?:this.interviewProcessList.add(
+                InterviewProcessUsage(
+                    this.interviewProcessList.size + 1,
+                    interviewProcess
+                )
+            )
+    }
+
+    fun removeInterviewProcess(key: Int) {
+        this.interviewProcessList.first {
+            it.sequence == key
+        }.let {
+            this.interviewProcessList.remove(it)
+        }
+        this.interviewProcessList.filter {
+            it.sequence >= key
+        }.map {
+            it.pullSequence(key)
+        }
     }
 
     fun approveNotice() {
-        this.isApprove = NoticeWaitingStatus.APPROVE
+        this.approveStatus = NoticeWaitingStatus.APPROVE
+    }
+
+    fun rejectNotice() {
+        this.approveStatus = NoticeWaitingStatus.REJECT
     }
 
     fun toMinimumNoticeResponse(): MinimumNoticeResponse {
         return MinimumNoticeResponse(
-            this.id!!,
+            this.id,
             this.company.toMinimumCompanyResponse(),
             this.recruitmentBusiness!!.toRecruitmentBusinessResponse(),
             this.applicantList.filter {
@@ -214,10 +250,10 @@ class Notice(
         }
     }
 
-    fun toNoticeWithIsApproveResponse(): NoticeWithIsApproveResponse {
-        return NoticeWithIsApproveResponse(
+    fun toNoticeWithApproveStatusResponse(): NoticeWithApproveStatusResponse {
+        return NoticeWithApproveStatusResponse(
             this.toMaximumNoticeWithPayResponse(),
-            NoticeWaitingStatus.APPROVE
+            this.approveStatus
         )
     }
 

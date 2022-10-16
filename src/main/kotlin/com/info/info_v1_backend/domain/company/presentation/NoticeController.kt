@@ -6,7 +6,6 @@ import com.info.info_v1_backend.domain.company.business.dto.request.notice.regis
 import com.info.info_v1_backend.domain.company.business.dto.response.notice.*
 import com.info.info_v1_backend.domain.company.business.service.NoticeService
 import com.info.info_v1_backend.domain.company.data.entity.notice.interview.InterviewProcess
-import com.info.info_v1_backend.domain.company.data.entity.notice.technology.Technology
 import com.info.info_v1_backend.global.error.common.TokenCanNotBeNullException
 import com.info.info_v1_backend.global.file.dto.FileResponse
 import org.springframework.data.domain.Page
@@ -55,14 +54,9 @@ class NoticeController(
 
 
 
-    @GetMapping("/big-classification/list")
-    fun getBigClassificationList(): List<BigClassificationResponse> {
-        return noticeService.getBigClassificationList()
-    }
-
-    @GetMapping("/small-classification/list")
-    fun getSmallClassificationList(): List<SmallClassificationResponse> {
-        return noticeService.getSmallClassificationList()
+    @GetMapping("/classification/list")
+    fun getClassificationList(): List<ClassificationResponse> {
+        return noticeService.getClassificationList()
     }
 
     @PutMapping("/{noticeId}/{bigClassificationId}/{smallClassificationId}")
@@ -87,7 +81,7 @@ class NoticeController(
         return noticeService.getLanguageList()
     }
 
-    @PutMapping("/{noticeId}/language/{languageId}")
+    @PutMapping("/{noticeId}/language/{languageName}")
     fun addLanguageSet(
         @AuthenticationPrincipal user: User?,
         @PathVariable languageName: String,
@@ -100,7 +94,8 @@ class NoticeController(
         )
     }
 
-    @DeleteMapping("/{noticeId}/language/{languageId}")
+    @DeleteMapping("/{noticeId}/language/{languageName}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     fun removeLanguage(
         @AuthenticationPrincipal user: User?,
         @PathVariable languageName: String,
@@ -133,7 +128,8 @@ class NoticeController(
         )
     }
 
-    @DeleteMapping("/{noticeId}/language/{technologyId}")
+    @DeleteMapping("/{noticeId}/technology/{technologyId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     fun removeTechnologySet(
         @AuthenticationPrincipal user: User?,
         @PathVariable technologyId: String,
@@ -170,6 +166,21 @@ class NoticeController(
         )
     }
 
+    @DeleteMapping("/intervi" +
+            "ew/process")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun removeInterviewProcess(
+        @AuthenticationPrincipal user: User?,
+        @RequestParam(required = true) sequence: Int,
+        @RequestParam(required = true) noticeId: Long
+    ) {
+        noticeService.removeInterviewProcess(
+            user?: throw TokenCanNotBeNullException(),
+            sequence,
+            noticeId
+        )
+    }
+
 
 
     @GetMapping("/certificate/list")
@@ -191,6 +202,7 @@ class NoticeController(
     }
 
     @DeleteMapping("/{noticeId}/certificate/{certificateName}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     fun removeCertificate(
         @AuthenticationPrincipal user: User?,
         @PathVariable certificateName: String,
@@ -251,7 +263,7 @@ class NoticeController(
     @GetMapping("/me")
     fun getMyNoticeList(
         @AuthenticationPrincipal user: User?
-    ): List<NoticeWithIsApproveResponse> {
+    ): List<NoticeWithApproveStatusResponse> {
         return noticeService.getMyNoticeList(
             user?: throw TokenCanNotBeNullException()
         )

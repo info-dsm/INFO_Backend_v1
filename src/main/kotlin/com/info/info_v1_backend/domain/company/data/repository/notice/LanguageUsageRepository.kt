@@ -10,4 +10,5 @@ import java.util.Optional
 interface LanguageUsageRepository: JpaRepository<LanguageUsage, LanguageUsageIdClass> {
 
     fun findByLanguageAndRecruitmentBusiness(language: Language, recruitmentBusiness: RecruitmentBusiness): Optional<LanguageUsage>
+    fun deleteByLanguageAndRecruitmentBusiness(language: Language, recruitmentBusiness: RecruitmentBusiness)
 }

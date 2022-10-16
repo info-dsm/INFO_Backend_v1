@@ -11,8 +11,8 @@ import java.util.*
 
 interface NoticeRepository: JpaRepository<Notice, Long> {
 
-    fun findAllByIsApprove(approve: NoticeWaitingStatus, pageable: Pageable): Page<Notice>
-    fun findByIdAndCompanyAndIsApproveNot(id: Long, company: Company, notApproveStatus: NoticeWaitingStatus): Optional<Notice>
+    fun findAllByApproveStatus(approve: NoticeWaitingStatus, pageable: Pageable): Page<Notice>
+    fun findByIdAndCompanyAndApproveStatusNot(id: Long, company: Company, notApproveStatus: NoticeWaitingStatus): Optional<Notice>
     fun findAllByCompanyOrderByCreatedAtDesc(company: Company): List<Notice>
     fun findAllByCreatedAtBetween(start: LocalDateTime, end: LocalDateTime, pageable: Pageable): Page<Notice>
 }

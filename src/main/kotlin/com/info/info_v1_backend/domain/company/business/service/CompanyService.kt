@@ -17,7 +17,12 @@ import java.time.Year
 
 interface CompanyService {
 
-    fun registerCompany(req: CompanySignupRequest, emailCheckCode: String, businessRegisteredCertificate: MultipartFile, companyIntroductionFile: List<MultipartFile>, companyLogo: MultipartFile, companyPhotoList: List<MultipartFile>)
+    fun checkCompanyNumber(companyNumber: String)
+
+    fun getPasswordHint(companyNumber: String): String
+    fun changePasswordHint(user: User, newHint: String)
+
+    fun registerCompany(req: CompanySignupRequest, emailCheckCode: String, businessRegisteredCertificate: MultipartFile, companyIntroductionFile: List<MultipartFile>, companyLogo: MultipartFile, companyPhotoList: List<MultipartFile>, passwordHint: String)
 
     fun editCompany(user: User, request: EditCompanyRequest, companyId: Long)
 

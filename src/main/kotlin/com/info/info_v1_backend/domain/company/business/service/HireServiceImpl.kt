@@ -200,13 +200,13 @@ class HireServiceImpl(
             (hiredStudentRepository.findByStudentAndCompany(
                 studentRepository.findByIdOrNull(studentId)?: throw UserNotFoundException(studentId.toString()),
                 user
-            ).orElse(null)?: throw HiredStudentNotFound(studentId.toString())
+            ).orElse(null)?: throw HiredStudentNotFoundException(studentId.toString())
                     ).makeFire()
         } else if (user is Teacher) {
             (hiredStudentRepository.findByStudentAndCompany(
                 studentRepository.findByIdOrNull(studentId)?: throw UserNotFoundException(studentId.toString()),
                 companyRepository.findByIdOrNull(companyId)?: throw CompanyNotFoundException(companyId.toString())
-            ).orElse(null)?: throw HiredStudentNotFound(studentId.toString())
+            ).orElse(null)?: throw HiredStudentNotFoundException(studentId.toString())
                     ).makeFire()
 
         } else throw NoAuthenticationException(user.roleList.toString())

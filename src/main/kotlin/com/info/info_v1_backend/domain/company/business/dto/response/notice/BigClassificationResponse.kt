@@ -1,6 +1,5 @@
 package com.info.info_v1_backend.domain.company.business.dto.response.notice
 
 data class BigClassificationResponse(
-    val name: String,
-
+    val bigClassificationName: String
 )
