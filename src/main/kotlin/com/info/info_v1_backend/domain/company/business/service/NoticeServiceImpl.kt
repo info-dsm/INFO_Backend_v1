@@ -117,9 +117,11 @@ class NoticeServiceImpl(
 
             attachmentList.map {
                 notice.addAttachment(
-                    FormAttachment(
-                        s3Util.uploadFile(it, "notice/${notice.id}", "attachment"),
-                        notice
+                    formAttachmentRepository.save(
+                        FormAttachment(
+                            s3Util.uploadFile(it, "notice/${notice.id}", "attachment"),
+                            notice
+                        )
                     )
                 )
             }
