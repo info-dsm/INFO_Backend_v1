@@ -4,9 +4,11 @@ import com.info.info_v1_backend.domain.auth.business.dto.request.*
 import com.info.info_v1_backend.domain.auth.business.service.AuthService
 import com.info.info_v1_backend.domain.auth.business.service.EmailService
 import com.info.info_v1_backend.domain.auth.data.entity.user.Student
+import com.info.info_v1_backend.domain.auth.data.entity.user.Teacher
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
 import com.info.info_v1_backend.domain.auth.exception.CheckEmailCodeException
 import com.info.info_v1_backend.domain.auth.exception.CheckTeacherCodeException
+import com.info.info_v1_backend.domain.auth.exception.IncorrectEmail
 import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
 import com.info.info_v1_backend.global.error.common.NoAuthenticationException
 import com.info.info_v1_backend.global.error.common.TokenCanNotBeNullException
@@ -126,12 +128,16 @@ class AuthController(
         @RequestParam
         @Email
         email: String
-    ){
-        if((user?: throw TokenCanNotBeNullException()) !is Student){
-        emailService.sendChangeEmailCodeToEmail(email)
+    ) {
+        if ((user ?: throw TokenCanNotBeNullException()) !is Student) {
+            if (user is Teacher) {
+                if (email.endsWith("@dsm.hs.kr")) {
+                    emailService.sendChangeEmailCodeToEmail(email)
+                } else throw IncorrectEmail(email)
+            }
+            else emailService.sendChangeEmailCodeToEmail(email)
         } else throw NoAuthenticationException(user.roleList.toString())
     }
-
     @PatchMapping("/email")
     fun changeEmail(
         @Valid
