@@ -39,8 +39,8 @@ class NoticeController(
         @AuthenticationPrincipal user: User?,
         @RequestPart(required = true) request: RegisterNoticeRequest,
         @RequestPart(required = true) attachment: List<MultipartFile>
-    ) {
-        noticeService.registerNotice(user?: throw TokenCanNotBeNullException(), request, attachment)
+    ): Long{
+        return noticeService.registerNotice(user?: throw TokenCanNotBeNullException(), request, attachment)
     }
 
     @PatchMapping
@@ -166,8 +166,7 @@ class NoticeController(
         )
     }
 
-    @DeleteMapping("/intervi" +
-            "ew/process")
+    @DeleteMapping("/interview/process")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun removeInterviewProcess(
         @AuthenticationPrincipal user: User?,

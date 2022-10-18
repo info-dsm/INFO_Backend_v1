@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile
 
 interface NoticeService {
 
-    fun registerNotice(user: User, request: RegisterNoticeRequest, attachmentList: List<MultipartFile>)
+    fun registerNotice(user: User, request: RegisterNoticeRequest, attachmentList: List<MultipartFile>) : Long
     fun editNotice(user: User, request: EditNoticeRequest, noticeId: Long)
 
     fun getClassificationList(): List<ClassificationResponse>

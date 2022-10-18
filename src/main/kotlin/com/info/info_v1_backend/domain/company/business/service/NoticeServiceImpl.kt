@@ -65,12 +65,14 @@ class NoticeServiceImpl(
         }
     }
 
-    override fun registerNotice(user: User, request: RegisterNoticeRequest, attachmentList: List<MultipartFile>) {
+    override fun registerNotice(user: User, request: RegisterNoticeRequest, attachmentList: List<MultipartFile>): Long{
         if (user is Company) {
+
+            val id = kotlin.random.Random.nextLong(100000000, 999999999)
 
             val notice = noticeRepository.save(
                 Notice(
-                    kotlin.random.Random.nextLong(100000000, 999999999),
+                    id,
                     user,
                     request.workTime.toWorkTime(),
                     request.pay.toPay(),
@@ -167,7 +169,7 @@ class NoticeServiceImpl(
                     )
                 )
             }
-
+            return id
         } else throw NoAuthenticationException(user.roleList.toString())
     }
 
