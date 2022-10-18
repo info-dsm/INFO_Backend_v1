@@ -9,10 +9,11 @@ import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.builders.WebSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.security.web.SecurityFilterChain
 import org.springframework.web.cors.CorsUtils
 
 
@@ -21,25 +22,24 @@ import org.springframework.web.cors.CorsUtils
 class SecurityConfiguration(
     private val tokenProvider: TokenProvider,
     private val customAuthDetailsService: CustomAuthDetailsService,
-    private val objectMapper: ObjectMapper
-): WebSecurityConfigurerAdapter() {
-
-
+    private val objectMapper: ObjectMapper,
+) {
     @Bean
     fun passwordEncoder(): PasswordEncoder {
         return BCryptPasswordEncoder()
     }
-
+    @Bean
     @Throws(Exception::class)
-    override fun configure(web: WebSecurity) {
-        web.ignoring().antMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api-docs/**", "/api-docs.json"
-        , "/swagger-ui.html", "/dsql-api-docs/**",
-        )
+    fun webSecurityCustomer(): WebSecurityCustomizer {
+        return WebSecurityCustomizer {
+            it.ignoring().antMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api-docs/**", "/api-docs.json"
+            , "/swagger-ui.html", "/dsql-api-docs/**")}
     }
 
+    @Bean
     @Throws(Exception::class)
-    override fun configure(httpSecurity: HttpSecurity) {
-        httpSecurity
+    fun configure(httpSecurity: HttpSecurity): SecurityFilterChain {
+        return httpSecurity
             .csrf().disable()
             .formLogin().disable()
             .cors()
@@ -62,6 +62,7 @@ class SecurityConfiguration(
             .anyRequest().authenticated()
             .and()
             .apply(FilterConfiguration(tokenProvider, customAuthDetailsService, objectMapper))
+            .and().build()
     }
 
 }
