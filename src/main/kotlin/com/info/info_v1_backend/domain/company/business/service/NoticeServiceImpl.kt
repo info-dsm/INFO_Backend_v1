@@ -193,9 +193,9 @@ class NoticeServiceImpl(
 
     override fun changeInterviewProcess(user: User, interviewProcessMap: Map<Int, InterviewProcess>, noticeId: Long) {
         if (user is Company) {
-            val notice = user.noticeList.first {
+            val notice = user.noticeList.firstOrNull {
                 it.id!! == noticeId
-            }
+            }?: throw NoticeNotFoundException(noticeId.toString())
 
             interviewProcessMap.map {
                 notice.changeInterviewProcess(
