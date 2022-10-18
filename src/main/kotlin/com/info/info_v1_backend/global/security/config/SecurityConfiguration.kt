@@ -1,20 +1,18 @@
 package com.info.info_v1_backend.global.security.config
 
-import com.info.info_v1_backend.global.security.jwt.JwtFilter
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.info.info_v1_backend.global.security.jwt.TokenProvider
 import com.info.info_v1_backend.global.security.jwt.auth.CustomAuthDetailsService
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.builders.WebSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.config.http.SessionCreationPolicy
-import org.springframework.security.crypto.bcrypt.BCrypt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.web.cors.CorsUtils
 
 
@@ -55,10 +53,15 @@ class SecurityConfiguration(
             .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
 //            .antMatchers(
 //                "/api/**").anonymous()
-            .anyRequest().permitAll()
+            .antMatchers(HttpMethod.POST, "/auth/email/school").permitAll()
+            .antMatchers(HttpMethod.POST, "/auth/signup/student").permitAll()
+            .antMatchers(HttpMethod.POST, "/auth/signup/teacher").permitAll()
+            .antMatchers(HttpMethod.POST, "/auth/login").permitAll()
+            .antMatchers(HttpMethod.POST, "/company/email").permitAll()
+            .antMatchers(HttpMethod.POST, "/company").permitAll()
+            .anyRequest().authenticated()
             .and()
             .apply(FilterConfiguration(tokenProvider, customAuthDetailsService, objectMapper))
     }
-
 
 }
