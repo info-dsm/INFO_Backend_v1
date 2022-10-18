@@ -1,5 +1,6 @@
 package com.info.info_v1_backend.domain.company.business.service
 
+import com.info.info_v1_backend.domain.auth.data.entity.user.Student
 import com.info.info_v1_backend.domain.auth.data.entity.user.Teacher
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.edit.EditNoticeRequest
@@ -11,11 +12,9 @@ import com.info.info_v1_backend.domain.company.data.entity.notice.Notice
 import com.info.info_v1_backend.domain.company.data.entity.notice.NoticeWaitingStatus
 import com.info.info_v1_backend.domain.company.data.entity.notice.certificate.Certificate
 import com.info.info_v1_backend.domain.company.data.entity.notice.certificate.CertificateUsage
-import com.info.info_v1_backend.domain.company.data.entity.notice.certificate.CertificateUsageIdClass
 import com.info.info_v1_backend.domain.company.data.entity.notice.classification.RecruitmentBigClassification
 import com.info.info_v1_backend.domain.company.data.entity.notice.classification.RecruitmentSmallClassification
 import com.info.info_v1_backend.domain.company.data.entity.notice.interview.InterviewProcess
-import com.info.info_v1_backend.domain.company.data.entity.notice.interview.InterviewProcessUsage
 import com.info.info_v1_backend.domain.company.data.entity.notice.language.Language
 import com.info.info_v1_backend.domain.company.data.entity.notice.language.LanguageUsage
 import com.info.info_v1_backend.domain.company.data.entity.notice.recruitment.RecruitmentBusiness
@@ -65,7 +64,7 @@ class NoticeServiceImpl(
         }
     }
 
-    override fun registerNotice(user: User, request: RegisterNoticeRequest, attachmentList: List<MultipartFile>): Long{
+    override fun registerNotice(user: User, request: RegisterNoticeRequest, attachmentList: List<MultipartFile>): NoticeIdResponse {
         if (user is Company) {
 
             val id = kotlin.random.Random.nextLong(100000000, 999999999)
@@ -169,7 +168,7 @@ class NoticeServiceImpl(
                     )
                 )
             }
-            return id
+            return NoticeIdResponse(id)
         } else throw NoAuthenticationException(user.roleList.toString())
     }
 
@@ -428,8 +427,11 @@ class NoticeServiceImpl(
         }
     }
 
-    override fun getMaximumNotice(id: Long): MaximumNoticeWithoutPayResponse {
+    override fun getMaximumNotice(id: Long, user: User): MaximumNoticeWithoutPayResponse {
+
         val notice = (noticeRepository.findByIdOrNull(id)?: throw NoticeNotFoundException(id.toString()))
+
+        if(notice.approveStatus == NoticeWaitingStatus.WAITING && user is Student) throw NoAuthenticationException(user.roleList.toString())
         return notice.toMaximumNoticeWithoutPayResponse()
     }
 

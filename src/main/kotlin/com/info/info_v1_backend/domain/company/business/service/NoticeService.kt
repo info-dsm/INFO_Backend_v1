@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile
 
 interface NoticeService {
 
-    fun registerNotice(user: User, request: RegisterNoticeRequest, attachmentList: List<MultipartFile>) : Long
+    fun registerNotice(user: User, request: RegisterNoticeRequest, attachmentList: List<MultipartFile>) : NoticeIdResponse
     fun editNotice(user: User, request: EditNoticeRequest, noticeId: Long)
 
     fun getClassificationList(): List<ClassificationResponse>
@@ -41,7 +41,7 @@ interface NoticeService {
 
     fun getMyNoticeList(user: User): List<NoticeWithApproveStatusResponse>
     fun getMinimumNoticeList(idx: Int, size: Int): Page<MinimumNoticeResponse>
-    fun getMaximumNotice(id: Long): MaximumNoticeWithoutPayResponse
+    fun getMaximumNotice(id: Long, user: User): MaximumNoticeWithoutPayResponse
     fun searchMinimumNoticeList(query: String): Page<MinimumNoticeResponse>?
 
     fun printNotice(user: User, noticeId: Long): FileResponse

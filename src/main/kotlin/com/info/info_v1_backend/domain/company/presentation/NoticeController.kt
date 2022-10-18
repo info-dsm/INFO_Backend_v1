@@ -39,7 +39,7 @@ class NoticeController(
         @AuthenticationPrincipal user: User?,
         @RequestPart(required = true) request: RegisterNoticeRequest,
         @RequestPart(required = true) attachment: List<MultipartFile>
-    ): Long{
+    ): NoticeIdResponse{
         return noticeService.registerNotice(user?: throw TokenCanNotBeNullException(), request, attachment)
     }
 
@@ -278,9 +278,10 @@ class NoticeController(
 
     @GetMapping
     fun getMaximumNotice(
+        @AuthenticationPrincipal user: User?,
         @RequestParam(required = true) id: Long
     ): MaximumNoticeWithoutPayResponse {
-        return noticeService.getMaximumNotice(id)
+        return noticeService.getMaximumNotice(id, user?: throw TokenCanNotBeNullException())
     }
 
     @GetMapping("/search")
