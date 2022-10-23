@@ -48,8 +48,7 @@ class RecruitmentBusiness(
     var smallClassification: RecruitmentSmallClassification = smallClassification
         protected set
 
-    @OneToOne
-    @JoinColumn(name = "notice_id", nullable = false)
+    @ManyToOne
     val notice: Notice = notice
 
     @Column(
@@ -98,6 +97,7 @@ class RecruitmentBusiness(
 
     fun toRecruitmentBusinessResponse(): RecruitmentBusinessResponse {
         return RecruitmentBusinessResponse(
+            this.id!!,
             this.smallClassification.toClassificationResponse(),
             this.detailBusinessDescription,
             this.languageUsageList.map {

@@ -7,6 +7,7 @@ import com.info.info_v1_backend.domain.auth.data.entity.user.Student
 import com.info.info_v1_backend.domain.auth.data.entity.user.Teacher
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
 import com.info.info_v1_backend.domain.auth.data.repository.token.*
+import com.info.info_v1_backend.domain.auth.data.repository.user.StudentRepository
 import com.info.info_v1_backend.domain.auth.data.repository.user.UserRepository
 import com.info.info_v1_backend.domain.auth.exception.*
 import com.info.info_v1_backend.domain.company.business.dto.request.company.CompanyIntroductionRequest
@@ -45,6 +46,7 @@ class AuthServiceImpl(
     private val checkSchoolEmailCodeRepository: CheckSchoolEmailCodeRepository,
     private val checkCompanyEmailCodeRepository: CheckCompanyEmailCodeRepository,
     private val checkPasswordCodeRepository: CheckPasswordCodeRepository,
+    private val studentRepository: StudentRepository
 ): AuthService {
 
     @Async
@@ -81,7 +83,7 @@ class AuthServiceImpl(
 
 
 
-    override fun checkSchoolEmail(email: String, authCode: String): Boolean {
+    override fun checkSchoolEmailAndDeleteCode(email: String, authCode: String): Boolean {
         checkExistsEmail(email)
         val checkEmail = checkSchoolEmailCodeRepository.findByIdOrNull(email)
         if ((checkEmail?: throw CheckEmailCodeException(email)).code == authCode) {
@@ -91,7 +93,25 @@ class AuthServiceImpl(
         return false
     }
 
-    override fun checkCompanyEmail(email: String, authCode: String): Boolean {
+    override fun checkSchoolEmailCode(email: String, authCode: String): Boolean {
+        checkExistsEmail(email)
+        val checkEmail = checkSchoolEmailCodeRepository.findByIdOrNull(email)
+        if ((checkEmail?: throw CheckEmailCodeException(email)).code == authCode) {
+            return true
+        }
+        return false
+    }
+
+    override fun checkCompanyEmailAndDeleteCode(email: String, authCode: String): Boolean {
+        checkExistsEmail(email)
+        val checkEmail = checkCompanyEmailCodeRepository.findByIdOrNull(email)
+        if ((checkEmail?: throw CheckEmailCodeException(email)).code == authCode) {
+            return true
+        }
+        return false
+    }
+
+    override fun checkCompanyEmailCode(email: String, authCode: String): Boolean {
         checkExistsEmail(email)
         val checkEmail = checkCompanyEmailCodeRepository.findByIdOrNull(email)
         if ((checkEmail?: throw CheckEmailCodeException(email)).code == authCode) {
@@ -99,6 +119,12 @@ class AuthServiceImpl(
             return true
         }
         return false
+    }
+
+    override fun checkStudentKey(studentKey: String): Boolean {
+        studentRepository.findByStudentKey(studentKey).orElse(null)
+            ?: return false
+        return true
     }
 
     override fun login(req: LoginRequest): TokenResponse {

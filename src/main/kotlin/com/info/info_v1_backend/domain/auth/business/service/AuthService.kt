@@ -6,15 +6,19 @@ import com.info.info_v1_backend.global.security.jwt.data.TokenResponse
 
 
 interface AuthService {
+
     fun studentSignUp(req: StudentSignUpRequest)
 
     fun teacherSignUp(req: TeacherSingUpRequest)
     fun checkTeacherCode(code: String): Boolean
 
+    fun checkSchoolEmailAndDeleteCode(email: String, authCode: String): Boolean
+    fun checkSchoolEmailCode(email: String, authCode: String): Boolean
 
+    fun checkCompanyEmailAndDeleteCode(email: String, authCode: String): Boolean
+    fun checkCompanyEmailCode(email: String, authCode: String): Boolean
 
-    fun checkSchoolEmail(email: String, authCode: String): Boolean
-    fun checkCompanyEmail(email: String, authCode: String): Boolean
+    fun checkStudentKey(studentKey: String): Boolean
 
     fun changePassword(user: User, req: EditPasswordRequest)
 

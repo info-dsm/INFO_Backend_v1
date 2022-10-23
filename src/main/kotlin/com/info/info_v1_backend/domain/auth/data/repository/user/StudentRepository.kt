@@ -8,4 +8,5 @@ interface StudentRepository: JpaRepository<Student, Long> {
 
     fun findAllByStudentKeyStartingWith(studentKey: String): List<Student>
     fun findByName(name: String) : Optional<Student>
+    fun findByStudentKey(studentKey: String): Optional<Student>
 }

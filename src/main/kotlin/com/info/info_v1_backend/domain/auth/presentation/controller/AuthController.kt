@@ -10,14 +10,17 @@ import com.info.info_v1_backend.domain.auth.exception.CheckEmailCodeException
 import com.info.info_v1_backend.domain.auth.exception.CheckTeacherCodeException
 import com.info.info_v1_backend.domain.auth.exception.IncorrectEmail
 import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
+import com.info.info_v1_backend.domain.company.exception.AlreadyExistsException
 import com.info.info_v1_backend.global.error.common.NoAuthenticationException
 import com.info.info_v1_backend.global.error.common.TokenCanNotBeNullException
 import com.info.info_v1_backend.global.security.jwt.data.TokenResponse
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.validation.annotation.Validated
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -34,6 +37,23 @@ class AuthController(
     private val authService: AuthService,
     private val emailService: EmailService,
 ) {
+
+    @GetMapping("/email/code/check")
+    fun checkSchoolEmailCode(
+        @RequestParam(required =  true) email: String,
+        @RequestParam(required = true) code: String
+    ) {
+        if (!authService.checkSchoolEmailCode(email, code)) throw CheckEmailCodeException("$email $code")
+    }
+
+    @GetMapping("/student/check")
+    fun studentKeyCheck(
+        @RequestParam(required = true) studentKey: String
+    ) {
+        if (!authService.checkStudentKey(studentKey)) throw AlreadyExistsException(studentKey)
+    }
+
+
     @PostMapping("/email/school")
     @ResponseStatus(HttpStatus.CREATED)
     fun sendSchoolEmail(
@@ -52,7 +72,7 @@ class AuthController(
         @RequestBody
         request: StudentSignUpRequest
     ){
-        if (authService.checkSchoolEmail(request.email, request.emailCheckCode)) {
+        if (authService.checkSchoolEmailAndDeleteCode(request.email, request.emailCheckCode)) {
             authService.studentSignUp(request)
         } else throw CheckEmailCodeException(request.emailCheckCode)
     }
@@ -64,7 +84,7 @@ class AuthController(
         @RequestBody
         request: TeacherSingUpRequest
     ){
-        if (authService.checkSchoolEmail(request.email, request.emailCheckCode)) {
+        if (authService.checkSchoolEmailAndDeleteCode(request.email, request.emailCheckCode)) {
             if (authService.checkTeacherCode(request.teacherCheckCode)) {
                 authService.teacherSignUp(request)
             } else throw CheckTeacherCodeException(request.teacherCheckCode)
@@ -75,11 +95,9 @@ class AuthController(
     @PostMapping("/password/code")
     @ResponseStatus(HttpStatus.CREATED)
     fun sendPasswordCode(
-        @AuthenticationPrincipal user: User?
+        @RequestParam(required = true) email: String
     ){
-        emailService.sendPasswordCodeToEmail(
-            (user?: throw UserNotFoundException("No User Found")).email
-        )
+        emailService.sendPasswordCodeToEmail(email)
     }
 
     @PostMapping("/password")

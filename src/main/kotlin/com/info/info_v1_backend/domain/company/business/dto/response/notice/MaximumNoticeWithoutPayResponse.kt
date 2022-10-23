@@ -8,7 +8,7 @@ import com.info.info_v1_backend.global.file.dto.FileResponse
 data class MaximumNoticeWithoutPayResponse(
     val noticeId: Long,
     val company: MaximumCompanyResponse,
-    val recruitmentBusinessResponse: RecruitmentBusinessResponse,
+    val recruitmentBusinessResponse: List<RecruitmentBusinessResponse>,
     val workTime: WorkTimeRequest,
 
     val mealSupport: MealSupportRequest,

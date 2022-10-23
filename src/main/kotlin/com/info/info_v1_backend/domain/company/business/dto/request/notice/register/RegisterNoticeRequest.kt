@@ -6,7 +6,7 @@ import javax.validation.Valid
 
 @Validated
 data class RegisterNoticeRequest(
-    val recruitmentRequest: AddRecruitmentRequest,
+    val recruitmentRequestList: List<AddRecruitmentRequest>,
     @field:Valid
     val workTime: WorkTimeRequest,
     val pay: PayRequest,

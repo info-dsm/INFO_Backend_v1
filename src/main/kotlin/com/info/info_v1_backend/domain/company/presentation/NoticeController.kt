@@ -59,18 +59,20 @@ class NoticeController(
         return noticeService.getClassificationList()
     }
 
-    @PutMapping("/{noticeId}/{bigClassificationId}/{smallClassificationId}")
+    @PutMapping("/{noticeId}/{recruitmentBusinessId}/{bigClassificationId}/{smallClassificationId}")
     fun changeClassification(
         @AuthenticationPrincipal user: User?,
         @PathVariable bigClassificationId: String,
         @PathVariable smallClassificationId: String,
-        @PathVariable noticeId: Long
+        @PathVariable noticeId: Long,
+        @PathVariable recruitmentBusinessId: Long
     ) {
         return noticeService.changeClassification(
             user?: throw TokenCanNotBeNullException(),
             bigClassificationId,
             smallClassificationId,
-            noticeId
+            noticeId,
+            recruitmentBusinessId
         )
     }
 
@@ -81,30 +83,34 @@ class NoticeController(
         return noticeService.getLanguageList()
     }
 
-    @PutMapping("/{noticeId}/language/{languageName}")
+    @PutMapping("/{noticeId}/{recruitmentBusinessId}/language/{languageName}")
     fun addLanguageSet(
         @AuthenticationPrincipal user: User?,
         @PathVariable languageName: String,
-        @PathVariable noticeId: Long
+        @PathVariable noticeId: Long,
+        @PathVariable recruitmentBusinessId: Long
     ) {
         return noticeService.addLanguageSet(
             user?: throw TokenCanNotBeNullException(),
             languageName,
-            noticeId
+            noticeId,
+            recruitmentBusinessId
         )
     }
 
-    @DeleteMapping("/{noticeId}/language/{languageName}")
+    @DeleteMapping("/{noticeId}/{recruitmentBusinessId}/language/{languageName}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun removeLanguage(
         @AuthenticationPrincipal user: User?,
         @PathVariable languageName: String,
-        @PathVariable noticeId: Long
+        @PathVariable noticeId: Long,
+        @PathVariable recruitmentBusinessId: Long
     ) {
         return noticeService.removeLanguageSet(
             user?: throw TokenCanNotBeNullException(),
             languageName,
-            noticeId
+            noticeId,
+            recruitmentBusinessId
         )
     }
 
@@ -115,30 +121,34 @@ class NoticeController(
         return noticeService.getTechnologyList()
     }
 
-    @PutMapping("/{noticeId}/technology/{technologyId}")
+    @PutMapping("/{noticeId}/{recruitmentBusinessId}/technology/{technologyId}")
     fun addTechnology(
         @AuthenticationPrincipal user: User?,
         @PathVariable technologyId: String,
-        @PathVariable noticeId: Long
+        @PathVariable noticeId: Long,
+        @PathVariable recruitmentBusinessId: Long
     ) {
         return noticeService.addTechnologySet(
             user?: throw TokenCanNotBeNullException(),
             technologyId,
-            noticeId
+            noticeId,
+            recruitmentBusinessId
         )
     }
 
-    @DeleteMapping("/{noticeId}/technology/{technologyId}")
+    @DeleteMapping("/{noticeId}/{recruitmentBusinessId}/technology/{technologyId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun removeTechnologySet(
         @AuthenticationPrincipal user: User?,
         @PathVariable technologyId: String,
-        @PathVariable noticeId: Long
+        @PathVariable noticeId: Long,
+        @PathVariable recruitmentBusinessId: Long
     ) {
         return noticeService.removeTechnologySet(
             user?: throw TokenCanNotBeNullException(),
             technologyId,
-            noticeId
+            noticeId,
+            recruitmentBusinessId
         )
     }
 
@@ -187,30 +197,34 @@ class NoticeController(
         return noticeService.getCertificateList()
     }
 
-    @PutMapping("/{noticeId}/certificate/{certificateName}")
+    @PutMapping("/{noticeId}/{recruitmentBusinessId}/certificate/{certificateName}")
     fun addCertificate(
         @AuthenticationPrincipal user: User?,
         @PathVariable certificateName: String,
-        @PathVariable noticeId: Long
+        @PathVariable noticeId: Long,
+        @PathVariable recruitmentBusinessId: Long
     ) {
         return noticeService.addCertificate(
             user?: throw TokenCanNotBeNullException(),
             certificateName,
-            noticeId
+            noticeId,
+            recruitmentBusinessId
         )
     }
 
-    @DeleteMapping("/{noticeId}/certificate/{certificateName}")
+    @DeleteMapping("/{noticeId}/{recruitmentBusinessId}/certificate/{certificateName}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun removeCertificate(
         @AuthenticationPrincipal user: User?,
         @PathVariable certificateName: String,
-        @PathVariable noticeId: Long
+        @PathVariable noticeId: Long,
+        @PathVariable recruitmentBusinessId: Long
     ) {
         return noticeService.removeCertificate(
             user?: throw TokenCanNotBeNullException(),
             certificateName,
-            noticeId
+            noticeId,
+            recruitmentBusinessId
         )
     }
 

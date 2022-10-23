@@ -1,13 +1,18 @@
 package com.info.info_v1_backend.domain.company.business.service
 
 import com.info.info_v1_backend.domain.auth.business.dto.request.CompanySignupRequest
+import com.info.info_v1_backend.domain.auth.business.dto.request.EditPasswordRequest
+import com.info.info_v1_backend.domain.auth.business.dto.request.LoginRequest
+import com.info.info_v1_backend.domain.auth.business.service.AuthService
+import com.info.info_v1_backend.domain.auth.business.service.EmailService
 import com.info.info_v1_backend.domain.auth.data.entity.user.Student
 import com.info.info_v1_backend.domain.auth.data.entity.user.Teacher
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
-import com.info.info_v1_backend.domain.auth.data.repository.user.StudentRepository
 import com.info.info_v1_backend.domain.auth.data.repository.user.UserRepository
 import com.info.info_v1_backend.domain.auth.exception.IsNotStudentException
 import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
+import com.info.info_v1_backend.domain.company.business.dto.request.company.CompanyLoginRequest
+import com.info.info_v1_backend.domain.company.business.dto.request.company.EditCompanyPasswordRequest
 import com.info.info_v1_backend.domain.company.business.dto.request.company.EditCompanyRequest
 import com.info.info_v1_backend.domain.company.business.dto.response.company.BusinessAreaResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyResponse
@@ -29,6 +34,7 @@ import com.info.info_v1_backend.global.error.common.ForbiddenException
 import com.info.info_v1_backend.global.error.common.NoAuthenticationException
 import com.info.info_v1_backend.global.file.exception.FileNotFoundException
 import com.info.info_v1_backend.global.file.repository.FileRepository
+import com.info.info_v1_backend.global.security.jwt.data.TokenResponse
 import com.info.info_v1_backend.infra.amazon.s3.S3Util
 import com.mongodb.MongoQueryException
 import org.springframework.data.domain.Page
@@ -47,7 +53,8 @@ import javax.transaction.Transactional
 @Transactional
 class CompanyServiceImpl(
     private val companyRepository: CompanyRepository,
-    private val studentRepository: StudentRepository,
+    private val emailService: EmailService,
+    private val authService: AuthService,
     private val userRepository: UserRepository<User>,
     private val companySearchDocumentRepository: CompanySearchDocumentRepository,
     private val noticeSearchDocumentRepository: NoticeSearchDocumentRepository,
@@ -61,6 +68,22 @@ class CompanyServiceImpl(
     private val businessAreaTaggedRepository: BusinessAreaTaggedRepository,
     private val companyPhotoFileRepository: FileRepository<CompanyPhotoFile>
 ): CompanyService {
+
+    override fun sendCompanyPasswordCode(companyNumber: String): String {
+        val company = companyRepository.findByCompanyNumber(companyNumber).orElse(null)?: throw CompanyNotFoundException(companyNumber)
+        emailService.sendPasswordCodeToEmail(company.email)
+        return company.email
+    }
+
+    override fun changeCompanyPassword(e: EditCompanyPasswordRequest) {
+        val company: Company = companyRepository.findByEmail(e.email).orElse(null)?: throw CompanyNotFoundException(e.email)
+        authService.changePassword(company, EditPasswordRequest(
+            e.password,
+            e.code
+        ))
+        company.changePasswordHint(e.passwordHint)
+    }
+
     override fun checkCompanyNumber(companyNumber: String) {
         if (!companyRepository.existsByCompanyNumber(companyNumber)) throw UserNotFoundException(companyNumber)
     }
@@ -75,6 +98,17 @@ class CompanyServiceImpl(
         if (user is Company) {
             user.changePasswordHint(newHint)
         } else throw NoAuthenticationException(user.roleList.toString())
+    }
+
+    override fun companyLogin(request: CompanyLoginRequest): TokenResponse {
+        val company = companyRepository.findByCompanyNumber(request.companyNumber).orElse(null)?: throw CompanyNotFoundException(request.companyNumber)
+        return authService.login(
+            LoginRequest(
+                company.email,
+                request.password
+            )
+        )
+
     }
 
     override fun registerCompany(

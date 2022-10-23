@@ -1,34 +1,27 @@
 package com.info.info_v1_backend.domain.company.data.entity.notice
 
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.edit.EditNoticeRequest
+import com.info.info_v1_backend.domain.company.business.dto.request.notice.edit.EditRecruitmentRequest
 import com.info.info_v1_backend.domain.company.business.dto.response.notice.MaximumNoticeWithPayResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.notice.MaximumNoticeWithoutPayResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.notice.MinimumNoticeResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.notice.NoticeWithApproveStatusResponse
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
 import com.info.info_v1_backend.domain.company.data.entity.notice.applicant.Applicant
-import com.info.info_v1_backend.domain.company.data.entity.notice.certificate.Certificate
 import com.info.info_v1_backend.domain.company.data.entity.notice.embeddable.*
 import com.info.info_v1_backend.domain.company.data.entity.notice.file.FormAttachment
 import com.info.info_v1_backend.domain.company.data.entity.notice.interview.InterviewProcess
 import com.info.info_v1_backend.domain.company.data.entity.notice.interview.InterviewProcessUsage
 import com.info.info_v1_backend.domain.company.data.entity.notice.recruitment.RecruitmentBusiness
-import com.info.info_v1_backend.domain.company.data.entity.notice.technology.Technology
-import com.info.info_v1_backend.global.base.entity.BaseAuthorEntity
 import com.info.info_v1_backend.global.base.entity.BaseTimeEntity
 import com.info.info_v1_backend.global.error.common.InvalidParameterException
 import org.hibernate.annotations.*
-import org.springframework.http.HttpStatus
-import java.time.DateTimeException
 import java.time.LocalDate
-import java.util.*
 import javax.persistence.*
 import javax.persistence.CascadeType
 import javax.persistence.Entity
 import javax.persistence.Table
-import javax.validation.ValidationException
 import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 
 @SQLDelete(sql = "UPDATE `notice` SET notice_is_delete = true WHERE id = ?")
@@ -65,9 +58,8 @@ class Notice(
     val company: Company = company
 
 
-    @OneToOne
-    @JoinColumn(name = "recruitment_business_id", nullable = true)
-    var recruitmentBusiness: RecruitmentBusiness? = null
+    @OneToMany
+    var recruitmentBusinessList: MutableList<RecruitmentBusiness> = kotlin.collections.ArrayList()
         protected set
 
     @Embedded
@@ -138,7 +130,7 @@ class Notice(
     }
 
     fun addRecruitmentBusiness(recruitmentBusiness: RecruitmentBusiness) {
-        this.recruitmentBusiness = recruitmentBusiness
+        this.recruitmentBusinessList.add(recruitmentBusiness)
     }
 
     fun addInterviewProcessAll(interviewProcessList: List<InterviewProcess>) {
@@ -189,18 +181,23 @@ class Notice(
         return MinimumNoticeResponse(
             this.id,
             this.company.toMinimumCompanyResponse(),
-            this.recruitmentBusiness!!.toRecruitmentBusinessResponse(),
+            this.recruitmentBusinessList.map {
+                it.toRecruitmentBusinessResponse()
+            },
             this.applicantList.filter {
-                !it.isDelete
+                    !it.isDelete
             }.size
-        )
+            )
+
     }
 
     fun toMaximumNoticeWithoutPayResponse(): MaximumNoticeWithoutPayResponse {
         return MaximumNoticeWithoutPayResponse(
             this.id!!,
             this.company.toMaximumCompanyResponse(),
-            this.recruitmentBusiness!!.toRecruitmentBusinessResponse(),
+            this.recruitmentBusinessList.map{
+                it.toRecruitmentBusinessResponse()
+            },
             this.workTime.toWorkTimeRequest(),
             this.mealSupport.toMealSupportRequest(),
             this.welfare.toWelfare(),
@@ -222,7 +219,12 @@ class Notice(
 
     fun editNotice(r: EditNoticeRequest) {
         r.recruitmentBusiness?.let {
-            this.recruitmentBusiness!!.editRecruitmentBusiness(it)
+            r: EditRecruitmentRequest ->
+            this.recruitmentBusinessList.firstOrNull {
+                it.id ==  r.recruitmentBusinessId
+            }?.let {
+                it.editRecruitmentBusiness(r)
+            }
         }
         r.workTime?.let {
             this.workTime.editWorkTime(r.workTime)

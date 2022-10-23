@@ -5,6 +5,8 @@ import com.info.info_v1_backend.domain.auth.business.service.AuthService
 import com.info.info_v1_backend.domain.auth.business.service.EmailService
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
 import com.info.info_v1_backend.domain.auth.exception.CheckEmailCodeException
+import com.info.info_v1_backend.domain.company.business.dto.request.company.CompanyLoginRequest
+import com.info.info_v1_backend.domain.company.business.dto.request.company.EditCompanyPasswordRequest
 import com.info.info_v1_backend.domain.company.business.dto.request.company.EditCompanyRequest
 import com.info.info_v1_backend.domain.company.business.dto.response.company.BusinessAreaResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyResponse
@@ -13,6 +15,7 @@ import com.info.info_v1_backend.domain.company.business.dto.response.company.Min
 import com.info.info_v1_backend.domain.company.business.service.CompanyService
 import com.info.info_v1_backend.global.error.common.TokenCanNotBeNullException
 import com.info.info_v1_backend.global.file.dto.FileResponse
+import com.info.info_v1_backend.global.security.jwt.data.TokenResponse
 import org.springframework.data.domain.Page
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -24,7 +27,6 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RequestPart
@@ -45,6 +47,28 @@ class CompanyController(
     private val authService: AuthService
 ) {
 
+    @GetMapping("/email/code/check")
+    fun checkEmailCode(
+        @RequestParam(required = true) email: String,
+        @RequestParam(required = true) code: String
+    ) {
+        if (!authService.checkCompanyEmailCode(email, code)) throw CheckEmailCodeException("$email $code")
+    }
+
+    @PutMapping("/password/code")
+    fun sendPasswordCode(
+        @RequestParam(required = true) companyNumber: String
+    ): String {
+        return companyService.sendCompanyPasswordCode(companyNumber)
+    }
+
+    @PostMapping("/password")
+    fun changeCompanyPassword(
+        @RequestBody e: EditCompanyPasswordRequest
+    ) {
+        return companyService.changeCompanyPassword(e)
+    }
+
     @PostMapping("/email")
     fun sendCompanyEmail(
         @Valid
@@ -56,11 +80,12 @@ class CompanyController(
         emailService.sendCodeToCompanyEmail(email)
     }
 
-    @GetMapping("/companyNumber")
-    fun checkCompanyNumber(
-        @RequestParam(required = true) number: String
-    ) {
-        companyService.checkCompanyNumber(number)
+    @PostMapping("/login")
+    @ResponseStatus(HttpStatus.CREATED)
+    fun companyLogin(
+        @RequestBody request: CompanyLoginRequest
+    ): TokenResponse {
+        return companyService.companyLogin(request)
     }
 
     @GetMapping("/hint")
@@ -81,8 +106,9 @@ class CompanyController(
         )
     }
 
-
+    
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     fun registerCompany(
         @Valid
         @RequestPart(required = true) request: CompanySignupRequest,
@@ -93,7 +119,7 @@ class CompanyController(
         @RequestPart(required = true) companyPhotoList: List<MultipartFile>,
         @RequestParam(required = true) passwordHint: String
     ) {
-        if (authService.checkCompanyEmail(request.companyContact.email, emailCheckCode)) {
+        if (authService.checkCompanyEmailAndDeleteCode(request.companyContact.email, emailCheckCode)) {
             companyService.registerCompany(
                 request,
                 emailCheckCode,

@@ -13,4 +13,5 @@ interface CompanyRepository: JpaRepository<Company, Long> {
     fun findAllByNoticeRegisteredYearListContains(year: Int, pageable: Pageable): Page<Company>
     fun existsByCompanyNumber(companyNumber: String): Boolean
     fun findByCompanyNumber(companyNumber: String): Optional<Company>
+    fun findByEmail(email: String): Optional<Company>
 }

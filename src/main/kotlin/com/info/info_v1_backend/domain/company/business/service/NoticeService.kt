@@ -15,23 +15,23 @@ interface NoticeService {
     fun editNotice(user: User, request: EditNoticeRequest, noticeId: Long)
 
     fun getClassificationList(): List<ClassificationResponse>
-    fun changeClassification(user: User, bigClassificationName: String, smallClassificationName: String, noticeId: Long)
+    fun changeClassification(user: User, bigClassificationName: String, smallClassificationName: String, noticeId: Long, recruitmentBusinessId: Long)
 
     fun getLanguageList(): List<LanguageResponse>
-    fun addLanguageSet(user: User, languageName: String, noticeId: Long)
-    fun removeLanguageSet(user: User, languageName: String, noticeId: Long)
+    fun addLanguageSet(user: User, languageName: String, noticeId: Long, recruitmentBusinessId: Long)
+    fun removeLanguageSet(user: User, languageName: String, noticeId: Long, recruitmentBusinessId: Long)
 
     fun getTechnologyList(): List<TechnologyResponse>
-    fun addTechnologySet(user: User, technologyName: String, noticeId: Long)
-    fun removeTechnologySet(user: User, technologyName: String, noticeId: Long)
+    fun addTechnologySet(user: User, technologyName: String, noticeId: Long, recruitmentBusinessId: Long)
+    fun removeTechnologySet(user: User, technologyName: String, noticeId: Long, recruitmentBusinessId: Long)
 
     fun changeAttachment(user: User, attachmentList: List<MultipartFile>, noticeId: Long)
     fun changeInterviewProcess(user: User, interviewProcessMap: Map<Int, InterviewProcess>, noticeId: Long)
     fun removeInterviewProcess(user: User, interviewSequence: Int, noticeId: Long)
 
     fun getCertificateList(): List<CertificateResponse>
-    fun addCertificate(user: User, certificateName: String, noticeId: Long)
-    fun removeCertificate(user: User, certificateName: String, noticeId: Long)
+    fun addCertificate(user: User, certificateName: String, noticeId: Long, recruitmentBusinessId: Long)
+    fun removeCertificate(user: User, certificateName: String, noticeId: Long, recruitmentBusinessId: Long)
 
     fun deleteNotice(user: User, noticeId: Long)
 
