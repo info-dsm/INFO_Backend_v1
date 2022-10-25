@@ -106,6 +106,7 @@ class AuthServiceImpl(
         checkExistsEmail(email)
         val checkEmail = checkCompanyEmailCodeRepository.findByIdOrNull(email)
         if ((checkEmail?: throw CheckEmailCodeException(email)).code == authCode) {
+            checkCompanyEmailCodeRepository.delete(checkEmail)
             return true
         }
         return false
@@ -115,7 +116,6 @@ class AuthServiceImpl(
         checkExistsEmail(email)
         val checkEmail = checkCompanyEmailCodeRepository.findByIdOrNull(email)
         if ((checkEmail?: throw CheckEmailCodeException(email)).code == authCode) {
-            checkCompanyEmailCodeRepository.delete(checkEmail)
             return true
         }
         return false

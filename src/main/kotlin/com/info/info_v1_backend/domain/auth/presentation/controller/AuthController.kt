@@ -50,7 +50,7 @@ class AuthController(
     fun studentKeyCheck(
         @RequestParam(required = true) studentKey: String
     ) {
-        if (!authService.checkStudentKey(studentKey)) throw AlreadyExistsException(studentKey)
+        if (authService.checkStudentKey(studentKey)) throw AlreadyExistsException(studentKey)
     }
 
 
@@ -71,12 +71,13 @@ class AuthController(
         @Valid
         @RequestBody
         request: StudentSignUpRequest
-    ){
-        if (authService.checkSchoolEmailAndDeleteCode(request.email, request.emailCheckCode)) {
-            authService.studentSignUp(request)
-        } else throw CheckEmailCodeException(request.emailCheckCode)
+    ) {
+        if (!authService.checkStudentKey(request.studentKey)) {
+            if (authService.checkSchoolEmailAndDeleteCode(request.email, request.emailCheckCode)) {
+                authService.studentSignUp(request)
+            } else throw CheckEmailCodeException(request.emailCheckCode)
+        } else throw AlreadyExistsException(request.studentKey)
     }
-
     @PostMapping("/signup/teacher")
     @ResponseStatus(HttpStatus.CREATED)
     fun teacherSignup(
