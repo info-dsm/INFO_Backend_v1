@@ -53,7 +53,7 @@ class RecruitmentBusiness(
 
     @Column(
         name = "detail_business_description",
-        nullable = false
+        nullable = true
     )
     var detailBusinessDescription: String? = detailBusinessDescription
         protected set
