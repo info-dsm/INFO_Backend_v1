@@ -116,53 +116,52 @@ class NoticeServiceImpl(
                 notice.addRecruitmentBusiness(
                     recruitmentBusiness
                 )
-                request.recruitmentRequestList.map {
-                    it.needCertificateList.map {
-                        certificateUsageRepository.save(
-                            CertificateUsage(
-                                certificateRepository.save(
-                                    certificateRepository.findByIdOrNull(it)
-                                        ?: Certificate(
-                                            it,
-                                        )
-                                ),
-                                recruitmentBusiness
-                            )
+
+                r.needCertificateList.map {
+                    val certificate = certificateRepository.findByIdOrNull(it)
+                    certificateUsageRepository.save(
+                        CertificateUsage(
+                            certificate?:
+                            certificateRepository.save(
+                                Certificate(
+                                    it
+                                )
+                            ),
+                            recruitmentBusiness
                         )
-                    }
+                    )
                 }
 
-                request.recruitmentRequestList.map {
-                    it.languageList.map {
+
+
+                    r.languageList.map {
+                        val language = languageRepository.findByIdOrNull(it)
                         languageUsageRepository.save(
                             LanguageUsage(
-                                languageRepository.save(
-                                    languageRepository.findByIdOrNull(it)
-                                        ?: Language(
-                                            it
-                                        )
-                                ),
+                                language?: languageRepository.save(Language(
+                                    it
+                                )),
                                 recruitmentBusiness
                             )
                         )
                     }
-                }
 
-                request.recruitmentRequestList.map {
-                    it.technologyList.map {
+
+
+                    r.technologyList.map {
+                        val technology = technologyRepository.findByIdOrNull(it)
                         technologyUsageRepository.save(
                             TechnologyUsage(
-                                technologyRepository.save(
-                                    technologyRepository.findByIdOrNull(it)
-                                        ?: Technology(
-                                            it
-                                        )
+                                technology?: technologyRepository.save(
+                                    Technology(
+                                        it
+                                    )
                                 ),
                                 recruitmentBusiness
                             )
                         )
                     }
-                }
+
 
             }
 
