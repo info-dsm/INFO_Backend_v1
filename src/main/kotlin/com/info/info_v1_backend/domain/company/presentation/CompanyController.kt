@@ -116,8 +116,7 @@ class CompanyController(
         @RequestPart(required = true) businessRegisteredCertificate: MultipartFile,
         @RequestPart(required = true) companyIntroductionFile: List<MultipartFile>,
         @RequestPart(required = true) companyLogo: MultipartFile,
-        @RequestPart(required = true) companyPhotoList: List<MultipartFile>,
-        @RequestParam(required = true) passwordHint: String
+        @RequestPart(required = true) companyPhotoList: List<MultipartFile>
     ) {
         if (authService.checkCompanyEmailAndDeleteCode(request.companyContact.email, emailCheckCode)) {
             companyService.registerCompany(
@@ -127,7 +126,7 @@ class CompanyController(
                 companyIntroductionFile,
                 companyLogo,
                 companyPhotoList,
-                passwordHint
+                request.passwordHint
             )
         } else throw CheckEmailCodeException(emailCheckCode)
     }
