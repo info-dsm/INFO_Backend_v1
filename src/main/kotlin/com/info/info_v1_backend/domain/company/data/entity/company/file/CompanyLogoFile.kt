@@ -36,9 +36,9 @@ class CompanyLogoFile(
     var company: Company = company
         protected set
 
-    init {
-        if (dto.fileType == FileType.DOCS) throw FileShouldBeImageTypeException()
-    }
+//    init {
+//        if (dto.fileType == FileType.DOCS) throw FileShouldBeImageTypeException()
+//    }
 
     override fun toString(): String {
         return "url: ${this.fileUrl}, companyId: ${this.company.id!!}, fileType: ${this.fileContentType}, " +

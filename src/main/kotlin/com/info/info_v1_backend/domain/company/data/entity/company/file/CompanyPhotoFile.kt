@@ -30,8 +30,8 @@ class CompanyPhotoFile(
     var company: Company = company
         protected set
 
-    init {
-        if (dto.fileType == FileType.DOCS) throw FileShouldBeImageTypeException()
-    }
+//    init {
+//        if (dto.fileType == FileType.DOCS) throw FileShouldBeImageTypeException()
+//    }
 
 }

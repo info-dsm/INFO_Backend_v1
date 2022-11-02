@@ -14,6 +14,7 @@ import com.info.info_v1_backend.domain.auth.exception.UserAlreadyExists
 import com.info.info_v1_backend.infra.mail.MailUtil
 import org.apache.commons.lang3.RandomStringUtils
 import org.apache.http.auth.AUTH
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 
@@ -50,6 +51,7 @@ class EmailServiceImpl(
         val random = RandomStringUtils.randomNumeric(CODE_LENGTH)
         val emailCheckCode = CheckCompanyEmailCode(email, random)
         checkCompanyEmailCodeRepository.save(emailCheckCode)
+        val code = checkCompanyEmailCodeRepository.findByIdOrNull(email)
         sendMail(email,random)
     }
 
