@@ -10,6 +10,7 @@ import com.info.info_v1_backend.domain.company.business.dto.response.notice.*
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
 import com.info.info_v1_backend.domain.company.data.entity.notice.file.FormAttachment
 import com.info.info_v1_backend.domain.company.data.entity.notice.Notice
+import com.info.info_v1_backend.domain.company.data.entity.notice.NoticeSearchDocument
 import com.info.info_v1_backend.domain.company.data.entity.notice.NoticeWaitingStatus
 import com.info.info_v1_backend.domain.company.data.entity.notice.certificate.Certificate
 import com.info.info_v1_backend.domain.company.data.entity.notice.certificate.CertificateUsage
@@ -181,6 +182,17 @@ class NoticeServiceImpl(
                 )
             }
 
+            noticeSearchDocumentRepository.save(
+                NoticeSearchDocument(
+                    notice.recruitmentBusinessList.map
+                    {
+                        it.detailBusinessDescription + it.technologyList.toString()
+                    }.toString(),
+                    notice.id!!,
+                    notice.company.name,
+                    notice.company.id!!.toString()
+                )
+            )
             return NoticeIdResponse(id)
         } else throw NoAuthenticationException(user.roleList.toString())
     }
@@ -419,7 +431,7 @@ class NoticeServiceImpl(
 
     override fun deleteNotice(user: User, noticeId: Long) {
         val notice = noticeRepository.findById(noticeId).orElse(null)?: throw NoticeNotFoundException(noticeId.toString())
-        if (!checkAuthentication(user, notice)) throw NoAuthenticationException(user.roleList.toString())
+        if (!checkAuthentication(user, notice) && user !is Teacher) throw NoAuthenticationException(user.roleList.toString())
         noticeRepository.delete(notice)
     }
 
