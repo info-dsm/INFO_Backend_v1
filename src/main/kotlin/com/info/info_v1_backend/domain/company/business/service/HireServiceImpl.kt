@@ -50,7 +50,12 @@ class HireServiceImpl(
 
     override fun applyNotice(user: User, noticeId: Long, reporterList: List<MultipartFile>) {
         if (user is Student) {
-            val notice = noticeRepository.findByIdOrNull(noticeId)?: throw NoticeNotFoundException(noticeId.toString())
+            val notice = noticeRepository.findByIdOrNull(noticeId)
+                ?: throw NoticeNotFoundException(noticeId.toString())
+            if(applicantRepository.existsByNoticeAndStudent(notice, user)){
+                throw AlreadyAppliedException("Already Apply Notice : $notice")
+            }
+
             val applicant = applicantRepository.save(
                 Applicant(
                     user,
@@ -61,7 +66,7 @@ class HireServiceImpl(
             reporterList.map {
                 reporterFileRepository.save(
                     Reporter(
-                        s3Util.uploadFile(it, "notice/${notice.id!!}", "reporter"),
+                        s3Util.uploadFile(it, "notice/${notice.id}", "reporter"),
                         applicant
                     )
                 )

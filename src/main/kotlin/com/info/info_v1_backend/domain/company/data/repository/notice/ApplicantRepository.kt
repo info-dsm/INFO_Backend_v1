@@ -13,4 +13,6 @@ interface ApplicantRepository: JpaRepository<Applicant, ApplicantIdClass> {
 
     fun findByNotice(notice: Notice): List<Applicant>
     fun findByNoticeAndStudent(notice: Notice, student: Student): Optional<Applicant>
+
+    fun existsByNoticeAndStudent(notice: Notice, student: Student): Boolean
 }

@@ -23,6 +23,7 @@ enum class ErrorCode(
     INCORRECT_EMAIL("Incorrect Email", HttpStatus.BAD_REQUEST),
     NOT_EMPTY_PLACE_WITH_NOT_SAME_WORK_PLACE("If 'isSameWithCompanyAddress' is empty, you must enter work place", HttpStatus.NOT_FOUND),
     ALREADY_JUDGED_NOTICE("Already judged Notice", HttpStatus.BAD_REQUEST),
+    ALREADY_APPLIED_NOTICE("Already Applied Notice",HttpStatus.BAD_REQUEST),
 
     //401
     TOKEN_IS_NULL("Token Can Not Be Null", HttpStatus.UNAUTHORIZED),
