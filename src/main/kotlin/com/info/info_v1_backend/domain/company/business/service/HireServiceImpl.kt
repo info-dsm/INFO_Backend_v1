@@ -52,9 +52,6 @@ class HireServiceImpl(
         if (user is Student) {
             val notice = noticeRepository.findByIdOrNull(noticeId)
                 ?: throw NoticeNotFoundException(noticeId.toString())
-            if(applicantRepository.existsByNoticeAndStudent(notice, user)){
-                throw AlreadyAppliedException("Already Apply Notice : $notice")
-            }
 
             val applicant = applicantRepository.save(
                 Applicant(
