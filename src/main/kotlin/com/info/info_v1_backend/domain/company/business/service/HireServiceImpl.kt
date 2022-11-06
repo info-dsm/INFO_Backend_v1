@@ -50,23 +50,25 @@ class HireServiceImpl(
 
     override fun applyNotice(user: User, noticeId: Long, reporterList: List<MultipartFile>) {
         if (user is Student) {
-            val notice = noticeRepository.findByIdOrNull(noticeId)
-                ?: throw NoticeNotFoundException(noticeId.toString())
-
-            val applicant = applicantRepository.save(
-                Applicant(
-                    user,
-                    notice,
-                )
-            )
-
-            reporterList.map {
-                reporterFileRepository.save(
-                    Reporter(
-                        s3Util.uploadFile(it, "notice/${notice.id}", "reporter"),
-                        applicant
+            val notice = noticeRepository.findByIdOrNull(noticeId)?: throw NoticeNotFoundException(noticeId.toString())
+            notice.applicantList.firstOrNull {
+                it.student.id == user.id
+            }?:let {
+                val applicant = applicantRepository.save(
+                    Applicant(
+                        user,
+                        notice,
                     )
                 )
+
+                reporterList.map {
+                    reporterFileRepository.save(
+                        Reporter(
+                            s3Util.uploadFile(it, "notice/${notice.id!!}", "reporter"),
+                            applicant
+                        )
+                    )
+                }
             }
 
         } else throw IsNotStudentException(user.roleList.toString())
