@@ -14,7 +14,7 @@ import javax.persistence.*
 @Entity
 @IdClass(ApplicantIdClass::class)
 @Table(name = "applicant")
-@SQLDelete(sql = "UPDATE `applicant` SET applicant_is_delete = true WHERE id = ?")
+@SQLDelete(sql = "UPDATE `applicant` SET applicant_is_delete = true WHERE student_id = ? AND notice_id = ?")
 @Where(clause = "applicant_is_delete = false")
 class Applicant(
     student: Student,
