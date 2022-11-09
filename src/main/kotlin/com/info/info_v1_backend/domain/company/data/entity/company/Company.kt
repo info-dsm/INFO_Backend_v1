@@ -11,14 +11,12 @@ import com.info.info_v1_backend.domain.company.data.entity.comment.Comment
 import com.info.info_v1_backend.domain.company.data.entity.company.embeddable.CompanyContact
 import com.info.info_v1_backend.domain.company.data.entity.company.embeddable.CompanyInformation
 import com.info.info_v1_backend.domain.company.data.entity.company.embeddable.CompanyIntroduction
-import com.info.info_v1_backend.domain.company.data.entity.company.work.hired.HiredStudent
 import com.info.info_v1_backend.domain.company.data.entity.company.tag.BusinessAreaTagged
 import com.info.info_v1_backend.domain.company.data.entity.company.work.field.FieldTraining
+import com.info.info_v1_backend.domain.company.data.entity.company.work.hired.HiredStudent
 import com.info.info_v1_backend.domain.company.data.entity.notice.Notice
 import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
-import org.hibernate.annotations.SQLDelete
-import org.hibernate.annotations.Where
 import java.time.LocalDate
 import java.time.Year
 import javax.persistence.*

@@ -24,7 +24,7 @@ import javax.persistence.Table
 @IdClass(FieldTrainingIdClass::class)
 @Table(name = "field_training")
 @Where(clause = "field_training_is_delete = false")
-@SQLDelete(sql = "UPDATE `field_training` SET field_training_is_delete = true where id = ?")
+@SQLDelete(sql = "UPDATE `field_training` SET field_training_is_delete = true where student_id = ? AND company_id = ?")
 class FieldTraining(
     student: Student,
     company: Company,

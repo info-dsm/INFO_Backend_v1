@@ -52,8 +52,6 @@ class NoticeController(
         noticeService.editNotice(user?: throw TokenCanNotBeNullException(), request, noticeId)
     }
 
-
-
     @GetMapping("/classification/list")
     fun getClassificationList(): List<ClassificationResponse> {
         return noticeService.getClassificationList()

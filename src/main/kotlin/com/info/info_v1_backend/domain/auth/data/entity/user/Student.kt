@@ -1,10 +1,8 @@
 package com.info.info_v1_backend.domain.auth.data.entity.user
 
-import com.info.info_v1_backend.domain.auth.data.entity.type.Role
-import com.info.info_v1_backend.domain.auth.business.dto.request.EditStudentInfoRequest
 import com.info.info_v1_backend.domain.auth.business.dto.response.MinimumStudent
 import com.info.info_v1_backend.domain.auth.business.dto.response.StudentInfoResponse
-import com.info.info_v1_backend.domain.company.data.entity.company.Company
+import com.info.info_v1_backend.domain.auth.data.entity.type.Role
 import com.info.info_v1_backend.domain.company.data.entity.company.work.field.FieldTraining
 import com.info.info_v1_backend.domain.company.data.entity.company.work.hired.HiredStudent
 import com.info.info_v1_backend.domain.company.data.entity.notice.applicant.Applicant
