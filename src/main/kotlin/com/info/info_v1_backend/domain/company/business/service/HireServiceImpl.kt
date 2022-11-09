@@ -24,6 +24,7 @@ import com.info.info_v1_backend.domain.company.data.repository.notice.NoticeRepo
 import com.info.info_v1_backend.domain.company.exception.*
 import com.info.info_v1_backend.global.error.common.NoAuthenticationException
 import com.info.info_v1_backend.infra.amazon.s3.S3Util
+import org.springframework.boot.autoconfigure.kafka.KafkaProperties.Admin
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
@@ -87,31 +88,47 @@ class HireServiceImpl(
     }
 
     override fun cancelApply(user: User, noticeId: Long, studentId: Long) {
-        when (user) {
-            is Student -> {
-                val notice = noticeRepository.findByIdOrNull(noticeId)
-                    ?:throw NoticeNotFoundException(noticeId.toString())
-                applicantRepository.delete(
-                    user.applicantList.firstOrNull {
-                        (!it.isDelete) && (it.student.id == user.id) && (it.notice.id == notice.id)
-                    } ?: throw ApplicantUserNotFoundException("${user.id}, $noticeId")
-                )
-            }
-            is Teacher -> {
-                applicantRepository.delete(
-                    applicantRepository.findByNoticeAndStudent(
-
-                        noticeRepository.findByIdOrNull(noticeId)
-                            ?: throw NoticeNotFoundException(noticeId.toString()),
-
-                        studentRepository.findByIdOrNull(studentId)
-                            ?: throw UserNotFoundException(studentId.toString())
-
-                    ).orElseThrow { ApplicantUserNotFoundException("$studentId, $noticeId") }
-                )
-            }
-            else -> throw NoAuthenticationException(user.roleList.toString())
+//        when (user) {
+//            is Student -> {
+//                val notice = noticeRepository.findByIdOrNull(noticeId)
+//                    ?:throw NoticeNotFoundException(noticeId.toString())
+//                applicantRepository.delete(
+//                    user.applicantList.firstOrNull {
+//                        (!it.isDelete) && (it.student.id == user.id) && (it.notice.id == notice.id)
+//                    } ?: throw ApplicantUserNotFoundException("${user.id}, $noticeId")
+//                )
+//            }
+//            is Teacher -> {
+//                applicantRepository.delete(
+//                    applicantRepository.findByNoticeAndStudent(
+//
+//                        noticeRepository.findByIdOrNull(noticeId)
+//                            ?: throw NoticeNotFoundException(noticeId.toString()),
+//
+//                        studentRepository.findByIdOrNull(studentId)
+//                            ?: throw UserNotFoundException(studentId.toString())
+//
+//                    ).orElseThrow { ApplicantUserNotFoundException("$studentId, $noticeId") }
+//                )
+//            }
+//            else -> throw NoAuthenticationException(user.roleList.toString())
+//        }
+        val notice = noticeRepository.findByIdOrNull(noticeId)
+            ?: throw NoticeNotFoundException(noticeId.toString())
+        val u = if(user is Student && studentId == user.id) {
+            user
+        }else if (user is Teacher){
+            studentRepository.findByIdOrNull(studentId)
+                ?:throw UserNotFoundException(studentId.toString())
+        }else{
+            throw NoAuthenticationException(user.roleList.toString())
         }
+        applicantRepository.delete(
+            applicantRepository.findByNoticeAndStudent(
+                notice,
+                u
+            ).orElseThrow { ApplicantUserNotFoundException("$studentId , $noticeId") }
+        )
     }
 
     override fun getFieldTrainingStudentList(user: User, companyId: Long): List<FieldTrainingResponse> {
