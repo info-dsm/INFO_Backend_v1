@@ -70,6 +70,7 @@ class CompanyController(
     }
 
     @PostMapping("/email")
+    @ResponseStatus(HttpStatus.CREATED)
     fun sendCompanyEmail(
         @Valid
         @NotNull
