@@ -65,7 +65,7 @@ class HireServiceImpl(
                 reporterList.map {
                     reporterFileRepository.save(
                         Reporter(
-                            s3Util.uploadFile(it, "notice/${notice.id!!}", "reporter"),
+                            s3Util.uploadFile(it, "notice/${notice.id}", "reporter"),
                             applicant
                         )
                     )
@@ -146,12 +146,15 @@ class HireServiceImpl(
 
     override fun makeFieldTrainingAndCloseNotice(user: User, request: CloseNoticeRequest, noticeId: Long) {
         if (user is Company || user is Teacher) {
-            val notice = noticeRepository.findByIdOrNull(noticeId) ?: throw NoticeNotFoundException(noticeId.toString())
+            val notice = noticeRepository.findByIdOrNull(noticeId)
+                ?: throw NoticeNotFoundException(noticeId.toString())
+
+            if(user is Company && user != notice.company){
+                throw NoAuthenticationException(user.name)
+            }
 
             notice.applicantList.filter {
-                request.studentIdList.contains(
-                    it.student.id!!
-                )
+                request.studentIdList.contains(it.student.id!!)
             }.map { applicant: Applicant ->
                 fieldTrainingRepository.save(
                     FieldTraining(
@@ -162,6 +165,11 @@ class HireServiceImpl(
                     )
                 )
             }
+
+            applicantRepository.deleteAll(notice.applicantList)
+
+            noticeRepository.delete(notice)
+
         } else throw NoAuthenticationException(user.roleList.toString())
     }
 
