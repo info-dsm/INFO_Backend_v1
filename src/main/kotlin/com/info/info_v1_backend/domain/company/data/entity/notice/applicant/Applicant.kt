@@ -8,6 +8,7 @@ import com.info.info_v1_backend.global.base.entity.BaseTimeEntity
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Where
 import org.springframework.data.domain.Persistable
+import java.io.Serializable
 import javax.persistence.*
 
 
@@ -19,7 +20,7 @@ import javax.persistence.*
 class Applicant(
     student: Student,
     notice: Notice
-): BaseTimeEntity(), Persistable<String>, java.io.Serializable {
+): BaseTimeEntity(), Persistable<String>, Serializable {
 
     @Id
     @ManyToOne(cascade = [CascadeType.REMOVE])

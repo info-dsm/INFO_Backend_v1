@@ -66,7 +66,7 @@ class SecurityConfiguration(
             .antMatchers(HttpMethod.POST, "/api/info/v1/company/password").permitAll()
             .antMatchers(HttpMethod.PUT, "/api/info/v1/company/password/code").permitAll()
             .antMatchers(HttpMethod.GET, "/api/info/v1/company/email/code/check").permitAll()
-            .antMatchers(HttpMethod.GET, "/api/info/v1//company/hint").permitAll()
+            .antMatchers(HttpMethod.GET, "/api/info/v1/company/hint").permitAll()
             .anyRequest().authenticated()
             .and()
             .apply(FilterConfiguration(tokenProvider, customAuthDetailsService, objectMapper))

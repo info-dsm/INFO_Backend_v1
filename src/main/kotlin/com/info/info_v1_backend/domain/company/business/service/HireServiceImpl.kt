@@ -115,7 +115,7 @@ class HireServiceImpl(
 //        }
         val notice = noticeRepository.findByIdOrNull(noticeId)
             ?: throw NoticeNotFoundException(noticeId.toString())
-        val u = if(user is Student && studentId == user.id) {
+        val user2 = if(user is Student && studentId == user.id) {
             user
         }else if (user is Teacher){
             studentRepository.findByIdOrNull(studentId)
@@ -126,7 +126,7 @@ class HireServiceImpl(
         applicantRepository.delete(
             applicantRepository.findByNoticeAndStudent(
                 notice,
-                u
+                user2
             ).orElseThrow { ApplicantUserNotFoundException("$studentId , $noticeId") }
         )
     }
