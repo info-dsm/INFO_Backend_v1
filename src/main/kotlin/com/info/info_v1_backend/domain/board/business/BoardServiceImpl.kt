@@ -81,7 +81,8 @@ class BoardServiceImpl(
             totalStudentCnt++
         }
 
-        val employRate = employStudentCnt/totalStudentCnt
+
+        val employRate = if(totalStudentCnt != 0) { employStudentCnt / totalStudentCnt } else { 0 }
 
 
 
