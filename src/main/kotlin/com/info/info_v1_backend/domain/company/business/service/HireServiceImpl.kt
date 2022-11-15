@@ -70,6 +70,8 @@ class HireServiceImpl(
                         )
                     )
                 }
+            }.let {
+                throw AlreadyExistsException("하나의 Notice에는 특정 직무 하나에만 신청할 수 있습니다. NoticeId: $noticeId, User: ${user.id}")
             }
 
         } else throw IsNotStudentException(user.roleList.toString())
@@ -88,47 +90,21 @@ class HireServiceImpl(
     }
 
     override fun cancelApply(user: User, noticeId: Long, studentId: Long) {
-//        when (user) {
-//            is Student -> {
-//                val notice = noticeRepository.findByIdOrNull(noticeId)
-//                    ?:throw NoticeNotFoundException(noticeId.toString())
-//                applicantRepository.delete(
-//                    user.applicantList.firstOrNull {
-//                        (!it.isDelete) && (it.student.id == user.id) && (it.notice.id == notice.id)
-//                    } ?: throw ApplicantUserNotFoundException("${user.id}, $noticeId")
-//                )
-//            }
-//            is Teacher -> {
-//                applicantRepository.delete(
-//                    applicantRepository.findByNoticeAndStudent(
-//
-//                        noticeRepository.findByIdOrNull(noticeId)
-//                            ?: throw NoticeNotFoundException(noticeId.toString()),
-//
-//                        studentRepository.findByIdOrNull(studentId)
-//                            ?: throw UserNotFoundException(studentId.toString())
-//
-//                    ).orElseThrow { ApplicantUserNotFoundException("$studentId, $noticeId") }
-//                )
-//            }
-//            else -> throw NoAuthenticationException(user.roleList.toString())
-//        }
-        val notice = noticeRepository.findByIdOrNull(noticeId)
-            ?: throw NoticeNotFoundException(noticeId.toString())
-        val user2 = if(user is Student && studentId == user.id) {
-            user
-        }else if (user is Teacher){
-            studentRepository.findByIdOrNull(studentId)
-                ?:throw UserNotFoundException(studentId.toString())
-        }else{
-            throw NoAuthenticationException(user.roleList.toString())
-        }
-        applicantRepository.delete(
-            applicantRepository.findByNoticeAndStudent(
-                notice,
-                user2
-            ).orElseThrow { ApplicantUserNotFoundException("$studentId , $noticeId") }
-        )
+        if (user is Student) {
+            applicantRepository.delete(
+                applicantRepository.findByNoticeAndStudent(
+                    noticeRepository.findByIdOrNull(noticeId)?: throw NoticeNotFoundException(noticeId.toString()),
+                    studentRepository.findByIdOrNull(user.id)?: throw UserNotFoundException(studentId.toString())
+                ).orElse(null)?: throw ApplicantUserNotFoundException("${user.id}, $noticeId")
+            )
+        } else if (user is Teacher) {
+            applicantRepository.delete(
+                applicantRepository.findByNoticeAndStudent(
+                    noticeRepository.findByIdOrNull(noticeId)?: throw NoticeNotFoundException(noticeId.toString()),
+                    studentRepository.findByIdOrNull(studentId)?: throw UserNotFoundException(studentId.toString())
+                ).orElse(null)?: throw ApplicantUserNotFoundException("$studentId, $noticeId")
+            )
+        } else throw NoAuthenticationException(user.roleList.toString())
     }
 
     override fun getFieldTrainingStudentList(user: User, companyId: Long): List<FieldTrainingResponse> {
