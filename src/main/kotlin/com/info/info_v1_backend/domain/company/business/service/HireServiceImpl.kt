@@ -88,31 +88,33 @@ class HireServiceImpl(
     }
 
     override fun cancelApply(user: User, noticeId: Long, studentId: Long) {
-//        when (user) {
-//            is Student -> {
-//                val notice = noticeRepository.findByIdOrNull(noticeId)
-//                    ?:throw NoticeNotFoundException(noticeId.toString())
-//                applicantRepository.delete(
-//                    user.applicantList.firstOrNull {
-//                        (!it.isDelete) && (it.student.id == user.id) && (it.notice.id == notice.id)
-//                    } ?: throw ApplicantUserNotFoundException("${user.id}, $noticeId")
-//                )
-//            }
-//            is Teacher -> {
-//                applicantRepository.delete(
-//                    applicantRepository.findByNoticeAndStudent(
-//
-//                        noticeRepository.findByIdOrNull(noticeId)
-//                            ?: throw NoticeNotFoundException(noticeId.toString()),
-//
-//                        studentRepository.findByIdOrNull(studentId)
-//                            ?: throw UserNotFoundException(studentId.toString())
-//
-//                    ).orElseThrow { ApplicantUserNotFoundException("$studentId, $noticeId") }
-//                )
-//            }
-//            else -> throw NoAuthenticationException(user.roleList.toString())
-//        }
+        /*
+        when (user) {
+        is Student -> {
+        val notice = noticeRepository.findByIdOrNull(noticeId)
+        ?:throw NoticeNotFoundException(noticeId.toString())
+        applicantRepository.delete(
+        user.applicantList.firstOrNull {
+        (!it.isDelete) && (it.student.id == user.id) && (it.notice.id == notice.id)
+        } ?: throw ApplicantUserNotFoundException("${user.id}, $noticeId")
+        )
+        }
+        is Teacher -> {
+        applicantRepository.delete(
+        applicantRepository.findByNoticeAndStudent(
+
+        noticeRepository.findByIdOrNull(noticeId)
+        ?: throw NoticeNotFoundException(noticeId.toString()),
+
+        studentRepository.findByIdOrNull(studentId)
+        ?: throw UserNotFoundException(studentId.toString())
+
+        ).orElseThrow { ApplicantUserNotFoundException("$studentId, $noticeId") }
+        )
+        }
+        else -> throw NoAuthenticationException(user.roleList.toString())
+        }
+        */
         val notice = noticeRepository.findByIdOrNull(noticeId)
             ?: throw NoticeNotFoundException(noticeId.toString())
         val user2 = if(user is Student && studentId == user.id) {
