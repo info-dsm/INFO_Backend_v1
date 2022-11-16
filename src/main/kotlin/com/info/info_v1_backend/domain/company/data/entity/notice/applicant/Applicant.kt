@@ -20,7 +20,7 @@ import javax.persistence.*
 class Applicant(
     student: Student,
     notice: Notice
-): BaseTimeEntity(), Persistable<String>, Serializable {
+): BaseTimeEntity(), Persistable<ApplicantIdClass>, Serializable {
 
     @Id
     @ManyToOne(cascade = [CascadeType.REMOVE])
@@ -40,9 +40,8 @@ class Applicant(
     var reporterList: MutableList<Reporter> = ArrayList()
         protected set
 
-
-    override fun getId(): String? {
-        return this.id
+    override fun getId(): ApplicantIdClass {
+        return ApplicantIdClass(notice.id, student.id);
     }
 
     override fun isNew(): Boolean {
