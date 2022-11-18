@@ -280,7 +280,7 @@ class CompanyController(
         @Valid
         @NotNull(message = "회사 이름을 입력해주세요")
         @RequestParam(required = true) query: String
-    ): List<MinimumCompanyResponse?>? {
+    ): Page<MinimumCompanyResponse>? {
         return companyService.searchCompany(query)
     }
 

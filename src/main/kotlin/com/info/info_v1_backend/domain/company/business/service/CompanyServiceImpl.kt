@@ -67,7 +67,6 @@ class CompanyServiceImpl(
     private val passwordEncoder: PasswordEncoder,
     private val businessAreaTaggedRepository: BusinessAreaTaggedRepository,
     private val companyPhotoFileRepository: FileRepository<CompanyPhotoFile>,
-    private val companyMongoTemplateRepository: MongoTemplateRepository
 ): CompanyService {
 
     override fun sendCompanyPasswordCode(companyNumber: String): String {
@@ -301,12 +300,9 @@ class CompanyServiceImpl(
         }
     }
 
-    override fun searchCompany(query: String): List<MinimumCompanyResponse?>? {
-       return companyMongoTemplateRepository.findAllCompanyName(query).map {
-           it1 ->
-           companyRepository.findByIdOrNull(it1.companyId)?.toMinimumCompanyResponse()
-       }
-       /* return try {
+    override fun searchCompany(query: String): Page<MinimumCompanyResponse>? {
+
+        return try {
             companySearchDocumentRepository.findAllBy(
                 TextCriteria.forDefaultLanguage().matchingAny(query),
                 PageRequest.of(0, 20, Sort.by("createdAt"))
@@ -320,7 +316,7 @@ class CompanyServiceImpl(
             return null
         } catch (e: java.lang.NullPointerException) {
             null
-        }*/
+        }
     }
 
     override fun getBusinessRegisteredCertificate(user: User, companyId: Long): BusinessRegisteredCertificateFile {

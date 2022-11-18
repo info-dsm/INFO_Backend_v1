@@ -6,7 +6,7 @@ data class MinimumNoticeResponse(
     val noticeId: Long,
     val company: MinimumCompanyResponse,
     val recruitmentBusinessResponse: List<RecruitmentBusinessResponse>,
-    val applicantCount: Int
-
+    val applicantCount: Int,
+    val otherFeatures: String?,
 
 )

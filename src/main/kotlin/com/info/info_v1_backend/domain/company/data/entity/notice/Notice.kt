@@ -186,7 +186,8 @@ class Notice(
             },
             this.applicantList.filter {
                     !it.isDelete
-            }.size
+            }.size,
+            this.otherFeatures
             )
 
     }
