@@ -50,7 +50,7 @@ interface CompanyService {
     fun getMinimumCompanyList(idx: Int, size: Int): Page<MinimumCompanyResponse>
     fun getMaximumCompany(id: Long): MaximumCompanyResponse
     fun getEntireMaximumCompanyByUserId(user: User, id: Long): List<MaximumCompanyWithIsWorkingResponse>
-    fun searchCompany(query: String): Page<MinimumCompanyResponse>?
+    fun searchCompany(query: String): List<MinimumCompanyResponse?>?
     fun getBusinessRegisteredCertificate(user: User, companyId: Long): BusinessRegisteredCertificateFile
     fun getNoticeRegisteredCompanyListByYear(user: User, year: Year, idx: Int, size: Int): Page<MinimumCompanyResponse>
 
