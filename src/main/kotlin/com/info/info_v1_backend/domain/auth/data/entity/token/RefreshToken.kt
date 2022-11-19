@@ -4,7 +4,6 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.redis.core.RedisHash
 import org.springframework.data.redis.core.TimeToLive
 
-
 @RedisHash
 class RefreshToken(
     id: String,
@@ -20,8 +19,9 @@ class RefreshToken(
     var ttl: Long = 604800
         protected set
 
-    fun reset(token: String){
+    fun reset(token: String): RefreshToken{
         this.token = token
         this.ttl = 604800
+        return this
     }
 }

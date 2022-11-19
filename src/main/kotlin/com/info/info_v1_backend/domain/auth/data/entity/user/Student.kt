@@ -1,10 +1,8 @@
 package com.info.info_v1_backend.domain.auth.data.entity.user
 
-import com.info.info_v1_backend.domain.auth.data.entity.type.Role
-import com.info.info_v1_backend.domain.auth.business.dto.request.EditStudentInfoRequest
 import com.info.info_v1_backend.domain.auth.business.dto.response.MinimumStudent
 import com.info.info_v1_backend.domain.auth.business.dto.response.StudentInfoResponse
-import com.info.info_v1_backend.domain.company.data.entity.company.Company
+import com.info.info_v1_backend.domain.auth.data.entity.type.Role
 import com.info.info_v1_backend.domain.company.data.entity.company.work.field.FieldTraining
 import com.info.info_v1_backend.domain.company.data.entity.company.work.hired.HiredStudent
 import com.info.info_v1_backend.domain.company.data.entity.notice.applicant.Applicant
@@ -24,6 +22,7 @@ class Student(
     email: String,
     password: String,
     creationList: MutableList<Creation>?,
+    githubLink: String?
 ): User(
     name,
     email,
@@ -32,7 +31,7 @@ class Student(
 ) {
     val studentKey: String = studentKey
 
-    val entranceYear: Year = Year.now().minusYears((studentKey.substring(0, 1).toLong()-1))
+    val entranceYear: Int = Year.now().minusYears((studentKey.substring(0, 1).toLong()-1)).value
 
     @OneToMany(mappedBy = "student", cascade = [CascadeType.REMOVE])
     var creationList: MutableList<Creation>? = creationList
@@ -49,13 +48,19 @@ class Student(
     var applicantList: MutableList<Applicant> = ArrayList()
         protected set
 
+    @Column(name = "github_link", nullable = false)
+    var githubLink: String? = githubLink
+        protected set
+
     fun toMinimumStudent(): MinimumStudent {
         return MinimumStudent(
                 this.name,
                 this.studentKey,
+                this.email,
                 this.id!!
         )
     }
+
 
     fun toStudentInfoResponse(): StudentInfoResponse {
         return StudentInfoResponse(
@@ -63,14 +68,12 @@ class Student(
             this.email,
             this.studentKey,
             this.fieldTrainingList.filter {
-                !it.isDelete || !it.isLinked
-            }.isNotEmpty(),
+                !it.isLinked
+            }.isNotEmpty() ||
             this.hiredStudentList.filter {
-                !it.isFire || !it.isDelete
+                !it.isFire
             }.isNotEmpty(),
-            this.hiredStudentList.filter {
-                !it.isFire || !it.isDelete
-            }.firstOrNull()?.company?.toMinimumCompanyResponse()
+            this.githubLink
         )
     }
 

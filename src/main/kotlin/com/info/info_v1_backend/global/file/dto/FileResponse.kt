@@ -6,5 +6,6 @@ data class FileResponse(
     val fileId: Long,
     val fileUrl: String,
     val fileType: FileType,
-    val extension: String
+    val extension: String,
+    val fileName: String
 )

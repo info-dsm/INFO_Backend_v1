@@ -1,4 +1,10 @@
 spring:
+  servlet:
+    multipart:
+      max-file-size: 7MB
+      max-request-size: 30MB
+  application:
+    name: "info-dsm-v1"
   jpa:
     database: mysql
     hibernate:
@@ -6,8 +12,6 @@ spring:
     generate-ddl: true
     show-sql: false
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
-
-
 
   datasource:
     url: ${dbDefaultUrl}
@@ -18,12 +22,29 @@ spring:
     job:
       enabled: false
 
+
   redis:
     host: ${redisHost}
     port: 6379
 
 server:
   port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - info
+          - health
+          - loggers
+          - mappings
+          - metrics
+          - shutdown
+          - prometheus
+#  metrics:
+#    tags:
+#      application: ${sprring.application.name}
 
 datasource:
   mongo:
@@ -72,4 +93,7 @@ mail:
         starttls:
           enable: true
 
+#logging:
+#  level:
+#    root: debug
 

@@ -2,19 +2,18 @@ package com.info.info_v1_backend.domain.company.business.dto.request.company
 
 import com.info.info_v1_backend.domain.company.data.entity.company.address.AddressInfo
 import com.info.info_v1_backend.domain.company.data.entity.company.embeddable.CompanyInformation
-import java.time.Year
 import javax.validation.constraints.Max
-import javax.validation.constraints.Size
+import javax.validation.constraints.Min
 
 
 data class CompanyInformationRequest(
     val homeAddress: AddressInfo,
     val agentAddress: AddressInfo?,
     val representative: String,
-    val establishedAt: Year,
+    val establishedAt: Int,
     @field:Max(100000)
     val workerCount: Int,
-    @field:Size(max = 20)
+    @field:Min(0) @field:Max(10000000000000)
     val annualSales: Long
 
 ) {

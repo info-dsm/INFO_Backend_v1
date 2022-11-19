@@ -14,7 +14,8 @@ class CompanySearchDocument(
     companyId: Long,
 ) {
     @Id
-    val id: ObjectId = ObjectId.get()
+    var id: ObjectId = ObjectId.get()
+        protected set
     @TextIndexed(weight = 10F)
     var companyName: String = companyName
         protected set
@@ -23,8 +24,8 @@ class CompanySearchDocument(
     val companyId: Long = companyId
 
     @TextScore
-    @Field(name = "text_score")
-    val textScore: Float? = null
+    var textScore: Float? = null
+        protected set
 
     fun changeCompanyName(newName: String) {
         this.companyName = newName

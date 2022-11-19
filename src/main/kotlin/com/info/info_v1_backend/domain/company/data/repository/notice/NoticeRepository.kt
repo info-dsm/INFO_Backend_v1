@@ -6,12 +6,13 @@ import com.info.info_v1_backend.domain.company.data.entity.notice.NoticeWaitingS
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
-import java.util.Optional
+import java.time.LocalDateTime
+import java.util.*
 
 interface NoticeRepository: JpaRepository<Notice, Long> {
 
-    fun findAllByIsApprove(approve: NoticeWaitingStatus, pageable: Pageable): Page<Notice>
-    fun findByIdAndCompanyAndIsApproveNot(id: Long, company: Company, notApproveStatus: NoticeWaitingStatus): Optional<Notice>
-    fun findAllByCompany(company: Company): List<Notice>
-
+    fun findAllByApproveStatus(approve: NoticeWaitingStatus, pageable: Pageable): Page<Notice>
+    fun findByIdAndCompanyAndApproveStatusNot(id: Long, company: Company, notApproveStatus: NoticeWaitingStatus): Optional<Notice>
+    fun findAllByCompanyOrderByCreatedAtDesc(company: Company): List<Notice>
+    fun findAllByCreatedAtBetween(start: LocalDateTime, end: LocalDateTime, pageable: Pageable): Page<Notice>
 }

@@ -16,7 +16,6 @@ import javax.persistence.IdClass
 import javax.persistence.JoinColumn
 import javax.persistence.JoinColumns
 import javax.persistence.ManyToOne
-import javax.persistence.OneToMany
 import javax.persistence.OneToOne
 import javax.persistence.Table
 
@@ -24,7 +23,7 @@ import javax.persistence.Table
 @IdClass(HiredStudentIdClass::class)
 @Table(name = "hired_student")
 @Where(clause = "hired_student_is_delete = false")
-@SQLDelete(sql = "UPDATE `hired_student` SET hired_student_is_delete = true where id = ?")
+@SQLDelete(sql = "UPDATE `hired_student` SET hired_student_is_delete = true where student_id = ? AND company_id")
 class HiredStudent(
     student: Student,
     company: Company,
@@ -87,7 +86,7 @@ class HiredStudent(
         return HiredStudentResponse(
             this.student.id!!,
             this.student.name,
-            this.student.studentKey,
+            this.student.entranceYear - 2014,
             this.company.id!!,
             this.startDate
         )

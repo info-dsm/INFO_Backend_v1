@@ -1,47 +1,43 @@
 package com.info.info_v1_backend.global.security.config
 
-import com.info.info_v1_backend.global.security.jwt.JwtFilter
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.info.info_v1_backend.global.security.jwt.TokenProvider
 import com.info.info_v1_backend.global.security.jwt.auth.CustomAuthDetailsService
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.config.annotation.web.builders.WebSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer
 import org.springframework.security.config.http.SessionCreationPolicy
-import org.springframework.security.crypto.bcrypt.BCrypt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import org.springframework.security.web.SecurityFilterChain
 import org.springframework.web.cors.CorsUtils
-
 
 @Configuration
 @EnableWebSecurity
 class SecurityConfiguration(
     private val tokenProvider: TokenProvider,
     private val customAuthDetailsService: CustomAuthDetailsService,
-    private val objectMapper: ObjectMapper
-): WebSecurityConfigurerAdapter() {
-
-
+    private val objectMapper: ObjectMapper,
+) {
     @Bean
     fun passwordEncoder(): PasswordEncoder {
         return BCryptPasswordEncoder()
     }
-
+    @Bean
     @Throws(Exception::class)
-    override fun configure(web: WebSecurity) {
-        web.ignoring().antMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api-docs/**", "/api-docs.json"
-        , "/swagger-ui.html", "/dsql-api-docs/**"
-        )
+    fun webSecurityCustomer(): WebSecurityCustomizer {
+        return WebSecurityCustomizer {
+            it.ignoring().antMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api-docs/**", "/api-docs.json"
+            , "/swagger-ui.html", "/dsql-api-docs/**")}
     }
 
+    @Bean
     @Throws(Exception::class)
-    override fun configure(httpSecurity: HttpSecurity) {
-        httpSecurity
+    fun configure(httpSecurity: HttpSecurity): SecurityFilterChain {
+        return httpSecurity
             .csrf().disable()
             .formLogin().disable()
             .cors()
@@ -53,17 +49,26 @@ class SecurityConfiguration(
             .and()
             .authorizeRequests()
             .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-            .antMatchers(
-                "/api/**").permitAll()
-            .antMatchers("/api/dsql/v1/news/img").authenticated()
-            .antMatchers("/api/dsql/v1/auth/reissue").authenticated()
-            .antMatchers("/api/dsql/v1/project/img").authenticated()
-            .antMatchers("/api/dsql/v1/project/dev").authenticated()
-            .antMatchers("/api/dsql/v1/project/url").authenticated()
-            .anyRequest().permitAll()
+//            .antMatchers(
+//                "/api/**").anonymous()
+            .antMatchers(HttpMethod.POST, "/api/info/v1/auth/email/school").permitAll()
+            .antMatchers(HttpMethod.POST, "/api/info/v1/auth/signup/student").permitAll()
+            .antMatchers(HttpMethod.POST, "/api/info/v1/auth/signup/teacher").permitAll()
+            .antMatchers(HttpMethod.POST, "/api/info/v1/auth/login").permitAll()
+            .antMatchers(HttpMethod.GET, "/api/info/v1/auth/email/code/check").permitAll()
+            .antMatchers(HttpMethod.GET, "/api/info/v1/auth/student/check").permitAll()
+            .antMatchers(HttpMethod.POST, "/api/info/v1/company/email").permitAll()
+            .antMatchers(HttpMethod.POST, "/api/info/v1/company").permitAll()
+            .antMatchers(HttpMethod.GET, "/api/info/v1/company/business-area").permitAll()
+            .antMatchers(HttpMethod.POST, "/api/info/v1/company/login").permitAll()
+            .antMatchers(HttpMethod.POST, "/api/info/v1/company/password").permitAll()
+            .antMatchers(HttpMethod.PUT, "/api/info/v1/company/password/code").permitAll()
+            .antMatchers(HttpMethod.GET, "/api/info/v1/company/email/code/check").permitAll()
+            .antMatchers(HttpMethod.GET, "/api/info/v1/company/hint").permitAll()
+            .anyRequest().authenticated()
             .and()
             .apply(FilterConfiguration(tokenProvider, customAuthDetailsService, objectMapper))
+            .and().build()
     }
-
 
 }

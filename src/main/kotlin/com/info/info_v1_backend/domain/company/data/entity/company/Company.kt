@@ -5,18 +5,18 @@ import com.info.info_v1_backend.domain.auth.data.entity.user.User
 import com.info.info_v1_backend.domain.company.business.dto.request.company.CompanyNameRequest
 import com.info.info_v1_backend.domain.company.business.dto.request.company.EditCompanyRequest
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.company.MaximumCompanyWithIsWorkingResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.MinimumCompanyResponse
-import com.info.info_v1_backend.domain.company.business.dto.response.notice.NoticeWithIsApproveResponse
 import com.info.info_v1_backend.domain.company.data.entity.comment.Comment
 import com.info.info_v1_backend.domain.company.data.entity.company.embeddable.CompanyContact
 import com.info.info_v1_backend.domain.company.data.entity.company.embeddable.CompanyInformation
 import com.info.info_v1_backend.domain.company.data.entity.company.embeddable.CompanyIntroduction
-import com.info.info_v1_backend.domain.company.data.entity.company.work.hired.HiredStudent
 import com.info.info_v1_backend.domain.company.data.entity.company.tag.BusinessAreaTagged
 import com.info.info_v1_backend.domain.company.data.entity.company.work.field.FieldTraining
+import com.info.info_v1_backend.domain.company.data.entity.company.work.hired.HiredStudent
 import com.info.info_v1_backend.domain.company.data.entity.notice.Notice
-import org.hibernate.annotations.SQLDelete
-import org.hibernate.annotations.Where
+import org.hibernate.annotations.OnDelete
+import org.hibernate.annotations.OnDeleteAction
 import java.time.LocalDate
 import java.time.Year
 import javax.persistence.*
@@ -24,8 +24,7 @@ import javax.persistence.*
 
 @Entity
 @DiscriminatorValue("company")
-@Where(clause = "user_is_delete = false")
-@SQLDelete(sql = "UPDATE `user` SET user_is_delete = true where id = ?")
+@OnDelete(action = OnDeleteAction.CASCADE)
 class Company(
     password: String,
     companyName: CompanyNameRequest,
@@ -33,7 +32,7 @@ class Company(
     companyContact: CompanyContact,
     companyIntroduction: CompanyIntroduction,
     isLeading: Boolean,
-
+    passwordHint: String
 ): User(
     companyName.companyName,
     companyContact.email,
@@ -77,6 +76,10 @@ class Company(
     var noticeList: MutableList<Notice> = ArrayList()
         protected set
 
+    @ElementCollection
+    var noticeRegisteredYearList: MutableList<Int> = ArrayList()
+        protected set
+
     @OneToMany(mappedBy = "company")
     var hiredStudentList: MutableList<HiredStudent> = ArrayList()
         protected set
@@ -89,9 +92,18 @@ class Company(
     var isAssociated: Boolean = false
         protected set
 
-    @Column(name = "company_is_delete", nullable = false)
-    var isDelete: Boolean = false
+    var passwordHint: String = passwordHint
         protected set
+
+    fun changePasswordHint(hint: String) {
+        this.passwordHint = hint
+    }
+
+    fun updateLastNoticeYear() {
+        if (!this.noticeRegisteredYearList.contains(
+            LocalDate.now().year
+        )) this.noticeRegisteredYearList.add(LocalDate.now().year)
+    }
 
     fun makeAssociated() {
         this.isAssociated = true
@@ -111,39 +123,77 @@ class Company(
             this.companyInformation.annualSales,
             this.isLeading,
             this.isAssociated,
-            Year.of(this.noticeList.last().createdAt?.year ?: LocalDate.now().year),
+            this.noticeList.lastOrNull()?.createdAt?.year?. let {Year.of(it)},
             this.hiredStudentList.filter {
                 !it.isFire
-            }.map {
-                it.toHiredStudentResponse()
-            },
+            }.size,
             this.commentList.map {
                 it.toCommentResponse()
-            }
+            },
+            this.companyIntroduction.toCompanyIntroductionResponse(),
         )
     }
 
     fun toMaximumCompanyResponse(): MaximumCompanyResponse {
         return MaximumCompanyResponse(
-            this.id!!,
-            this.companyNumber,
-            this.name,
-            this.companyInformation.toCompanyInformationRequest(),
-            this.companyContact.toCompanyContactRequest(),
-            this.businessAreaTaggedList.map {
+            companyId = this.id!!,
+            companyNumber = this.companyNumber,
+            companyName = this.name,
+            companyInformation = this.companyInformation.toCompanyInformationRequest(),
+            companyContact = this.companyContact.toCompanyContactRequest(),
+            businessAreaResponseList = this.businessAreaTaggedList.map {
                 it.businessArea.toBusinessAreaResponse()
             },
-            this.companyIntroduction.toCompanyIntroductionResponse(),
-            this.commentList.map {
+            companyIntroduction = this.companyIntroduction.toCompanyIntroductionResponse(),
+            commentList = this.commentList.map {
                 it.toCommentResponse()
             },
-            this.isLeading,
-            this.isAssociated
+            isLeading = this.isLeading,
+            isAssociated = this.isAssociated,
+            lastNoticeDate = this.noticeList.lastOrNull()
+                ?.createdAt?.toLocalDate(),
+            totalHiredStudentList = this.hiredStudentList.map {
+                it.toHiredStudentResponse()
+            }
+        )
+    }
+
+    fun toMaximumCompanyWithIsWorkingResponse(): MaximumCompanyWithIsWorkingResponse {
+        return MaximumCompanyWithIsWorkingResponse(
+            this.toMaximumCompanyResponse(),
+            this.fieldTrainingList.filter {
+                !it.isDelete && !it.isLinked
+            }.firstOrNull()?.let {
+                return@let true
+            }?: this.hiredStudentList.filter {
+                !it.isFire && !it.isDelete
+            }.firstOrNull()?. let {
+                return@let true
+            }?: false
         )
     }
 
     fun editCompany(r: EditCompanyRequest) {
-
+        r.companyName?.let {
+            this.name = r.companyName
+        }
+        r.companyInformation?.let {
+            this.companyInformation.editCompanyInformation(it)
+        }
+        r.companyContact?.let {
+            this.companyContact.editCompanyContact(it)
+        }
+        r.introduction?.let {
+            this.companyIntroduction.editCompanyIntroduction(it)
+        }
+        r.isLeading?.let {
+            this.isLeading = it
+        }
     }
+
+    fun addBusinessAreaTagged(businessAreaTagged: BusinessAreaTagged) {
+        this.businessAreaTaggedList.add(businessAreaTagged)
+    }
+
 
 }

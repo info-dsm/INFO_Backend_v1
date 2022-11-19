@@ -11,14 +11,14 @@ data class TeacherSingUpRequest(
 
     val emailCheckCode: String,
 
-    @field:Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d~!@#\$%^&*()+|=]{8,30}\$",
-        message = "비밀번호는영소문자,대문자,숫자,특수문자 8~30자여야 합니다.")
+    @field:Pattern(regexp = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@\$%^&*-]).{8,30}\$",
+        message = "비밀번호는 영소문자,대문자,숫자,특수문자 8~30자여야 합니다.")
     val password: String,
 
     @field:NotNull
     val teacherCheckCode: String,
 
     @field:NotNull
-    @field:Size(min = 2, max = 4, message="2 ~ 4글자")
+    @field:Size(min = 2, max = 4, message="2 ~ 4글자이여야 합니다.")
     val name: String,
 )

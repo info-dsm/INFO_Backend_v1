@@ -1,6 +1,7 @@
 package com.info.info_v1_backend.domain.company.data.entity.company.embeddable
 
 import com.info.info_v1_backend.domain.company.business.dto.request.company.CompanyContactRequest
+import com.info.info_v1_backend.domain.company.business.dto.request.company.EditCompanyContactRequest
 import javax.persistence.Column
 import javax.persistence.Embeddable
 
@@ -43,4 +44,21 @@ class CompanyContact(
         )
     }
 
+    fun editCompanyContact(r: EditCompanyContactRequest) {
+        r.contactorName?.let {
+            this.contactorName = it
+        }
+        r.contactorRank?.let {
+            this.contactorRank = it
+        }
+        r.phoneNumber?.let {
+            this.phoneNumber = it
+        }
+        r.contactorPhone?.let {
+            this.contactorPhone = it
+        }
+        r.email?.let {
+            this.email = it
+        }
+    }
 }

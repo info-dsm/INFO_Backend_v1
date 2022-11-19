@@ -1,5 +1,6 @@
 package com.info.info_v1_backend.global.security.jwt
 
+import com.info.info_v1_backend.global.error.common.TokenCanNotBeNullException
 import com.info.info_v1_backend.global.security.jwt.auth.CustomAuthDetailsService
 import com.info.info_v1_backend.global.security.jwt.data.TokenResponse
 import com.info.info_v1_backend.global.security.jwt.env.JwtProperty
@@ -51,12 +52,13 @@ class TokenProvider(
     fun getSubjectWithExpiredCheck(token: String): String {
         val body = decodeBody(token)
         val now = Date()
-        if (now.after(Date(now.time + body.expiration.time))) throw ExpiredTokenException(token)
+        if (now.after(Date(body.expiration.time))) throw ExpiredTokenException(token)
         return body.subject
+            ?: throw TokenCanNotBeNullException("Subject is Null")
     }
 
     fun isExpired(token: String): Boolean {
-        val body = Jwts.parser().setSigningKey(jwtProperty.secretKey).parseClaimsJwt(token).body
+        val body = Jwts.parser().setSigningKey(jwtProperty.secretKey).parseClaimsJws(token).body
         val now = Date()
         return now.after(Date(now.time + body.expiration.time))
     }

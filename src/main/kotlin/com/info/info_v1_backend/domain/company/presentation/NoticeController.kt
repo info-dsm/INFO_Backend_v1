@@ -1,17 +1,12 @@
 package com.info.info_v1_backend.domain.company.presentation
 
-import com.info.info_v1_backend.domain.auth.business.dto.response.MinimumStudent
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
-import com.info.info_v1_backend.domain.company.business.dto.request.notice.CloseNoticeRequest
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.edit.EditNoticeRequest
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.register.RegisterNoticeRequest
-import com.info.info_v1_backend.domain.company.business.dto.response.notice.MaximumNoticeWithoutPayResponse
-import com.info.info_v1_backend.domain.company.business.dto.response.notice.MinimumNoticeResponse
-import com.info.info_v1_backend.domain.company.business.dto.response.notice.NoticeWithIsApproveResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.notice.*
 import com.info.info_v1_backend.domain.company.business.service.NoticeService
 import com.info.info_v1_backend.domain.company.data.entity.notice.interview.InterviewProcess
-import com.info.info_v1_backend.global.error.common.TokenNotFoundException
-import com.info.info_v1_backend.global.file.dto.FileDto
+import com.info.info_v1_backend.global.error.common.TokenCanNotBeNullException
 import com.info.info_v1_backend.global.file.dto.FileResponse
 import org.springframework.data.domain.Page
 import org.springframework.http.HttpStatus
@@ -42,20 +37,128 @@ class NoticeController(
     @ResponseStatus(HttpStatus.CREATED)
     fun registerNotice(
         @AuthenticationPrincipal user: User?,
-        @RequestPart request: RegisterNoticeRequest,
-        @RequestPart attachment: List<MultipartFile>
-    ) {
-        noticeService.registerNotice(user?: throw TokenNotFoundException(), request, attachment)
+        @RequestPart(required = true) request: RegisterNoticeRequest,
+        @RequestPart(required = true) attachment: List<MultipartFile>
+    ): NoticeIdResponse{
+        return noticeService.registerNotice(user?: throw TokenCanNotBeNullException(), request, attachment)
     }
+
+    @PatchMapping
+    fun editNotice(
+        @AuthenticationPrincipal user: User?,
+        @RequestBody request: EditNoticeRequest,
+        @RequestParam(required = true) noticeId: Long
+    ) {
+        noticeService.editNotice(user?: throw TokenCanNotBeNullException(), request, noticeId)
+    }
+
+    @GetMapping("/classification/list")
+    fun getClassificationList(): List<ClassificationResponse> {
+        return noticeService.getClassificationList()
+    }
+
+    @PutMapping("/{noticeId}/{recruitmentBusinessId}/{bigClassificationId}/{smallClassificationId}")
+    fun changeClassification(
+        @AuthenticationPrincipal user: User?,
+        @PathVariable bigClassificationId: String,
+        @PathVariable smallClassificationId: String,
+        @PathVariable noticeId: Long,
+        @PathVariable recruitmentBusinessId: Long
+    ) {
+        return noticeService.changeClassification(
+            user?: throw TokenCanNotBeNullException(),
+            bigClassificationId,
+            smallClassificationId,
+            noticeId,
+            recruitmentBusinessId
+        )
+    }
+
+
+
+    @GetMapping("/language/list")
+    fun getLanguageList(): List<LanguageResponse> {
+        return noticeService.getLanguageList()
+    }
+
+    @PutMapping("/{noticeId}/{recruitmentBusinessId}/language/{languageName}")
+    fun addLanguageSet(
+        @AuthenticationPrincipal user: User?,
+        @PathVariable languageName: String,
+        @PathVariable noticeId: Long,
+        @PathVariable recruitmentBusinessId: Long
+    ) {
+        return noticeService.addLanguageSet(
+            user?: throw TokenCanNotBeNullException(),
+            languageName,
+            noticeId,
+            recruitmentBusinessId
+        )
+    }
+
+    @DeleteMapping("/{noticeId}/{recruitmentBusinessId}/language/{languageName}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun removeLanguage(
+        @AuthenticationPrincipal user: User?,
+        @PathVariable languageName: String,
+        @PathVariable noticeId: Long,
+        @PathVariable recruitmentBusinessId: Long
+    ) {
+        return noticeService.removeLanguageSet(
+            user?: throw TokenCanNotBeNullException(),
+            languageName,
+            noticeId,
+            recruitmentBusinessId
+        )
+    }
+
+
+
+    @GetMapping("/technology/list")
+    fun getTechnologyList(): List<TechnologyResponse> {
+        return noticeService.getTechnologyList()
+    }
+
+    @PutMapping("/{noticeId}/{recruitmentBusinessId}/technology/{technologyId}")
+    fun addTechnology(
+        @AuthenticationPrincipal user: User?,
+        @PathVariable technologyId: String,
+        @PathVariable noticeId: Long,
+        @PathVariable recruitmentBusinessId: Long
+    ) {
+        return noticeService.addTechnologySet(
+            user?: throw TokenCanNotBeNullException(),
+            technologyId,
+            noticeId,
+            recruitmentBusinessId
+        )
+    }
+
+    @DeleteMapping("/{noticeId}/{recruitmentBusinessId}/technology/{technologyId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun removeTechnologySet(
+        @AuthenticationPrincipal user: User?,
+        @PathVariable technologyId: String,
+        @PathVariable noticeId: Long,
+        @PathVariable recruitmentBusinessId: Long
+    ) {
+        return noticeService.removeTechnologySet(
+            user?: throw TokenCanNotBeNullException(),
+            technologyId,
+            noticeId,
+            recruitmentBusinessId
+        )
+    }
+
 
 
     @PutMapping("/attachment")
     fun changeAttachment(
         @AuthenticationPrincipal user: User?,
-        @RequestPart attachment: List<MultipartFile>,
+        @RequestPart(required = true) attachment: List<MultipartFile>,
         @RequestParam(required = true) noticeId: Long
     ) {
-        noticeService.changeAttachment(user?: throw TokenNotFoundException(), attachment, noticeId)
+        noticeService.changeAttachment(user?: throw TokenCanNotBeNullException(), attachment, noticeId)
     }
 
     @PutMapping("/interview/process")
@@ -65,23 +168,65 @@ class NoticeController(
         @RequestParam(required = true) noticeId: Long
     ) {
         noticeService.changeInterviewProcess(
-            user?: throw TokenNotFoundException(),
+            user?: throw TokenCanNotBeNullException(),
             interviewProcessMap,
             noticeId
         )
     }
 
-
-    //add attachment
-
-    @PatchMapping
-    fun editNotice(
+    @DeleteMapping("/interview/process")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun removeInterviewProcess(
         @AuthenticationPrincipal user: User?,
-        @RequestBody request: EditNoticeRequest,
+        @RequestParam(required = true) sequence: Int,
         @RequestParam(required = true) noticeId: Long
     ) {
-        noticeService.editNotice(user?: throw TokenNotFoundException(), request, noticeId)
+        noticeService.removeInterviewProcess(
+            user?: throw TokenCanNotBeNullException(),
+            sequence,
+            noticeId
+        )
     }
+
+
+
+    @GetMapping("/certificate/list")
+    fun getCertificateList(): List<CertificateResponse> {
+        return noticeService.getCertificateList()
+    }
+
+    @PutMapping("/{noticeId}/{recruitmentBusinessId}/certificate/{certificateName}")
+    fun addCertificate(
+        @AuthenticationPrincipal user: User?,
+        @PathVariable certificateName: String,
+        @PathVariable noticeId: Long,
+        @PathVariable recruitmentBusinessId: Long
+    ) {
+        return noticeService.addCertificate(
+            user?: throw TokenCanNotBeNullException(),
+            certificateName,
+            noticeId,
+            recruitmentBusinessId
+        )
+    }
+
+    @DeleteMapping("/{noticeId}/{recruitmentBusinessId}/certificate/{certificateName}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun removeCertificate(
+        @AuthenticationPrincipal user: User?,
+        @PathVariable certificateName: String,
+        @PathVariable noticeId: Long,
+        @PathVariable recruitmentBusinessId: Long
+    ) {
+        return noticeService.removeCertificate(
+            user?: throw TokenCanNotBeNullException(),
+            certificateName,
+            noticeId,
+            recruitmentBusinessId
+        )
+    }
+
+
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -89,17 +234,9 @@ class NoticeController(
         @AuthenticationPrincipal user: User?,
         @RequestParam(required = true) noticeId: Long
     ) {
-        noticeService.deleteNotice(user?: throw TokenNotFoundException(), noticeId)
+        noticeService.deleteNotice(user?: throw TokenCanNotBeNullException(), noticeId)
     }
 
-    @GetMapping("/me")
-    fun getMyNoticeList(
-        @AuthenticationPrincipal user: User?
-    ): List<NoticeWithIsApproveResponse> {
-        return noticeService.getMyNoticeList(
-            user?: throw TokenNotFoundException()
-        )
-    }
 
 
     @PutMapping("/approve")
@@ -107,7 +244,7 @@ class NoticeController(
         @AuthenticationPrincipal user: User?,
         @RequestParam(required = true) noticeId: Long
     ) {
-        return noticeService.approveNotice(user?: throw TokenNotFoundException(), noticeId)
+        return noticeService.approveNotice(user?: throw TokenCanNotBeNullException(), noticeId)
     }
 
     @DeleteMapping("/approve")
@@ -116,9 +253,8 @@ class NoticeController(
         @AuthenticationPrincipal user: User?,
         @RequestParam(required = true) noticeId: Long
     ) {
-        return noticeService.rejectNotice(user?: throw TokenNotFoundException(), noticeId)
+        return noticeService.rejectNotice(user?: throw TokenCanNotBeNullException(), noticeId)
     }
-
 
     @GetMapping("/waiting-notice/list")
     fun getWaitingNoticeList(
@@ -127,12 +263,22 @@ class NoticeController(
         @RequestParam(defaultValue = "10") size: Int
     ): Page<MinimumNoticeResponse> {
         return noticeService.getWaitingNoticeList(
-            user?: throw TokenNotFoundException(),
+            user?: throw TokenCanNotBeNullException(),
             idx,
             size
         )
     }
 
+
+
+    @GetMapping("/me")
+    fun getMyNoticeList(
+        @AuthenticationPrincipal user: User?
+    ): List<NoticeWithApproveStatusResponse> {
+        return noticeService.getMyNoticeList(
+            user?: throw TokenCanNotBeNullException()
+        )
+    }
 
     @GetMapping("/list")
     fun getMinimumNoticeList(
@@ -144,24 +290,27 @@ class NoticeController(
 
     @GetMapping
     fun getMaximumNotice(
+        @AuthenticationPrincipal user: User?,
         @RequestParam(required = true) id: Long
     ): MaximumNoticeWithoutPayResponse {
-        return noticeService.getMaximumNotice(id)
+        return noticeService.getMaximumNotice(id, user?: throw TokenCanNotBeNullException())
     }
 
     @GetMapping("/search")
     fun searchMinimumNotice(
         @RequestParam query: String
-    ): Page<MinimumNoticeResponse> {
+    ): Page<MinimumNoticeResponse>? {
         return noticeService.searchMinimumNoticeList(query)
     }
+
+
 
     @PostMapping("/out")
     fun printNotice(
         @AuthenticationPrincipal user: User?,
         @RequestParam(required = true) noticeId: Long
     ): FileResponse {
-        return noticeService.printNotice(user?: throw TokenNotFoundException(), noticeId)
+        return noticeService.printNotice(user?: throw TokenCanNotBeNullException(), noticeId)
     }
 
 

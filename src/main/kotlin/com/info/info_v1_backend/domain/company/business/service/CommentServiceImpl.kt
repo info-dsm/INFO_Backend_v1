@@ -20,32 +20,32 @@ import org.springframework.stereotype.Service
 class CommentServiceImpl(
     private val companyRepository: CompanyRepository,
     private val commentRepository: CommentRepository,
-    private val currentUtil: CurrentUtil
 ): CommentService {
 
     override fun writeComment(user: User, request: WriteCommentRequest, companyId: Long) {
         if (user is Student) {
             val company = companyRepository.findByIdOrNull(companyId)?: throw CompanyNotFoundException(companyId.toString())
-            if (company.hiredStudentList.map { it.student }.contains(user) ||
-                company.fieldTrainingList.map { it.student }.contains(user)) {
-                commentRepository.save(
-                    Comment(
-                        request.content,
-                        company,
-                        user
-                    )
+            commentRepository.save(
+                Comment(
+                    request.content,
+                    company,
+                    user
                 )
-            }
+            )
+
         }
         throw IsNotStudentException(user.roleList.toString())
     }
 
     override fun editComment(user: User, request: EditCommentRequest, commentId: Long) {
         if (user is Student) {
-            val comment = commentRepository.findByWriterAndId(user, commentId).orElse(null)?:
-            throw CommentNotFoundException(commentId.toString())
+            val comment = commentRepository.findByWriterAndId(user, commentId)
+                .orElse(null)?: throw CommentNotFoundException(commentId.toString())
 
             comment.editComment(request)
+        } else if (user is Teacher) {
+            (commentRepository.findById(commentId).orElse(null)?: throw CommentNotFoundException(commentId.toString()))
+                .editComment(request)
         }
         throw IsNotStudentException(user.roleList.toString())
     }

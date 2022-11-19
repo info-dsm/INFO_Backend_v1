@@ -1,6 +1,5 @@
 package com.info.info_v1_backend.domain.company.business.service
 
-import com.info.info_v1_backend.domain.auth.business.dto.response.MinimumStudent
 import com.info.info_v1_backend.domain.auth.data.entity.user.Student
 import com.info.info_v1_backend.domain.auth.data.entity.user.Teacher
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
@@ -11,6 +10,7 @@ import com.info.info_v1_backend.domain.company.business.dto.request.notice.Close
 import com.info.info_v1_backend.domain.company.business.dto.response.company.FieldTrainingResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.FieldTrainingStudentWithHiredResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.HiredStudentResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.notice.ApplicantResponse
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
 import com.info.info_v1_backend.domain.company.data.entity.company.work.field.FieldTraining
 import com.info.info_v1_backend.domain.company.data.entity.notice.applicant.Applicant
@@ -18,16 +18,15 @@ import com.info.info_v1_backend.domain.company.data.entity.notice.file.Reporter
 import com.info.info_v1_backend.domain.company.data.repository.company.CompanyRepository
 import com.info.info_v1_backend.domain.company.data.repository.company.FieldTrainingRepository
 import com.info.info_v1_backend.domain.company.data.repository.company.HiredStudentRepository
-import com.info.info_v1_backend.domain.company.data.repository.company.ReporterFileRepository
+import com.info.info_v1_backend.domain.company.data.repository.notice.ReporterFileRepository
 import com.info.info_v1_backend.domain.company.data.repository.notice.ApplicantRepository
 import com.info.info_v1_backend.domain.company.data.repository.notice.NoticeRepository
 import com.info.info_v1_backend.domain.company.exception.*
 import com.info.info_v1_backend.global.error.common.NoAuthenticationException
 import com.info.info_v1_backend.infra.amazon.s3.S3Util
-import org.joda.time.Days
+import org.springframework.boot.autoconfigure.kafka.KafkaProperties.Admin
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -53,45 +52,50 @@ class HireServiceImpl(
     override fun applyNotice(user: User, noticeId: Long, reporterList: List<MultipartFile>) {
         if (user is Student) {
             val notice = noticeRepository.findByIdOrNull(noticeId)?: throw NoticeNotFoundException(noticeId.toString())
-            val applicant = applicantRepository.save(
-                Applicant(
-                    user,
-                    notice,
-                )
-            )
-
-            reporterList.map {
-                reporterFileRepository.save(
-                    Reporter(
-                        s3Util.uploadFile(it, "notice/${notice.id!!}", "reporter"),
-                        applicant
+            notice.applicantList.firstOrNull {
+                it.student.id == user.id
+            }?:let {
+                val applicant = applicantRepository.save(
+                    Applicant(
+                        user,
+                        notice,
                     )
                 )
+
+                reporterList.map {
+                    reporterFileRepository.save(
+                        Reporter(
+                            s3Util.uploadFile(it, "notice/${notice.id}", "reporter"),
+                            applicant
+                        )
+                    )
+                }
+            }.let {
+                throw AlreadyExistsException("하나의 Notice에는 특정 직무 하나에만 신청할 수 있습니다. NoticeId: $noticeId, User: ${user.id}")
             }
 
         } else throw IsNotStudentException(user.roleList.toString())
     }
 
-    override fun getApplierList(user: User, noticeId: Long, idx: Int, size: Int): Page<MinimumStudent> {
+    override fun getApplierList(user: User, noticeId: Long, idx: Int, size: Int): List<ApplicantResponse> {
         if (user is Company || user is Teacher) {
             val notice = noticeRepository.findByIdOrNull(noticeId)?: throw NoticeNotFoundException(noticeId.toString())
 
             return applicantRepository.findByNotice(
-                notice,
-                PageRequest.of(idx, size, Sort.by("created_at").descending())
+                notice
             ).map {
-                (studentRepository.findByIdOrNull(it.student.id!!)?: throw UserNotFoundException(it.student.id.toString()))
-                    .toMinimumStudent()
+                it.toApplicantResponse()
             }
-        } else throw NoAuthenticationException(noticeId.toString())
+        } else throw NoAuthenticationException(user.roleList.toString())
     }
 
     override fun cancelApply(user: User, noticeId: Long, studentId: Long) {
         if (user is Student) {
             applicantRepository.delete(
-                user.applicantList.filter {
-                    !it.isDelete && it.student.id == user.id && it.notice.id!! == noticeId
-                }.firstOrNull()?: throw ApplicantUserNotFoundException("${user.id}, $noticeId")
+                applicantRepository.findByNoticeAndStudent(
+                    noticeRepository.findByIdOrNull(noticeId)?: throw NoticeNotFoundException(noticeId.toString()),
+                    studentRepository.findByIdOrNull(user.id)?: throw UserNotFoundException(studentId.toString())
+                ).orElse(null)?: throw ApplicantUserNotFoundException("${user.id}, $noticeId")
             )
         } else if (user is Teacher) {
             applicantRepository.delete(
@@ -107,10 +111,10 @@ class HireServiceImpl(
         if (user is Student) throw NoAuthenticationException(user.roleList.toString())
         else {
             companyRepository.findByIdOrNull(companyId)?. let {
-                return it.fieldTrainingList.filter {
-                    !it.isDelete && !it.isLinked && it.createdAt!!.year == LocalDateTime.now().year
-                }.map {
-                    it.toFieldTrainingResponse()
+                return it.fieldTrainingList.filter { it1 ->
+                    !it1.isDelete && !it1.isLinked && it1.createdAt!!.year == LocalDateTime.now().year
+                }.map { it1 ->
+                    it1.toFieldTrainingResponse()
                 }
             }?: throw CompanyNotFoundException(companyId.toString())
         }
@@ -118,12 +122,15 @@ class HireServiceImpl(
 
     override fun makeFieldTrainingAndCloseNotice(user: User, request: CloseNoticeRequest, noticeId: Long) {
         if (user is Company || user is Teacher) {
-            val notice = noticeRepository.findByIdOrNull(noticeId) ?: throw NoticeNotFoundException(noticeId.toString())
+            val notice = noticeRepository.findByIdOrNull(noticeId)
+                ?: throw NoticeNotFoundException(noticeId.toString())
+
+            if(user is Company && user != notice.company){
+                throw NoAuthenticationException(user.name)
+            }
 
             notice.applicantList.filter {
-                request.studentIdList.contains(
-                    it.student.id!!
-                )
+                request.studentIdList.contains(it.student.id!!)
             }.map { applicant: Applicant ->
                 fieldTrainingRepository.save(
                     FieldTraining(
@@ -134,86 +141,115 @@ class HireServiceImpl(
                     )
                 )
             }
+
+            applicantRepository.deleteAll(notice.applicantList)
+
+            noticeRepository.delete(notice)
+
         } else throw NoAuthenticationException(user.roleList.toString())
     }
 
     override fun fireFieldTrainingStudent(user: User, studentId: Long, companyId: Long) {
-        if (user is Company) {
-            (
-                    (fieldTrainingRepository.findByStudentAndCompany(
-                        studentRepository.findByIdOrNull(studentId)?: throw UserNotFoundException(studentId.toString()),
-                        user
-                    )).orElse(null)?: throw FieldTrainingNotFoundException("$studentId, $companyId")
-                    ).makeNoLinked()
+        when (user) {
+            is Company -> {
+                (
+                        (fieldTrainingRepository.findByStudentAndCompany(
+                            studentRepository.findByIdOrNull(studentId)
+                                ?: throw UserNotFoundException(studentId.toString()),
+                            user
+                        )).orElseThrow { FieldTrainingNotFoundException("$studentId, $companyId") }
+                        ).makeNoLinked()
+            }
 
-        } else if (user is Teacher) {
-            val company = companyRepository.findByIdOrNull(companyId)?: throw CompanyNotFoundException(companyId.toString())
-            (
-                    fieldTrainingRepository.findByStudentAndCompany(
-                        studentRepository.findByIdOrNull(studentId)?: throw UserNotFoundException(studentId.toString()),
-                        company
-                    ).orElse(null)?: throw FieldTrainingNotFoundException("$studentId, $companyId")
-                    ).makeNoLinked()
+            is Teacher -> {
+                val company = companyRepository.findByIdOrNull(companyId)
+                    ?: throw CompanyNotFoundException(companyId.toString())
+                (
+                        fieldTrainingRepository.findByStudentAndCompany(
+                            studentRepository.findByIdOrNull(studentId)
+                                ?: throw UserNotFoundException(studentId.toString()),
+                            company
+                        ).orElseThrow { FieldTrainingNotFoundException("$studentId, $companyId") }
+                        ).makeNoLinked()
 
-        } else throw NoAuthenticationException(user.roleList.toString())
+            }
+
+            else -> throw NoAuthenticationException(user.roleList.toString())
+        }
     }
 
     override fun getHiredStudentList(user: User, companyId: Long): List<HiredStudentResponse> {
         if (user is Student) throw NoAuthenticationException(user.roleList.toString())
         else {
             companyRepository.findByIdOrNull(companyId)?. let {
-                return it.hiredStudentList.filter {
-                    !it.isDelete && !it.isFire && it.createdAt!!.year == LocalDateTime.now().year
-                }.map {
-                    it.toHiredStudentResponse()
+                return it.hiredStudentList.filter { it1 ->
+                    !it1.isDelete && !it1.isFire && it1.createdAt!!.year == LocalDateTime.now().year
+                }.map { it1 ->
+                    it1.toHiredStudentResponse()
                 }
             }?: throw CompanyNotFoundException(companyId.toString())
         }
     }
 
     override fun hireStudent(user: User, studentId: Long, companyId: Long, startDate: LocalDate) {
-        if (user is Company) {
-            val training = user.fieldTrainingList.firstOrNull {
-                it.student.id!! == studentId
-            } ?: throw IsNotFieldTrainingException(studentId.toString())
+        when (user) {
+            is Company -> {
+                val training = user.fieldTrainingList.firstOrNull {
+                    it.student.id!! == studentId
+                } ?: throw IsNotFieldTrainingException(studentId.toString())
 
-            training.let {
-                hiredStudentRepository.save(
-                    it.toHiredStudent(startDate)
-                )
+                training.let {
+                    hiredStudentRepository.save(
+                        it.toHiredStudent(startDate)
+                    )
+                }
+
             }
 
-        } else if(user is Teacher) {
-            val company = companyRepository.findByIdOrNull(companyId)?: throw CompanyNotFoundException(companyId.toString())
+            is Teacher -> {
+                val company = companyRepository.findByIdOrNull(companyId)
+                    ?: throw CompanyNotFoundException(companyId.toString())
 
-            val training = company.fieldTrainingList.filter {
-                it.student.id!! == studentId
-            }.firstOrNull()?: throw IsNotFieldTrainingException(studentId.toString())
+                val training = company.fieldTrainingList.firstOrNull {
+                    it.student.id!! == studentId
+                } ?: throw IsNotFieldTrainingException(studentId.toString())
 
-            training.let {
-                hiredStudentRepository.save(
-                    it.toHiredStudent(startDate)
-                )
+                training.let {
+                    hiredStudentRepository.save(
+                        it.toHiredStudent(startDate)
+                    )
+                }
+
             }
 
-        } else throw NoAuthenticationException(user.roleList.toString())
+            else -> throw NoAuthenticationException(user.roleList.toString())
+        }
     }
 
     override fun fireStudent(user: User, studentId: Long, companyId: Long) {
-        if (user is Company) {
-            (hiredStudentRepository.findByStudentAndCompany(
-                studentRepository.findByIdOrNull(studentId)?: throw UserNotFoundException(studentId.toString()),
-                user
-            ).orElse(null)?: throw HiredStudentNotFound(studentId.toString())
-                    ).makeFire()
-        } else if (user is Teacher) {
-            (hiredStudentRepository.findByStudentAndCompany(
-                studentRepository.findByIdOrNull(studentId)?: throw UserNotFoundException(studentId.toString()),
-                companyRepository.findByIdOrNull(companyId)?: throw CompanyNotFoundException(companyId.toString())
-            ).orElse(null)?: throw HiredStudentNotFound(studentId.toString())
-                    ).makeFire()
+        when (user) {
+            is Company -> {
+                (hiredStudentRepository.findByStudentAndCompany(
+                    studentRepository.findByIdOrNull(studentId)?: throw UserNotFoundException(studentId.toString()),
+                    user
+                ).orElse(null)?: throw HiredStudentNotFoundException(studentId.toString())
+                        ).makeFire()
+            }
 
-        } else throw NoAuthenticationException(user.roleList.toString())
+            is Teacher -> {
+                (hiredStudentRepository.findByStudentAndCompany(
+
+                    studentRepository.findByIdOrNull(studentId)
+                        ?: throw UserNotFoundException(studentId.toString()),
+
+                    companyRepository.findByIdOrNull(companyId)
+                        ?: throw CompanyNotFoundException(companyId.toString())
+
+                ).orElseThrow { HiredStudentNotFoundException(studentId.toString()) }
+                        ).makeFire()
+            }
+            else -> throw NoAuthenticationException(user.roleList.toString())
+        }
     }
 
     override fun getFieldTrainingStudentWithHiredListInThisYear(

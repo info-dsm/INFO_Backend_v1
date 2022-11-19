@@ -56,7 +56,7 @@ class IndividualProjectController(
     @PostMapping("/image/{project-id}")
     @ResponseStatus(HttpStatus.CREATED)
     fun uploadImage(
-        @RequestPart image: MultipartFile,
+        @RequestPart(required = true) image: MultipartFile,
         @PathVariable("project-id") projectId: Long
     ) {
         individualProjectService.uploadImage(image, projectId)

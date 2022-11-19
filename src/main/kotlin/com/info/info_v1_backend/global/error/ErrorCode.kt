@@ -10,8 +10,6 @@ enum class ErrorCode(
     ALREADY_SAME_NAME_PROJECT_EXISTS("Already Same Name Project Exists.", HttpStatus.BAD_REQUEST),
     USER_ALREADY_EXISTS("User Already Exists", HttpStatus.BAD_REQUEST),
     INVALID_PARAMETER("Null or Invalid Parameter Value Inputted", HttpStatus.BAD_REQUEST),
-    INVALID_TOKEN("Invalid Token", HttpStatus.BAD_REQUEST),
-    EXPIRED_TOKEN("token Expired", HttpStatus.BAD_REQUEST),
     INCORRECT_PASSWORD("Incorrect Password", HttpStatus.BAD_REQUEST),
     EMAIL_ERROR("Email 전송 과정 중 에러가 발생했습니다.", HttpStatus.BAD_GATEWAY),
     INVALID_FILE_EXTENSION("Invalid File Extension", HttpStatus.BAD_REQUEST),
@@ -20,14 +18,22 @@ enum class ErrorCode(
     CONTACTOR_MUST_LEAVE_LEAST_AT_ONE_ON_COMPANY("Contactor Must leave least at one on company", HttpStatus.BAD_REQUEST),
     IS_NOT_FIELD_TRAINING_STUDENT("Is not fieldtraining student", HttpStatus.BAD_REQUEST),
     IS_ALREADY_FIELD_TRAINING_STUDENT("Is already field training student", HttpStatus.BAD_REQUEST),
+    FILE_SHOULD_BE_IMAGE_TYPE("File should be image type", HttpStatus.BAD_REQUEST),
+    ALREADY_EXISTS("Already Exists", HttpStatus.BAD_REQUEST),
+    INCORRECT_EMAIL("Incorrect Email", HttpStatus.BAD_REQUEST),
+    NOT_EMPTY_PLACE_WITH_NOT_SAME_WORK_PLACE("If 'isSameWithCompanyAddress' is empty, you must enter work place", HttpStatus.NOT_FOUND),
+    ALREADY_JUDGED_NOTICE("Already judged Notice", HttpStatus.BAD_REQUEST),
 
     //401
-    TOKEN_NOT_FOUND("Token Not Found", HttpStatus.UNAUTHORIZED),
+    TOKEN_IS_NULL("Token Can Not Be Null", HttpStatus.UNAUTHORIZED),
+    UN_AUTHORIZED("Un Authorized", HttpStatus.UNAUTHORIZED),
+    INVALID_TOKEN("Invalid Token", HttpStatus.UNAUTHORIZED),
+    EXPIRED_TOKEN("token Expired", HttpStatus.UNAUTHORIZED),
 
     //403
     NOT_HAVE_ACCESS_TO_THE_PROJECT("Not Have Access To The project", HttpStatus.FORBIDDEN),
     FORBIDDEN("권한이 없습니다", HttpStatus.FORBIDDEN),
-    IS_NOT_STUDENT("You are not student", HttpStatus.FORBIDDEN),
+    IS_NOT_STUDENT("Is not student", HttpStatus.FORBIDDEN),
     NO_AUTHENTICATION("you have No Authentication", HttpStatus.FORBIDDEN),
 
     //404
@@ -50,6 +56,8 @@ enum class ErrorCode(
     HIRED_STUDENT_NOT_FOUND("Hired Student Not Found", HttpStatus.NOT_FOUND),
     FIELD_TRAINING_NOT_FOUND("Field training not found", HttpStatus.NOT_FOUND),
     APPLICANT_USER_NOT_FOUND("Applicant user not found", HttpStatus.NOT_FOUND),
+    BIG_CLASSIFICATION_NOT_FOUND("Big classification not found", HttpStatus.NOT_FOUND),
+    RECRUITMENT_BUSINESS_NOT_FOUND("Recruitment business not found", HttpStatus.NOT_FOUND),
 
 
     //500

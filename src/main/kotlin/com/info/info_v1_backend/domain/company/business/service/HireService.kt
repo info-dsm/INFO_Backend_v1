@@ -6,7 +6,9 @@ import com.info.info_v1_backend.domain.company.business.dto.request.notice.Close
 import com.info.info_v1_backend.domain.company.business.dto.response.company.FieldTrainingResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.FieldTrainingStudentWithHiredResponse
 import com.info.info_v1_backend.domain.company.business.dto.response.company.HiredStudentResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.notice.ApplicantResponse
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
+import com.info.info_v1_backend.domain.company.data.entity.notice.applicant.Applicant
 import org.springframework.data.domain.Page
 import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDate
@@ -14,7 +16,7 @@ import java.time.Year
 
 interface HireService {
 
-    fun getApplierList(user: User, noticeId: Long, idx: Int, size: Int): Page<MinimumStudent>
+    fun getApplierList(user: User, noticeId: Long, idx: Int, size: Int): List<ApplicantResponse>
     fun applyNotice(user: User, noticeId: Long, reporterList: List<MultipartFile>)
     fun cancelApply(user: User, noticeId: Long, studentId: Long)
 

@@ -6,38 +6,48 @@ import com.info.info_v1_backend.domain.company.data.entity.company.file.CompanyI
 import com.info.info_v1_backend.domain.company.data.entity.company.file.CompanyLogoFile
 import com.info.info_v1_backend.domain.company.data.entity.company.file.CompanyPhotoFile
 import com.info.info_v1_backend.global.file.entity.File
+import javax.persistence.CascadeType
 import javax.persistence.Embeddable
+import javax.persistence.JoinColumn
 import javax.persistence.OneToMany
 import javax.persistence.OneToOne
 
 @Embeddable
 class CompanyIntroduction(
     introduction: String,
-//    businessRegisteredCertificate: BusinessRegisteredCertificateFile,
-//    companyIntroductionFile: MutableList<CompanyIntroductionFile>,
-//    companyLogo: CompanyLogoFile?,
-//    companyPhotoList: MutableList<CompanyPhotoFile>
 ) {
 
     var introduction: String = introduction
         protected set
 
-    @OneToOne
+    @OneToOne(cascade = [CascadeType.PERSIST])
+    @JoinColumn(nullable = true)
     var businessRegisteredCertificate: BusinessRegisteredCertificateFile? = null
         protected set
 
-    @OneToMany
+    @OneToMany(cascade = [CascadeType.PERSIST])
     var companyIntroductionFile: MutableList<CompanyIntroductionFile> = ArrayList()
         protected set
 
-    @OneToOne
+    @OneToOne(cascade = [CascadeType.PERSIST])
+    @JoinColumn(nullable = true)
     var companyLogo: CompanyLogoFile? = null
         protected set
 
-    @OneToMany(mappedBy = "company")
+    @OneToMany(cascade = [CascadeType.PERSIST])
     var companyPhotoList: MutableList<CompanyPhotoFile> = ArrayList()
         protected set
 
+
+    fun addCompanyIntroductionFile(file: CompanyIntroductionFile) {
+        this.companyIntroductionFile.add(file)
+    }
+
+
+    fun registerCompanyLogoAndBusinessCertificate(logo: CompanyLogoFile, businessRegisteredCertificate: BusinessRegisteredCertificateFile) {
+        this.companyLogo = logo
+        this.businessRegisteredCertificate = businessRegisteredCertificate
+    }
 
     fun changeBusinessRegisteredCertificate(file: BusinessRegisteredCertificateFile) {
         this.businessRegisteredCertificate = file
@@ -67,19 +77,23 @@ class CompanyIntroduction(
 
     fun toCompanyIntroductionResponse(): CompanyIntroductionResponse {
         return CompanyIntroductionResponse(
-            this.introduction,
-            this.companyIntroductionFile.map {
+            introduction = this.introduction,
+            companyIntroductionFile = this.companyIntroductionFile.map {
                 it.toFileResponse()
-            },
-            this.companyLogo?.toFileResponse(),
-            this.companyPhotoList.map {
+            }.toList(),
+            companyLogo = this.companyLogo?.toFileResponse(),
+            companyPhotoList = this.companyPhotoList.map {
                 it.toFileResponse()
-            }
+            }.toList()
         )
     }
 
     fun getBusinessRegisteredCertificateResponse(): BusinessRegisteredCertificateFile {
         return this.businessRegisteredCertificate!!
+    }
+
+    fun editCompanyIntroduction(introduction: String) {
+        this.introduction = introduction
     }
 
 }

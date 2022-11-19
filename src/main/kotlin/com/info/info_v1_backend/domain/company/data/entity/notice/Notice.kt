@@ -1,26 +1,35 @@
 package com.info.info_v1_backend.domain.company.data.entity.notice
 
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.edit.EditNoticeRequest
-import com.info.info_v1_backend.domain.company.business.dto.response.notice.*
+import com.info.info_v1_backend.domain.company.business.dto.request.notice.edit.EditRecruitmentRequest
+import com.info.info_v1_backend.domain.company.business.dto.response.notice.MaximumNoticeWithPayResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.notice.MaximumNoticeWithoutPayResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.notice.MinimumNoticeResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.notice.NoticeWithApproveStatusResponse
 import com.info.info_v1_backend.domain.company.data.entity.company.Company
 import com.info.info_v1_backend.domain.company.data.entity.notice.applicant.Applicant
 import com.info.info_v1_backend.domain.company.data.entity.notice.embeddable.*
 import com.info.info_v1_backend.domain.company.data.entity.notice.file.FormAttachment
-import com.info.info_v1_backend.domain.company.data.entity.notice.file.Reporter
 import com.info.info_v1_backend.domain.company.data.entity.notice.interview.InterviewProcess
 import com.info.info_v1_backend.domain.company.data.entity.notice.interview.InterviewProcessUsage
 import com.info.info_v1_backend.domain.company.data.entity.notice.recruitment.RecruitmentBusiness
-import com.info.info_v1_backend.global.base.entity.BaseAuthorEntity
-import org.hibernate.annotations.SQLDelete
-import org.hibernate.annotations.Where
+import com.info.info_v1_backend.global.base.entity.BaseTimeEntity
+import com.info.info_v1_backend.global.error.common.InvalidParameterException
+import org.hibernate.annotations.*
+import java.time.LocalDate
 import javax.persistence.*
+import javax.persistence.CascadeType
+import javax.persistence.Entity
+import javax.persistence.Table
+import kotlin.collections.ArrayList
 
 
-@Entity
-@Table(name = "notice")
 @SQLDelete(sql = "UPDATE `notice` SET notice_is_delete = true WHERE id = ?")
 @Where(clause = "notice_is_delete = false")
+@Entity
+@Table(name = "notice")
 class Notice(
+    id: Long,
     company: Company,
 //    recruitmentBusinessList: MutableList<RecruitmentBusiness>,
     workTime: WorkTime,
@@ -31,8 +40,6 @@ class Notice(
 
     noticeOpenPeriod: NoticeOpenPeriod,
 
-    interviewProcessList: List<InterviewProcessUsage>,
-
     needDocuments: String?,
 
     otherFeatures: String?,
@@ -40,21 +47,19 @@ class Notice(
     isPersonalContact: Boolean,
 
 
-    ): BaseAuthorEntity() {
-    @Id
-    @GeneratedValue(
-        strategy = GenerationType.IDENTITY,
-    )
-    val id: Long? = null
+): BaseTimeEntity() {
 
-    @ManyToOne(cascade = [CascadeType.REMOVE])
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long = id
+
+    @ManyToOne(cascade = [CascadeType.PERSIST])
     @JoinColumn(name = "company_id", nullable = false)
     val company: Company = company
 
 
-    @OneToOne
-    @JoinColumn(name = "recruitment_business_id", nullable = false)
-    var recruitmentBusiness: RecruitmentBusiness? = null
+    @OneToMany
+    var recruitmentBusinessList: MutableList<RecruitmentBusiness> = kotlin.collections.ArrayList()
         protected set
 
     @Embedded
@@ -79,7 +84,7 @@ class Notice(
 
 
     @ElementCollection
-    var interviewProcessList: MutableList<InterviewProcessUsage> = interviewProcessList as MutableList<InterviewProcessUsage>
+    var interviewProcessList: MutableList<InterviewProcessUsage> = kotlin.collections.ArrayList()
         protected set
 
     @Column(name = "need_documents", nullable = true)
@@ -97,7 +102,7 @@ class Notice(
     @Column(name = "is_personal_contact", nullable = false)
     var isPersonalContact: Boolean = isPersonalContact
 
-    @OneToMany(mappedBy = "notice")
+    @OneToMany(cascade = [CascadeType.REMOVE], orphanRemoval = true)
     var formAttachmentList: MutableList<FormAttachment> = ArrayList()
         protected set
 
@@ -107,12 +112,17 @@ class Notice(
         protected set
 
     @Column(name = "notice_is_approve", nullable = false)
-    var isApprove: NoticeWaitingStatus = NoticeWaitingStatus.WAITING
+    var approveStatus: NoticeWaitingStatus = NoticeWaitingStatus.WAITING
         protected set
 
-    @OneToMany(mappedBy = "notice")
+    @OneToMany(mappedBy = "notice", cascade = [CascadeType.PERSIST])
     var applicantList: MutableList<Applicant> = ArrayList()
         protected set
+
+    init {
+        this.company.updateLastNoticeYear()
+        if (LocalDate.now().isAfter(noticeOpenPeriod.startDate)) throw InvalidParameterException("notice open period: start date must after then now.")
+    }
 
 
     fun addAttachment(formAttachment: FormAttachment) {
@@ -120,39 +130,81 @@ class Notice(
     }
 
     fun addRecruitmentBusiness(recruitmentBusiness: RecruitmentBusiness) {
-        this.recruitmentBusiness = recruitmentBusiness
+        this.recruitmentBusinessList.add(recruitmentBusiness)
+    }
+
+    fun addInterviewProcessAll(interviewProcessList: List<InterviewProcess>) {
+        interviewProcessList.map {
+            this.interviewProcessList.add(
+                InterviewProcessUsage(
+                    interviewProcessList.indexOf(it) + 1,
+                    it
+                )
+            )
+        }
+
     }
 
     fun changeInterviewProcess(key: Int, interviewProcess: InterviewProcess) {
-        this.interviewProcessList.first { it.sequence == key }.changeInterviewProcess(interviewProcess)
+        this.interviewProcessList.firstOrNull { it.sequence == key }
+            ?.changeInterviewProcess(interviewProcess)
+            ?:this.interviewProcessList.add(
+                InterviewProcessUsage(
+                    this.interviewProcessList.size + 1,
+                    interviewProcess
+                )
+            )
+    }
+
+    fun removeInterviewProcess(key: Int) {
+        this.interviewProcessList.first {
+            it.sequence == key
+        }.let {
+            this.interviewProcessList.remove(it)
+        }
+        this.interviewProcessList.filter {
+            it.sequence >= key
+        }.map {
+            it.pullSequence(key)
+        }
     }
 
     fun approveNotice() {
-        this.isApprove = NoticeWaitingStatus.APPROVE
+        this.approveStatus = NoticeWaitingStatus.APPROVE
+    }
+
+    fun rejectNotice() {
+        this.approveStatus = NoticeWaitingStatus.REJECT
     }
 
     fun toMinimumNoticeResponse(): MinimumNoticeResponse {
         return MinimumNoticeResponse(
-            this.id!!,
+            this.id,
             this.company.toMinimumCompanyResponse(),
-            this.recruitmentBusiness!!.toRecruitmentBusinessResponse(),
+            this.recruitmentBusinessList.map {
+                it.toRecruitmentBusinessResponse()
+            },
             this.applicantList.filter {
-                !it.isDelete
-            }.size
-        )
+                    !it.isDelete
+            }.size,
+            this.otherFeatures
+            )
+
     }
 
     fun toMaximumNoticeWithoutPayResponse(): MaximumNoticeWithoutPayResponse {
         return MaximumNoticeWithoutPayResponse(
             this.id!!,
             this.company.toMaximumCompanyResponse(),
-            this.recruitmentBusiness!!.toRecruitmentBusinessResponse(),
+            this.recruitmentBusinessList.map{
+                it.toRecruitmentBusinessResponse()
+            },
             this.workTime.toWorkTimeRequest(),
             this.mealSupport.toMealSupportRequest(),
             this.welfare.toWelfare(),
             this.noticeOpenPeriod.toNoticeOpenPeriod(),
             this.interviewProcessList.map {
-                it.interviewProcess
+                return@map mapOf(Pair(it.sequence, it.interviewProcess.meaning))
             },
             this.needDocuments,
             this.otherFeatures,
@@ -167,6 +219,14 @@ class Notice(
     }
 
     fun editNotice(r: EditNoticeRequest) {
+        r.recruitmentBusiness?.let {
+            r: EditRecruitmentRequest ->
+            this.recruitmentBusinessList.firstOrNull {
+                it.id ==  r.recruitmentBusinessId
+            }?.let {
+                it.editRecruitmentBusiness(r)
+            }
+        }
         r.workTime?.let {
             this.workTime.editWorkTime(r.workTime)
         }
@@ -193,35 +253,17 @@ class Notice(
         }
     }
 
-    fun toNoticeWithIsApproveResponse(): NoticeWithIsApproveResponse {
-        return NoticeWithIsApproveResponse(
+    fun toNoticeWithApproveStatusResponse(): NoticeWithApproveStatusResponse {
+        return NoticeWithApproveStatusResponse(
             this.toMaximumNoticeWithPayResponse(),
-            this.isApprove == NoticeWaitingStatus.APPROVE
+            this.approveStatus
         )
     }
 
     fun toMaximumNoticeWithPayResponse(): MaximumNoticeWithPayResponse {
         return MaximumNoticeWithPayResponse(
-            this.id!!,
-            this.company.toMaximumCompanyResponse(),
-            this.recruitmentBusiness!!.toRecruitmentBusinessResponse(),
-            this.pay.toPayRequest(),
-            this.workTime.toWorkTimeRequest(),
-            this.mealSupport.toMealSupportRequest(),
-            this.welfare.toWelfare(),
-            this.noticeOpenPeriod.toNoticeOpenPeriod(),
-            this.interviewProcessList.map {
-                it.interviewProcess
-            },
-            this.needDocuments,
-            this.otherFeatures,
-            this.workPlace.toWorkPlaceRequest(),
-            this.formAttachmentList.map {
-                it.toFileResponse()
-            },
-            this.applicantList.filter {
-                !it.isDelete
-            }.size
+            this.toMaximumNoticeWithoutPayResponse(),
+            this.pay.toPayRequest()
         )
     }
 

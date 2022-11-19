@@ -4,7 +4,7 @@ import com.info.info_v1_backend.domain.auth.data.entity.user.User
 import com.info.info_v1_backend.domain.company.business.dto.request.comment.EditCommentRequest
 import com.info.info_v1_backend.domain.company.business.dto.request.comment.WriteCommentRequest
 import com.info.info_v1_backend.domain.company.business.service.CommentService
-import com.info.info_v1_backend.global.error.common.TokenNotFoundException
+import com.info.info_v1_backend.global.error.common.TokenCanNotBeNullException
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.validation.annotation.Validated
@@ -31,7 +31,7 @@ class CommentController(
         @RequestBody request: WriteCommentRequest,
         @RequestParam(required = true) companyId: Long
     ) {
-        commentService.writeComment(user?: throw TokenNotFoundException(), request, companyId)
+        commentService.writeComment(user?: throw TokenCanNotBeNullException(), request, companyId)
     }
 
     @PatchMapping
@@ -41,7 +41,7 @@ class CommentController(
         @RequestBody request: EditCommentRequest,
         @RequestParam(required = true) commentId: Long
     ) {
-        commentService.editComment(user?: throw TokenNotFoundException(), request, commentId)
+        commentService.editComment(user?: throw TokenCanNotBeNullException(), request, commentId)
     }
 
     @DeleteMapping
@@ -50,7 +50,7 @@ class CommentController(
         @AuthenticationPrincipal user: User?,
         @RequestParam(required = true) commentId: Long
     ) {
-        commentService.deleteComment(user?: throw TokenNotFoundException(), commentId)
+        commentService.deleteComment(user?: throw TokenCanNotBeNullException(), commentId)
     }
 
 }

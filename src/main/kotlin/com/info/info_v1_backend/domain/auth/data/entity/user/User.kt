@@ -9,7 +9,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import javax.persistence.*
 
-
 @Where(clause = "user_is_delete = false")
 @SQLDelete(sql = "UPDATE `user` SET user_is_delete = true where id = ?")
 @Table(name = "user")

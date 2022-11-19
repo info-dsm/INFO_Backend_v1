@@ -5,7 +5,7 @@ import java.time.LocalDate
 data class HiredStudentResponse(
     val studentId: Long,
     val studentName: String,
-    val studentKey: String,
+    val studentGeneration: Int,
     val companyId: Long,
     val startDate: LocalDate,
 )

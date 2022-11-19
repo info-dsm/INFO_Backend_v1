@@ -15,7 +15,8 @@ class NoticeSearchDocument(
 ) {
 
     @Id
-    val id: ObjectId = ObjectId.get()
+    var id: ObjectId = ObjectId.get()
+        protected set
 
     @TextIndexed(weight = 10F)
     var businessInformation: String = businessInformation

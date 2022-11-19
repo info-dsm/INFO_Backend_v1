@@ -8,11 +8,16 @@ import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseBody
+import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.context.request.WebRequest
+import org.springframework.web.multipart.MaxUploadSizeExceededException
+import org.springframework.web.multipart.MultipartException
 import javax.validation.ConstraintViolationException
+import javax.validation.UnexpectedTypeException
+import javax.validation.ValidationException
 
 
-@ControllerAdvice
+@RestControllerAdvice
 class ErrorHandler {
 
 
@@ -27,8 +32,7 @@ class ErrorHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
-    @ResponseBody
-    fun methodArgumentNotValidException(e: MethodArgumentNotValidException): ResponseEntity<*> {
+    fun methodArgumentNotValidExceptionHandler(e: MethodArgumentNotValidException): ResponseEntity<*> {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
             ErrorResponse(
                 e.bindingResult.allErrors[0].defaultMessage.toString(),
@@ -37,8 +41,8 @@ class ErrorHandler {
         )
     }
 
-    @ExceptionHandler(value = [ConstraintViolationException::class])
-    protected fun handleConstraintViolation(
+    @ExceptionHandler(ValidationException::class)
+    fun validationExceptionHandler(
         e: ConstraintViolationException,
         request: WebRequest?
     ): ResponseEntity<Any?>? {
@@ -49,5 +53,19 @@ class ErrorHandler {
             )
         )
     }
+
+    @ExceptionHandler(MultipartException::class)
+    fun maxUploadSizeExceededException(
+        e: MaxUploadSizeExceededException
+    ): ResponseEntity<*> {
+        return ResponseEntity.badRequest().body(
+            ErrorResponse(
+                e.message.toString(),
+                e.cause.toString()
+            )
+        )
+    }
+
+
 
 }

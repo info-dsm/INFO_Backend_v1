@@ -1,14 +1,13 @@
 package com.info.info_v1_backend.global.error.filter
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.info.info_v1_backend.global.error.data.ErrorResponse
 import com.info.info_v1_backend.global.error.data.GlobalError
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.http.MediaType
 import org.springframework.web.filter.OncePerRequestFilter
 import javax.servlet.FilterChain
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
-
 
 class ExceptionFilter(
     private val objectMapper: ObjectMapper

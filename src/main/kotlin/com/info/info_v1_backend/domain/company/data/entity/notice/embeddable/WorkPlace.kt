@@ -2,6 +2,7 @@ package com.info.info_v1_backend.domain.company.data.entity.notice.embeddable
 
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.edit.EditWorkPlaceRequest
 import com.info.info_v1_backend.domain.company.business.dto.request.notice.register.WorkPlaceRequest
+import com.info.info_v1_backend.domain.company.exception.NotEmptyPlaceWIthNotSameWorkPlaceException
 import javax.persistence.Column
 import javax.persistence.Embeddable
 
@@ -19,6 +20,10 @@ class WorkPlace(
     @Column(name = "other_place", nullable = true)
     var otherPlace: String? = otherPlace
         protected set
+
+    init {
+        if (!this.isSameWithCompanyAddress && otherPlace.isNullOrEmpty()) throw NotEmptyPlaceWIthNotSameWorkPlaceException()
+    }
 
     fun toWorkPlaceRequest(): WorkPlaceRequest {
         return WorkPlaceRequest(

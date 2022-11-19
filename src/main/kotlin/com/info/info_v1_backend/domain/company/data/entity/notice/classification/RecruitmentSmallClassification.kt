@@ -1,7 +1,7 @@
 package com.info.info_v1_backend.domain.company.data.entity.notice.classification
 
 import com.info.info_v1_backend.domain.company.business.dto.response.notice.BigClassificationResponse
-import com.info.info_v1_backend.domain.company.business.dto.response.notice.SmallClassificationResponse
+import com.info.info_v1_backend.domain.company.business.dto.response.notice.ClassificationResponse
 import com.info.info_v1_backend.domain.company.data.entity.notice.recruitment.RecruitmentBusiness
 import com.info.info_v1_backend.global.base.entity.BaseTimeEntity
 import javax.persistence.*
@@ -25,8 +25,8 @@ class RecruitmentSmallClassification(
     @JoinColumn(name = "big_classifiction", nullable = false)
     val bigClassification: RecruitmentBigClassification = bigClassification
 
-    fun toSmallClassification(): SmallClassificationResponse {
-        return SmallClassificationResponse(
+    fun toClassificationResponse(): ClassificationResponse {
+        return ClassificationResponse(
             BigClassificationResponse(
                 this.bigClassification.name
             ),

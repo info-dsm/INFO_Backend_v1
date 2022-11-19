@@ -1,25 +1,33 @@
 package com.info.info_v1_backend.domain.auth.presentation.controller
 
 import com.info.info_v1_backend.domain.auth.business.dto.request.*
-import com.info.info_v1_backend.domain.auth.business.dto.response.MinimumStudent
 import com.info.info_v1_backend.domain.auth.business.service.AuthService
 import com.info.info_v1_backend.domain.auth.business.service.EmailService
-import com.info.info_v1_backend.domain.auth.business.dto.response.UserInfoResponse
-import com.info.info_v1_backend.domain.auth.business.service.UserService
+import com.info.info_v1_backend.domain.auth.data.entity.user.Student
+import com.info.info_v1_backend.domain.auth.data.entity.user.Teacher
 import com.info.info_v1_backend.domain.auth.data.entity.user.User
+import com.info.info_v1_backend.domain.auth.exception.CheckEmailCodeException
+import com.info.info_v1_backend.domain.auth.exception.CheckTeacherCodeException
+import com.info.info_v1_backend.domain.auth.exception.IncorrectEmail
 import com.info.info_v1_backend.domain.auth.exception.UserNotFoundException
-import com.info.info_v1_backend.domain.company.data.entity.company.Company
+import com.info.info_v1_backend.domain.company.exception.AlreadyExistsException
+import com.info.info_v1_backend.global.error.common.NoAuthenticationException
+import com.info.info_v1_backend.global.error.common.TokenCanNotBeNullException
 import com.info.info_v1_backend.global.security.jwt.data.TokenResponse
-import com.info.info_v1_backend.global.util.user.CurrentUtil
-import org.springframework.data.domain.Page
+import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.validation.annotation.Validated
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import javax.validation.Valid
+import javax.validation.constraints.Email
 import javax.validation.constraints.Pattern
 
 @RestController
@@ -28,61 +36,74 @@ import javax.validation.constraints.Pattern
 class AuthController(
     private val authService: AuthService,
     private val emailService: EmailService,
-    private val userService: UserService
 ) {
-    @PostMapping("/email/school")
-    fun sendSchoolEmail(
-        @RequestParam
-        @Pattern(regexp = "[a-zA-Z\\d+_.]+@dsm\\.hs\\.kr$")
-        email: String
-    ){
-        emailService.sendCodeToEmail(email)
+
+    @GetMapping("/email/code/check")
+    fun checkSchoolEmailCode(
+        @RequestParam(required =  true) email: String,
+        @RequestParam(required = true) code: String
+    ) {
+        if (!authService.checkSchoolEmailCode(email, code)) throw CheckEmailCodeException("$email $code")
     }
 
-    @PostMapping("/email/company")
-    fun sendCompanyEmail(
+    @GetMapping("/student/check")
+    fun studentKeyCheck(
+        @RequestParam(required = true) studentKey: String
+    ) {
+        if (authService.checkStudentKey(studentKey)) throw AlreadyExistsException(studentKey)
+    }
+
+
+    @PostMapping("/email/school")
+    @ResponseStatus(HttpStatus.CREATED)
+    fun sendSchoolEmail(
+        @Valid
         @RequestParam
+        @Pattern(regexp = "[a-zA-Z\\d+_.]+@dsm\\.hs\\.kr$", message = "올바른 이메일 형식이 아닙니다.")
         email: String
     ){
-        emailService.sendCodeToEmail(email)
+        emailService.sendCodeToSchoolEmail(email)
     }
 
     @PostMapping("/signup/student")
+    @ResponseStatus(HttpStatus.CREATED)
     fun studentSignup(
-        @RequestBody @Valid
+        @Valid
+        @RequestBody
         request: StudentSignUpRequest
-    ){
-        authService.studentSignUp(request)
+    ) {
+        if (!authService.checkStudentKey(request.studentKey)) {
+            if (authService.checkSchoolEmailAndDeleteCode(request.email, request.emailCheckCode)) {
+                authService.studentSignUp(request)
+            } else throw CheckEmailCodeException(request.emailCheckCode)
+        } else throw AlreadyExistsException(request.studentKey)
     }
-
     @PostMapping("/signup/teacher")
+    @ResponseStatus(HttpStatus.CREATED)
     fun teacherSignup(
-        @RequestBody @Valid
+        @Valid
+        @RequestBody
         request: TeacherSingUpRequest
     ){
-        authService.teacherSignUp(request)
-    }
-
-    @PostMapping("/signup/company")
-    fun companySignup(
-        @RequestBody request: CompanySignupRequest,
-        @RequestParam emailCheckCode: String
-    ) {
-        authService.companySignup(request, emailCheckCode)
+        if (authService.checkSchoolEmailAndDeleteCode(request.email, request.emailCheckCode)) {
+            if (authService.checkTeacherCode(request.teacherCheckCode)) {
+                authService.teacherSignUp(request)
+            } else throw CheckTeacherCodeException(request.teacherCheckCode)
+        } else throw CheckEmailCodeException(request.emailCheckCode)
     }
 
 
     @PostMapping("/password/code")
+    @ResponseStatus(HttpStatus.CREATED)
     fun sendPasswordCode(
-        @AuthenticationPrincipal user: User?
+        @RequestParam(required = true) email: String
     ){
-        emailService.sendPasswordCodeToEmail(
-            (user?: throw UserNotFoundException("No User Found")).email
-        )
+        emailService.sendPasswordCodeToEmail(email)
     }
 
     @PostMapping("/password")
     fun changePassword(
+        @Valid
         @RequestBody request: EditPasswordRequest,
         @AuthenticationPrincipal user: User?
     ){
@@ -94,6 +115,7 @@ class AuthController(
 
 
     @PostMapping("/login")
+    @ResponseStatus(HttpStatus.CREATED)
     fun login(
         @RequestBody
         request: LoginRequest
@@ -103,6 +125,7 @@ class AuthController(
 
 
     @PostMapping("/reissue")
+    @ResponseStatus(HttpStatus.CREATED)
     fun reissue(
         @RequestBody
         request: ReissueRequest
@@ -117,14 +140,29 @@ class AuthController(
 //        authService.deleteMe(user?: throw UserNotFoundException(""))
 //    }
 
-
-
-
-    @PostMapping("/changeEmail")
+    @PostMapping("/email")
+    fun sendChangeEmail(
+        @AuthenticationPrincipal
+        user: User?,
+        @RequestParam
+        @Email
+        email: String
+    ) {
+        if ((user ?: throw TokenCanNotBeNullException()) !is Student) {
+            if (user is Teacher) {
+                if (email.endsWith("@dsm.hs.kr")) {
+                    emailService.sendChangeEmailCodeToEmail(email)
+                } else throw IncorrectEmail(email)
+            }
+            else emailService.sendChangeEmailCodeToEmail(email)
+        } else throw NoAuthenticationException(user.roleList.toString())
+    }
+    @PatchMapping("/email")
     fun changeEmail(
-            @RequestBody request: ChangeEmailRequest,
-            @AuthenticationPrincipal user: User?
+        @Valid
+        @RequestBody request: ChangeEmailRequest,
+        @AuthenticationPrincipal user: User?
     ){
-        authService.changeEmail(user?: throw UserNotFoundException("No User Found"), request)
+        authService.changeEmail(user?: throw TokenCanNotBeNullException(), request)
     }
 }
